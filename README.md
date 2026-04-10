@@ -10,7 +10,7 @@
 |------|------|
 | **每日一问** | 首页轻触开始 → 摇动 → 揭晓 → 读诗/释义/建议；可选 AI 漫谈（需云开发）。 |
 | **自察分型** | 道性测验 → 十六型结果与自修提示；可重做，以最后一次为准。 |
-| **量化记录** | 自修页填睡眠、情绪等滑动项 → 保存 → 刷新分析得侧重点（非诊断）。 |
+| **量化记录** | 自修页填睡眠、情绪、恢复/耗竭、五行相关代理项等 → 保存；**五行雷达图** + 分轴卡片；**刷新分析**得带理由的排序建议（综合道性/档案/自选重点，非诊断）。 |
 | **档案与上下文** | 个人档案补齐箴言上下文项后，抽取时少打扰、建议与释义更贴情境。 |
 | **展馆** | 心象展馆按时间看「首获」图鉴；成就展馆用趣味条件解锁勋章，长按看评语。 |
 
@@ -26,10 +26,14 @@
 | 网络 | 天气使用 Open-Meteo，需在公众平台配置 request 合法域名 `https://api.open-meteo.com` |
 | 地理编码 | 档案地区保存后请求 `https://geocoding-api.open-meteo.com` 解析经纬度（与 forecast 同系列，需在合法域名中配置）；**不使用地图选点与定位权限** |
 
+**界面规范**：紫金墨配色、字体与按钮层级见 **`docs/UI_DESIGN_SYSTEM.md`**；在 Cursor 中开发本仓库 UI 时可启用技能 **`dao-ui-design`**（`.cursor/skills/dao-ui-design/SKILL.md`）。
+
 ### 目录结构（核心）
 
 ```
 wx_program/
+├── .cursor/skills/       # dao-ui-design：紫金墨 UI 技能（可选）
+├── docs/                 # UI_DESIGN_SYSTEM.md 等设计说明
 ├── behaviors/            # page-analytics：页面停留与跳转边
 ├── app.js / app.json / app.wxss
 ├── pages/
@@ -55,7 +59,9 @@ wx_program/
 │   ├── lot-art.js        # 配图 Canvas 绘制（按等第配色）
 │   ├── lot-display.js    # 释义展示偏好（简/详/白话分行等）
 │   ├── profile-lottery.js    # 抽取前档案是否「完整」
-│   ├── analysis.js       # 自修记录分析
+│   ├── analysis.js       # 自修分析入口（转发 cultivation-model）
+│   ├── cultivation-model.js  # 近窗评分卡 + recommendations / 阴阳模态等
+│   ├── five-elements-chart.js  # 五行雷达 Canvas + 计分与页脚免责文案
 │   ├── storage-keys.js   # 本地存储键名
 │   └── cloud-env.js      # 云环境 ID（若使用）
 └── project.config.json
@@ -195,10 +201,43 @@ wx_program/
 
 ---
 
-## 四、量化自修记录与分析
+## 四、量化自修记录、五行雷达与自修方案
 
-- 存储键：**`trackRecords_v1`**，结构为日记数组（字段以 `pages/track/track.js` 为准：如睡眠时长、生气次数、屏幕时间、步行、静坐等）。
-- **`utils/analysis.js`**：对**最近至多 7 条**做简单平均与规则文案，生成「自修侧重点」类说明，**非医疗诊断**。
+### 4.1 存储与兼容
+
+- **自修日记**：键 **`trackRecords_v1`**（`TRACK_RECORDS`），按日期一条；旧版本仅含睡眠、怒、烦、屏、走、静坐等字段时，读入后缺省项在 `track.js` 的 `formFromRecord` 中补默认，无需迁移脚本。
+- **自修重点（加权）**：键 **`trackPriorities_v1`**（`TRACK_PRIORITIES`），为最多 **3** 个维度 id（`sleep` / `emotion` / `energy` / `screen` / `body`），用于分析结果排序时的轻微加权；不选则各维度均衡。
+
+### 4.2 表单字段（今日记录）
+
+除原有 **睡眠、生气/强烦、烦恼登记、娱乐屏、步行、静坐/正念** 外，还包括（用于阴/阳画像与五行代理量）：
+
+| 字段（概念） | 说明 |
+|--------------|------|
+| 主观恢复感 | 1～5 |
+| 耗竭/支出感 | 1～5 |
+| 社交负荷 | 0～5 |
+| 今日主模态 | 思多 / 动多 / 言多 / 静多 / 杂（`phaseMode`） |
+| 主动留白/放空 | 分钟 |
+| 微行动完成 | 布尔 |
+
+### 4.3 自修方案分析：`cultivation-model.js`（经 `analysis.js` 导出）
+
+- **窗口**：默认取按日期升序数组的**最近 7 天**。
+- **输入**：`records` + 可选上下文 **`personalityResult_v1`**、**`userProfile_v2`**、**`trackPriorities_v1`**。
+- **输出**（供 `pages/track` 展示）：`title`、`lines`（摘要 bullet）、`focus`（一句话侧重点）、**`recommendations[]`**（每项含优先级、`title`、`adjust`、`reason`）、**`modules`**（阴阳读数、主模态、无为/留白摘要）、`meta.disclaimer`。
+- **逻辑类型**：可解释的阈值与加权评分（睡眠、情绪、屏、走动、恢复/耗竭、社交、模态比例、连续天数等），**非**黑盒模型；**非医疗诊断**。
+
+### 4.4 五行意象雷达：`five-elements-chart.js`
+
+- **展示**：`pages/track` 顶部卡片内 **旧版 Canvas**（`canvas-id` + `wx.createCanvasContext`）绘制**五边形网格 + 数据面**；顶点外缘仅标 **金、木、水、火、土** 单字，避免长文案重叠。
+- **顺序**：自正上**顺时针**为 **金 → 木 → 水 → 火 → 土**；图下 **分轴卡片** 列出该轴**分数**与**释义**（与 `rows` 顺序一致）。
+- **计分**：由近 7 天自填项与档案 **近况 `recentState`**、道性 **四维分数** 等综合加权，映射到五行–五脏–情志的**意象分数**；代码注释中引用维基百科综述条目（**Wuxing**、**Traditional Chinese medicine**、**Stress (biology)**）说明概念边界：**TCM 脏腑为功能模型，不等于西医解剖器官**。
+- **页脚**：自修页**最底部**小字号展示静态免责、参考文献链接与 `computeFiveElements` 返回的动态一句说明（如「基于近 N 天…」）。
+
+### 4.5 行为统计挂载
+
+- **`behaviors/page-analytics.js`**：在已挂载的页面 `pageLifetimes` 中调用 `usage-analytics` 的 `onPageShow` / `onPageHide`，与 `app.js` 生命周期共同写入 **`usageStats_v1`**。若该文件缺失会导致 `require` 报错，需与仓库一并保留。
 
 ---
 
@@ -218,6 +257,7 @@ wx_program/
 |----------|------|
 | `PERSONALITY_RESULT` | 道性测验最新结果 |
 | `TRACK_RECORDS` | 自修记录列表 |
+| `TRACK_PRIORITIES` | 自修页勾选的重点维度（最多 3 项），参与分析排序加权 |
 | `LOTTERY_TODAY` | 当日心象箴言缓存（lotId、revealed、adviceList、lotStylePref 等） |
 | `LOTTERY_HISTORY` | 历次生成时间线（ts、dateStr、lotId、tier、title），用于展馆与成就 |
 | `USER_PROFILE` | 个人档案与箴言上下文 |
@@ -298,7 +338,8 @@ wx_program/
 ## 九、版本与维护
 
 - 卦爻文案与等第映射调整时，同步检查 **`lots-data.js`**、**`lots.js`（`TIERS_BY_LOT_ID` 分布 8/16/24/10/6）**、**`fortune.js` / `lottery-advice.js`** 的注释与本文档第三节。
-- 展馆与成就规则变更时，同步 **`lottery-history.js`**（成就定义与统计逻辑）及本文档 **§3.8**。
+- 展馆与成就规则变更时，同步 **`lottery-history.js`**（成就定义与统计逻辑）及本文档 **3.8 节**。
+- 自修字段、五行计分或分析规则变更时，同步 **`track/*`**、**`cultivation-model.js`**、**`five-elements-chart.js`**、**`storage-keys.js`** 及本文档 **第四节**。
 - 若增加服务端同步，需在存储层引入 **用户唯一标识**（如 openid）并迁移读写逻辑，本文档「用户隔离」一节需改写。
 
 ### 后续可迭代（保持克制）

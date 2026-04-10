@@ -1,6 +1,33 @@
+/**
+ * 全局样式与「紫金墨」设计令牌（详见 docs/UI_DESIGN_SYSTEM.md）
+ * 新页面优先使用 var(--dao-*)，避免重复 hex。
+ */
 page {
-  background-color: #f5f0e8;
-  color: #2c2416;
+  /* —— 色彩 —— */
+  --dao-bg-page: #f5f0e8;
+  --dao-bg-card: #fffef8;
+  --dao-ink: #2c2416;
+  --dao-ink-muted: #6d5d4a;
+  --dao-ink-faint: #8d7b68;
+  --dao-ink-caption: #9a8b7a;
+  --dao-ink-body: #4a4034;
+  --dao-brown-warm: #5c4d3d;
+  --dao-purple-deep: #1a237e;
+  --dao-purple-mid: #3949ab;
+  --dao-purple-soft: #5c6bc0;
+  --dao-purple-tint: #7986cb;
+  --dao-ritual-purple-a: #3d2b69;
+  --dao-ritual-purple-b: #2a1f4a;
+  --dao-gold: #d4af37;
+  --dao-gold-pale: #e8d4a8;
+  --dao-gold-muted: #9a7b2e;
+  --dao-border-gold: rgba(212, 175, 55, 0.2);
+  --dao-border-gold-strong: rgba(212, 175, 55, 0.45);
+  --dao-shadow-purple: rgba(26, 35, 126, 0.08);
+  --dao-divider: #ece5d8;
+
+  background-color: var(--dao-bg-page);
+  color: var(--dao-ink);
   font-size: 28rpx;
   line-height: 1.6;
   box-sizing: border-box;
@@ -11,20 +38,21 @@ page {
 }
 
 .card {
-  background: #fffef8;
+  background: var(--dao-bg-card);
   border-radius: 20rpx;
   padding: 32rpx;
   margin: 24rpx;
-  box-shadow: 0 8rpx 32rpx rgba(26, 35, 126, 0.08);
-  border: 1rpx solid rgba(212, 175, 55, 0.2);
+  box-shadow: 0 8rpx 32rpx var(--dao-shadow-purple);
+  border: 1rpx solid var(--dao-border-gold);
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #3949ab 0%, #1a237e 100%);
+  background: linear-gradient(135deg, var(--dao-purple-mid) 0%, var(--dao-purple-deep) 100%);
   color: #fff;
   border-radius: 48rpx;
   padding: 24rpx 48rpx;
   font-size: 30rpx;
+  font-weight: 500;
   border: none;
 }
 
@@ -34,11 +62,12 @@ page {
 
 .btn-ghost {
   background: transparent;
-  color: #3949ab;
-  border: 2rpx solid #3949ab;
+  color: var(--dao-purple-mid);
+  border: 2rpx solid var(--dao-purple-mid);
   border-radius: 48rpx;
   padding: 20rpx 40rpx;
   font-size: 28rpx;
+  font-weight: 500;
 }
 
 .btn-ghost::after {
@@ -48,11 +77,11 @@ page {
 .title-lg {
   font-size: 40rpx;
   font-weight: 600;
-  color: #1a237e;
+  color: var(--dao-purple-deep);
 }
 
 .subtitle {
   font-size: 26rpx;
-  color: #6d5d4a;
+  color: var(--dao-ink-muted);
   margin-top: 12rpx;
 }

@@ -11,8 +11,8 @@
   left: 0;
   right: 0;
   z-index: 1000;
-  background: linear-gradient(180deg, #3d2b69 0%, #2a1f4a 100%);
-  border-bottom: 2rpx solid rgba(212, 175, 55, 0.45);
+  background: linear-gradient(180deg, var(--dao-ritual-purple-a) 0%, var(--dao-ritual-purple-b) 100%);
+  border-bottom: 2rpx solid var(--dao-border-gold-strong);
   box-sizing: border-box;
 }
 
@@ -27,7 +27,7 @@
   font-size: 34rpx;
   font-weight: 600;
   letter-spacing: 6rpx;
-  color: #e8d4a8;
+  color: var(--dao-gold-pale);
   text-shadow:
     0 0 20rpx rgba(180, 140, 60, 0.5),
     0 2rpx 0 rgba(60, 40, 20, 0.35);
