@@ -120,30 +120,6 @@
             <text class="b-title">建议</text>
             <text class="adv-line" wx:for="{{adviceList}}" wx:key="*this">{{item}}</text>
           </view>
-
-          <view class="block ai-block">
-            <text class="b-title">混元 · 延展漫谈</text>
-            <view
-              class="btn-ai {{aiExpandLoading ? 'btn-ai-disabled' : ''}}"
-              hover-class="btn-ai-hover"
-              bindtap="tapAiExpand"
-              wx:if="{{!aiExpandText && !aiExpandErr}}"
-            >
-              <text>生成延展漫谈（AI）</text>
-            </view>
-            <view
-              class="btn-ai {{aiExpandLoading ? 'btn-ai-disabled' : ''}}"
-              hover-class="btn-ai-hover"
-              bindtap="tapAiRegenerate"
-              wx:if="{{aiExpandText}}"
-            >
-              <text>重新生成</text>
-            </view>
-            <text class="ai-loading" wx:if="{{aiExpandLoading}}">生成中…</text>
-            <text class="ai-err" wx:if="{{aiExpandErr}}">{{aiExpandErr}}</text>
-            <text class="ai-body" wx:if="{{aiExpandText}}" selectable="{{true}}">{{aiExpandText}}</text>
-            <text class="ai-note">由腾讯混元大模型生成，仅供文化休闲阅读；上架需合规类目与备案，请勿替代专业意见。</text>
-          </view>
         </block>
 
         <text class="fine-print">仅供自察与行动参考，请勿替代专业帮助。</text>
