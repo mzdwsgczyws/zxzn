@@ -13,8 +13,8 @@ const { getLotById } = require('./lots.js')
 const { getHuangdaoPackage } = require('./almanac.js')
 const { fetchWeather } = require('./weather.js')
 const { computeLotteryAdvices } = require('./lottery-advice.js')
-const { drawLotArtWx } = require('./lot-art.js')
-const { ensureLotArtFont, FONT_FAMILY } = require('./lot-font.js')
+const { drawLotArtWx, buildLotArtOverlay } = require('./lot-art.js')
+const { ensureLotArtFont } = require('./lot-font.js')
 const { applyLotStylePref } = require('./lot-display.js')
 
 function todayStr() {
@@ -53,7 +53,8 @@ function lotteryDataDefaults() {
     tierColor: '#1565c0',
     adviceList: [],
     lotArtW: w,
-    lotArtH: h
+    lotArtH: h,
+    lotArtOverlay: null
   }
 }
 
@@ -74,7 +75,8 @@ function restoreToday(page, options) {
         lot,
         revealed: !!cache.revealed,
         tierColor: TIER_COLORS[lot.tier] || '#1565c0',
-        adviceList: cache.adviceList || []
+        adviceList: cache.adviceList || [],
+        lotArtOverlay: null
       },
       () => {
         if (cache.revealed) {
@@ -93,7 +95,8 @@ function restoreToday(page, options) {
     shakeHint: '摇动手机数次…',
     lot: null,
     revealed: false,
-    adviceList: []
+    adviceList: [],
+    lotArtOverlay: null
   })
   page.shakeAccum = 0
   page.lastShake = 0
@@ -235,7 +238,8 @@ function finalizeDraw(page, lat, lng, weather) {
       lot,
       revealed: false,
       tierColor: TIER_COLORS[lot.tier] || '#1565c0',
-      adviceList
+      adviceList,
+      lotArtOverlay: null
     })
   }, 900)
 }
@@ -282,7 +286,8 @@ function renderLotArt(page, retry) {
 
 function paintLotToCanvas(page, w, h, lot) {
   if (!lot || w < 2 || h < 2) return
-  const draw = (lishuOk) => {
+  const overlay = buildLotArtOverlay(lot, w, h)
+  const drawCanvas = () => {
     try {
       const ctx = wx.createCanvasContext(getCanvasId(page), page)
       drawLotArtWx(ctx, w, h, {
@@ -290,14 +295,17 @@ function paintLotToCanvas(page, w, h, lot) {
         title: lot.title,
         tierLabel: lot.tierLabel || '',
         tier: lot.tier,
-        lishuFontFamily: lishuOk ? FONT_FAMILY : ''
+        skipText: true
       })
       ctx.draw(false)
     } catch (e) {
       console.warn('lot canvas draw', e)
     }
   }
-  ensureLotArtFont().then(draw)
+  ensureLotArtFont().then(() => {
+    page.setData({ lotArtOverlay: overlay })
+    drawCanvas()
+  })
 }
 
 function simShake(page) {

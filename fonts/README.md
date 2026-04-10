@@ -18,3 +18,5 @@
 CTAN 上的官方 [fandol](https://ctan.org/pkg/fandol) 包仅含宋、黑、楷、仿等，**不包含**名为 FandolLi 的文件；若网上另有同名文件，请自行核对来源与授权后再使用。
 
 若未放置任何上述文件，配图文字将回退为系统默认字体。
+
+配图卦名与副标题使用页面上的 **cover-view** 叠在原生 canvas 之上显示（真机上旧版 canvas 无法可靠使用 `loadFontFace` 字体）。

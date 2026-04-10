@@ -85,3 +85,43 @@ page {
   color: var(--dao-ink-muted);
   margin-top: 12rpx;
 }
+
+/* 心象箴言配图：cover-view 叠在原生 canvas 上，隶书由 wx.loadFontFace 的 DaoLotLiShu 生效 */
+.lot-art-wrap {
+  position: relative;
+}
+
+.lot-art-cover-root {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 2;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.lot-art-title-cv,
+.lot-art-sub-cv {
+  position: absolute;
+  left: 0;
+  right: 0;
+  width: 100%;
+  text-align: center;
+  font-family: 'DaoLotLiShu', 'KaiTi', 'STKaiti', serif;
+  font-weight: normal;
+  box-sizing: border-box;
+  padding: 0 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lot-art-title-cv {
+  top: 46%;
+  transform: translateY(-50%);
+}
+
+.lot-art-sub-cv {
+  top: 80%;
+  transform: translateY(-50%);
+}
