@@ -1,13 +1,13 @@
 <view class="page">
   <view class="hero">
-    <text class="hero-title">首次结缘</text>
-    <text class="hero-sub">按第一次抽到该签的时间排序 · 共 {{rows.length}} / 64 支</text>
+    <text class="hero-title">首次收录</text>
+    <text class="hero-sub">按第一次收录该条的时间排序 · 共 {{rows.length}} / 64 条</text>
   </view>
 
   <view class="empty" wx:if="{{empty}}">
     <text class="empty-moon">☽</text>
     <text class="empty-title">展馆还是空的</text>
-    <text class="empty-body">在首页或灵签页成功求签后，每一支签「第一次」抽到的时间会出现在这里。</text>
+    <text class="empty-body">在首页或心象箴言页成功生成后，每一条「第一次」收录的时间会出现在这里。</text>
   </view>
 
   <scroll-view wx:else scroll-y class="list" enhanced="{{true}}">

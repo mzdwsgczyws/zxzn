@@ -1,5 +1,5 @@
 /**
- * 根据近日量化记录生成修行建议（观察与优化，非医疗建议）
+ * 根据近日量化记录生成自修建议（观察与优化，非医疗建议）
  */
 
 function avg(arr, key) {
@@ -71,7 +71,7 @@ function analyzeRecords(records) {
   lines.push('说明：本分析为自我观察辅助，情绪与睡眠持续困扰时请寻求专业帮助。')
 
   return {
-    title: `基于近 ${last7.length} 天记录的修行侧重点`,
+    title: `基于近 ${last7.length} 天记录的自修侧重点`,
     lines,
     focus: focus.length ? focus : ['继续保持记录习惯']
   }

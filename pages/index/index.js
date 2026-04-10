@@ -90,7 +90,7 @@ Page({
     const rpx2px = win.windowWidth / 750
     const navContentPx = Math.ceil(88 * rpx2px)
     const navTotal = sb + navContentPx
-    // 底部三入口：在约 1/7 屏高基础上再缩小 1/3（≈2/21 屏）；主区留给灵签滚动
+    // 底部三入口：在约 1/7 屏高基础上再缩小 1/3（≈2/21 屏）；主区留给心象箴言滚动
     const bottomPx = Math.max(68, Math.floor((win.windowHeight / 7) * (2 / 3)))
     const hallStripPx = Math.max(72, Math.floor(132 * rpx2px))
     const mainH = Math.max(200, win.windowHeight - navTotal - bottomPx - hallStripPx)
@@ -134,12 +134,12 @@ Page({
     recordShare('/pages/index/index')
     const { lot } = this.data
     return {
-      title: lot ? `今日灵签：${lot.tierLabel} · ${lot.title}` : '量化论道修身',
+      title: lot ? `今日心象箴言：${lot.tierLabel} · ${lot.title}` : '量化自修正念',
       path: '/pages/index/index'
     }
   },
 
-  /** 首页：点击后进入摇签感应 */
+  /** 首页：点击后进入摇动感应 */
   tapStartLottery() {
     const p = wx.getStorageSync(KEYS.USER_PROFILE) || {}
     if (!isLotteryProfileComplete(p)) {
@@ -147,9 +147,9 @@ Page({
       wx.showModal({
         title: '提示',
         content:
-          '完善个人档案可提高抽签准确性。若暂不完善，可先摇签，稍后在「个人档案」补充即可。',
+          '完善个人档案可提高匹配准确度。若暂不完善，可先摇动手机生成，稍后在「个人档案」补充即可。',
         confirmText: '去完善',
-        cancelText: '继续抽签',
+        cancelText: '继续抽取',
         success: (res) => {
           if (res.confirm) {
             wx.navigateTo({ url: '/pages/profile/profile' })
@@ -174,7 +174,7 @@ Page({
     core.simShake(this)
   },
 
-  /** 清除今日签并回到抽签入口 */
+  /** 清除当日缓存并回到抽取入口 */
   redrawLottery() {
     this.setData({ aiExpandText: '', aiExpandErr: '', aiExpandLoading: false })
     core.clearTodayAndReset(this, 'idle')
@@ -191,11 +191,11 @@ Page({
       {
         role: 'system',
         content:
-          '你是传统文化与自我观察方向的辅助写手。根据用户提供的灵签文案写 3～6 句延展漫谈，语气温和、口语化。禁止：断言吉凶命运、医疗心理咨询、违法违规与迷信恐吓。说明这是文化娱乐与自我提醒，非专业建议。'
+          '你是传统文化与自我观察方向的辅助写手。根据用户提供的心象箴言相关文案写 3～6 句延展漫谈，语气温和、口语化。禁止：断言吉凶命运、医疗心理咨询、违法违规与迷信恐吓。说明这是文化娱乐与自我提醒，非专业建议。'
       },
       {
         role: 'user',
-        content: `签题：${lot.title || ''}\n等第：${lot.tierLabel || lot.tier || ''}\n签诗：${poem}\n释义节选：${interpret}\n请直接输出正文，不要小标题。`
+        content: `标题：${lot.title || ''}\n等第：${lot.tierLabel || lot.tier || ''}\n诗句：${poem}\n释义节选：${interpret}\n请直接输出正文，不要小标题。`
       }
     ]
     const page = this

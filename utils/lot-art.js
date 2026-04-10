@@ -1,7 +1,7 @@
 /**
- * 灵签画意：使用微信小程序旧版 Canvas API（wx.createCanvasContext），
+ * 心象箴言配图：使用微信小程序旧版 Canvas API（wx.createCanvasContext），
  * 与 canvas-id 配合；避免 type="2d" 在部分基础库下合成失败只显示黑色。
- * 颜色一律 rgb/rgba；背景与装饰按签等等级配色。
+ * 颜色一律 rgb/rgba；背景与装饰按等第配色。
  */
 
 function wxStrokeRoundRect(ctx, x, y, rw, rh, radius, color, lw) {
@@ -31,7 +31,7 @@ function mulberry32(a) {
   }
 }
 
-/** 按签等等级配色：上上金、上红、中蓝、下灰、下下黑 */
+/** 按等第配色：上上金、上红、中蓝、下灰、下下黑 */
 function getTierTheme(tier) {
   const t = tier || '中'
   if (t === '上上') {
@@ -155,7 +155,7 @@ function drawCornerMarksWx(ctx, w, h, id, strokeColor) {
  */
 function drawLotArtWx(ctx, w, h, lot) {
   const id = lot.id != null ? lot.id : 0
-  const title = lot.title || '签'
+  const title = lot.title || '箴'
   const titleLen = Array.from(title).length
   const theme = getTierTheme(lot.tier)
 
@@ -225,7 +225,7 @@ function drawLotArtWx(ctx, w, h, lot) {
   ctx.setTextBaseline('middle')
   ctx.fillText(title, cx, cy)
 
-  const sub = `${lot.tierLabel || ''} · 第${id + 1}签`
+  const sub = `${lot.tierLabel || ''} · 第${id + 1}条`
   ctx.setFontSize(Math.max(10, Math.floor(Math.min(w, h) * 0.062)))
   ctx.setFillStyle(theme.sub)
   ctx.fillText(sub, cx, h * 0.8)

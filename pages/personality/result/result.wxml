@@ -3,7 +3,7 @@
     <text class="retest-link" bindtap="retest">重新测验</text>
   </view>
   <view class="banner">
-    <text class="tip">你当前更接近以下状态（非固定标签，可随修行与境遇变化）</text>
+    <text class="tip">你当前更接近以下状态（非固定标签，可随自修与境遇变化）</text>
   </view>
 
   <view class="card main-card">
@@ -30,7 +30,7 @@
       <text class="li" wx:for="{{result.risks}}" wx:key="*this">· {{item}}</text>
     </view>
     <view class="section">
-      <text class="sec-title">修行建议</text>
+      <text class="sec-title">自修建议</text>
       <text class="li" wx:for="{{result.advice}}" wx:key="*this">· {{item}}</text>
     </view>
     <view class="section">

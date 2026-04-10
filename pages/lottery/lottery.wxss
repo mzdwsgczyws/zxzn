@@ -123,7 +123,7 @@
   font-style: italic;
 }
 
-/* 签图区域：约一屏高度的 1/5，介于诗句与释义之间 */
+/* 配图区域：约一屏高度的 1/5，介于诗句与释义之间 */
 .lot-art-wrap {
   width: 100%;
   height: 20vh;
@@ -136,7 +136,7 @@
   box-shadow: 0 10rpx 28rpx rgba(26, 35, 126, 0.15);
 }
 
-/* 宽高由 lotArtW/lotArtH（px）与内联 style 指定；签图使用 canvas-id 旧版接口绘制 */
+/* 宽高由 lotArtW/lotArtH（px）与内联 style 指定；配图使用 canvas-id 旧版接口绘制 */
 .lot-art-canvas {
   display: block;
 }

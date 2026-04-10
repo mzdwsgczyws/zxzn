@@ -1,5 +1,5 @@
 /**
- * 今日灵签：首页与 lottery 页共用（同一份本地缓存）
+ * 今日心象箴言：首页与 lottery 页共用（同一份本地缓存）
  */
 
 const KEYS = require('./storage-keys.js')
@@ -143,7 +143,7 @@ function readProfileLatLng() {
 }
 
 function drawLot(page) {
-  page.setData({ phase: 'anim', shaking: true, shakeHint: '签筒已动，请稍候…' })
+  page.setData({ phase: 'anim', shaking: true, shakeHint: '内容生成中，请稍候…' })
   const { lat, lng } = readProfileLatLng()
   if (lat != null && lng != null) {
     fetchWeather(lat, lng).then((w) => {

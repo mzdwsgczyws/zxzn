@@ -1,5 +1,5 @@
 /**
- * 灵签抽签历史：每次出签追加一条，供灵签展馆 / 成就展馆使用。
+ * 心象箴言抽取历史：每次生成后追加一条，供心象展馆 / 成就展馆使用。
  */
 
 const KEYS = require('./storage-keys.js')
@@ -171,119 +171,118 @@ function buildAchievementState(draws) {
 const ACHIEVEMENT_DEFS = [
   {
     id: 'first_draw',
-    name: '初入签筒',
-    subtitle: '第一次成功求签',
+    name: '初启心象',
+    subtitle: '第一次成功生成一条心象箴言',
     accent: 'gold',
     test: (s) => s.drawCount >= 1,
-    comment:
-      '恭喜你第一次摇动灵签！展馆的灯从此为你亮了一盏——以后每一次缘分都会写进这里。',
-    commentLocked: '去首页摇一支签，成就就从这里开始啦。'
+    comment: '第一次收录完成！展馆里多了一条时间戳——以后每次生成都会留在这里。',
+    commentLocked: '去首页轻触开始并完成一次摇动，成就就从这里亮起。'
   },
   {
     id: 'draws_10',
-    name: '十签之约',
-    subtitle: '累计抽签满 10 次',
+    name: '十次心象',
+    subtitle: '累计生成满 10 次',
     accent: 'violet',
     test: (s) => s.drawCount >= 10,
-    comment: '十次求问，十次回响。你已经是个老熟客了，签筒都记得你的手感。',
-    commentLocked: '再抽几次，签缘攒满十位数就能解锁。'
+    comment: '十次下来，你对这些句子应该已经有点「脸熟」了——习惯记录本身就是收获。',
+    commentLocked: '再多生成几次，累计到十次就能解锁。'
   },
   {
     id: 'draws_30',
     name: '三十昼夜',
-    subtitle: '累计抽签满 30 次',
+    subtitle: '累计生成满 30 次',
     accent: 'violet',
     test: (s) => s.drawCount >= 30,
-    comment: '三十签下来，运势曲线都快能画成心电图了——坚持本身就是一种答案。',
-    commentLocked: '细水长流，签数到了自然解锁。'
+    comment: '三十次坚持打卡，像在做一本私人情绪手账——节奏比单次结果更重要。',
+    commentLocked: '细水长流，次数到了自然解锁。'
   },
   {
     id: 'first_shangshang',
-    name: '首遇上上',
-    subtitle: '曾抽到过「上上」等第',
+    name: '首遇「上上」',
+    subtitle: '曾得到过「上上」等第',
     accent: 'gold',
     test: (s) => !!s.tiersSeen['上上'],
-    comment: '第一支上上签到手！今日宜开心三秒，再该干嘛干嘛——好运也要配行动呀。',
-    commentLocked: '上上签在等你，多来几日缘分到了就遇见。'
+    comment: '第一次遇到「上上」档——开心几秒就好，接下来照旧把小事做完。',
+    commentLocked: '多试几天，等第分布里会出现「上上」。'
   },
   {
     id: 'first_xiaxia',
-    name: '首遇下下',
-    subtitle: '曾抽到过「下下」等第',
+    name: '首遇「下下」',
+    subtitle: '曾得到过「下下」等第',
     accent: 'slate',
     test: (s) => !!s.tiersSeen['下下'],
     comment:
-      '哇，下下签也让你遇见了？别慌，签文是提醒不是判决，喝杯热水压压惊，明天又是新卦。',
-    commentLocked: '这条成就……解锁了再告诉你评语（坏笑）。'
+      '「下下」档也碰上了？把它当语气偏重的提醒就好，喝口水、睡一觉，明天重新翻页。',
+    commentLocked: '解锁后再来看这条的碎碎念。'
   },
   {
     id: 'calendar_3_upper',
-    name: '三日祥云',
-    subtitle: '连续三个「日历日」抽到上或上上',
+    name: '三日晴心',
+    subtitle: '连续三个日历日均为上或上上',
     accent: 'rose',
     test: (s) => s.calendarUpperRun >= 3,
-    comment: '连续三天签运都在高位飘，像是老天爷连发三个赞——记得别飘太高，脚踏实地更稳。',
-    commentLocked: '试着让连续几天都抽到上签，祥云成就就会出现。'
+    comment: '连续三天档位偏高——心情不错时更要把脚落在地上，别一次塞太多任务。',
+    commentLocked: '让连续几个日历日都落在「上」或「上上」档，就能点亮。'
   },
   {
     id: 'calendar_3_lower',
     name: '三日砺心',
-    subtitle: '连续三个「日历日」抽到下或下下',
+    subtitle: '连续三个日历日均为下或下下',
     accent: 'slate',
     test: (s) => s.calendarLowerRun >= 3,
     comment:
-      '你可真是太「稳」了——连续三天都不太轻松？不过苦尽会甘来，签文只是让你慢下来自检一下。',
-    commentLocked: '这条成就希望你永远别解锁……但若解锁了，说明你真的需要抱抱自己。'
+      '连续几天档位偏低？先照顾睡眠和饮食，把节奏放慢——句子只是在帮你喊停。',
+    commentLocked: '若连续多日落在低位档，记得对自己温柔一点。'
   },
   {
     id: 'streak_draw_upper3',
     name: '连中三元',
-    subtitle: '连续三次抽签均为上或上上',
+    subtitle: '连续三次生成均为上或上上',
     accent: 'gold',
     test: (s) => s.drawUpperStreak >= 3,
-    comment: '三连高位！手气热得像刚开锅的汤圆——趁热打铁，但别贪多哦。',
-    commentLocked: '连续三次抽签都拿到上签，就能召唤这条成就。'
+    comment: '三连高位！趁热把一件小事收尾，但别一口气开太多新坑。',
+    commentLocked: '连续三次生成都落在「上」或「上上」档即可解锁。'
   },
   {
     id: 'streak_draw_lower3',
     name: '逆风三连',
-    subtitle: '连续三次抽签均为下或下下',
+    subtitle: '连续三次生成均为下或下下',
     accent: 'slate',
     test: (s) => s.drawLowerStreak >= 3,
-    comment: '三连低位……签筒是不是在跟你开玩笑？去晒晒太阳、走两步，换换手气。',
-    commentLocked: '（希望你用不上）连续三次下签时解锁。'
+    comment: '三连低位……出门晒晒太阳、走十分钟，比盯着屏幕反复想更管用。',
+    commentLocked: '（但愿用不上）连续三次落在低位档时出现。'
   },
   {
     id: 'collect_all_shangshang',
     name: '上上圆满',
-    subtitle: '集齐全部 8 种「上上」卦签（各至少见过一次）',
+    subtitle: '全部 8 条「上上」档条目各至少见过一次',
     accent: 'gold',
     test: (s) => s.hasAllShangshangLots,
-    comment: '八种上上全齐！你是签王本王了，建议低调炫耀，别让朋友眼红。',
-    commentLocked: '把八种不同的上上签都抽到过一遍，展馆会为你放小烟花。'
+    comment: '八种「上上」档都收录齐了——可以悄悄得意一下，然后继续过平常日子。',
+    commentLocked: '把八种不同的「上上」档条目各遇到一次即可解锁。'
   },
   {
     id: 'collect_all_xiaxia',
     name: '下下通鉴',
-    subtitle: '集齐全部 6 种「下下」卦签',
+    subtitle: '全部 6 条「下下」档条目各至少见过一次',
     accent: 'slate',
     test: (s) => s.hasAllXiaxiaLots,
-    comment: '六种下下都见过了……全集通关！接下来该转运了，我掐指一算你是后期型选手。',
-    commentLocked: '六种下下签各见一次——集邮癖的黑暗版。'
+    comment: '六种「下下」档都见过了——像集齐一套稀有贴纸，接下来该换换心情啦。',
+    commentLocked: '六种「下下」档条目各见一次即可解锁。'
   },
   {
     id: 'full_64',
-    name: '六十四缘',
-    subtitle: '六十四卦签全部至少抽到过一次',
+    name: '六十四象',
+    subtitle: '64 条条目全部至少生成过一次',
     accent: 'gold',
     test: (s) => s.uniqueLots >= 64,
-    comment: '六十四签全图鉴！周易在你面前都得鞠个躬——这是耐心与缘分的双重勋章。',
-    commentLocked: '路还长，但每多一支新签，你就离「圆满」更近一步。'
+    comment: '六十四条全收录！这是耐心与好奇叠出来的勋章，值得给自己点个赞。',
+    commentLocked: '每多一条新条目，就离「全图鉴」更近一步。'
   },
   {
     id: 'five_tiers',
     name: '五档皆尝',
-    subtitle: '五种等第都抽到过',
+    subtitle: '五种等第都曾出现过',
     accent: 'blue',
     test: (s) =>
       !!s.tiersSeen['上上'] &&
@@ -291,53 +290,53 @@ const ACHIEVEMENT_DEFS = [
       !!s.tiersSeen['中'] &&
       !!s.tiersSeen['下'] &&
       !!s.tiersSeen['下下'],
-    comment: '酸甜苦辣咸（签版）全尝过了，人生样本齐全，可以写回忆录第一章。',
-    commentLocked: '多抽签，把五种等第都体验一遍。'
+    comment: '五个档位都见过了——像尝遍五味，样本齐了，观察会更有趣。',
+    commentLocked: '多生成几次，把五种等第都体验一遍。'
   },
   {
     id: 'repeat_lot',
-    name: '故签重来',
-    subtitle: '同一支签抽到至少两次',
+    name: '故象重来',
+    subtitle: '同一条目至少生成过两次',
     accent: 'amber',
     test: (s) => s.maxSameLot >= 2,
-    comment: '又见面了老熟人！签文复读不是bug，是提醒你别忘了上次悟到的那句。',
-    commentLocked: '同一卦再来一次时解锁——缘分会轮回。'
+    comment: '又抽到同一条？也许是提醒你别忘了上次读到时的那点心意。',
+    commentLocked: '同一条目再次出现时会解锁。'
   },
   {
     id: 'triple_same_lot',
     name: '三见故知',
-    subtitle: '同一支签抽到至少三次',
+    subtitle: '同一条目至少生成过三次',
     accent: 'amber',
     test: (s) => s.maxSameLot >= 3,
-    comment: '三连撞签！宇宙在对你按喇叭：这件事，真的要上心啦。',
-    commentLocked: '同一支签第三次出现时解锁，留意那个反复出现的卦名。'
+    comment: '同一条连着三次露面——像便签贴在冰箱上：这件事，该认真看一眼了。',
+    commentLocked: '同一条目第三次出现时会解锁，留意反复出现的标题。'
   },
   {
     id: 'week_draw_streak',
     name: '七日不断',
-    subtitle: '连续 7 个日历日都有抽签记录',
+    subtitle: '连续 7 个日历日都有生成记录',
     accent: 'rose',
     test: (s) => s.drawDayStreak >= 7,
-    comment: '整整一周天天问签，仪式感拉满——记得也给生活留点「无签日」喘口气。',
-    commentLocked: '连续七天，每天都要来抽一签哦。'
+    comment: '连续一周天天打开——仪式感很足，也记得留几天完全不看，给大脑留白。',
+    commentLocked: '连续七个日历日，每天都有生成记录即可。'
   },
   {
     id: 'unique_16',
-    name: '十六初缘',
-    subtitle: '至少抽到过 16 种不同的签',
+    name: '十六初象',
+    subtitle: '至少生成过 16 种不同条目',
     accent: 'blue',
     test: (s) => s.uniqueLots >= 16,
-    comment: '十六卦初识，签筒里的朋友圈正在扩容——继续探索剩下四十八位网友。',
-    commentLocked: '多抽不同的签，种类凑满十六就能点亮。'
+    comment: '十六条不重复——图鉴正在变厚，剩下的慢慢逛就好。',
+    commentLocked: '多遇到不同条目，种类凑满十六就能点亮。'
   },
   {
     id: 'middle_master',
     name: '中庸达人',
-    subtitle: '至少 8 次抽签全部为「中」',
+    subtitle: '累计至少 8 次生成，且全部为「中」',
     accent: 'blue',
     test: (s) => s.allMiddleLong,
-    comment: '八连「中」！你这是在走极致中庸路线吗？稳得像秤砣，偶尔也可以冲动一下。',
-    commentLocked: '连续很多次都抽到「中」签——难度不低，佛系玩家专属。'
+    comment: '八连「中」！稳得像节拍器——偶尔也可以故意「跑调」一下换换心情。',
+    commentLocked: '连续很多次都落在「中」档——佛系玩家专属彩蛋。'
   }
 ]
 
@@ -356,7 +355,7 @@ function getFirstUnlockListSorted() {
       return {
         lotId: d.lotId | 0,
         title: d.title || lot.title,
-        name: lot.name || `${d.title}·第${(d.lotId | 0) + 1}签`,
+        name: lot.name || `${d.title}·第${(d.lotId | 0) + 1}条`,
         tier: d.tier,
         ts: d.ts,
         dateTimeLabel: formatDateTime(d.ts),
@@ -377,7 +376,7 @@ function computeAchievements() {
       subtitle: def.subtitle,
       accent: def.accent,
       unlocked,
-      comment: unlocked ? def.comment : def.commentLocked || '继续抽签，缘分到了自然解锁。'
+      comment: unlocked ? def.comment : def.commentLocked || '继续抽取心象箴言，条件满足时会自动解锁。'
     }
   })
   const unlockedCount = list.filter((x) => x.unlocked).length

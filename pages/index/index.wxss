@@ -49,7 +49,7 @@
   box-sizing: border-box;
 }
 
-/* —— 未抽签 —— */
+/* —— 未抽取 —— */
 .lot-idle {
   display: flex;
   flex-direction: column;
@@ -112,7 +112,7 @@
   line-height: 1.65;
 }
 
-/* —— 摇签舞台 —— */
+/* —— 摇动舞台 —— */
 .lot-stage {
   display: flex;
   flex-direction: column;
@@ -368,7 +368,7 @@
   line-height: 1.45;
 }
 
-/* —— 灵签 / 成就 圆形入口（贴在底栏上方） —— */
+/* —— 心象展馆 / 成就 圆形入口（贴在底栏上方） —— */
 .hall-strip {
   position: fixed;
   left: 0;

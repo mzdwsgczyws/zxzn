@@ -1,23 +1,23 @@
 <view class="page">
   <view class="card">
-    <text class="title-lg">用于签运与解读（仅存本机）</text>
-    <text class="subtitle">用于灵签与建议的个性化参考；未填写的项不会使用。以下带「签运增强」的项填齐后，抽签将不再提示完善档案。</text>
+    <text class="title-lg">用于箴言上下文与解读（仅存本机）</text>
+    <text class="subtitle">用于心象箴言与建议的个性化参考；未填写的项不会使用。以下带「箴言上下文」的项填齐后，抽取时将不再提示完善档案。</text>
 
     <view class="field section-gap">
-      <text class="label">近期状态（签运增强）</text>
+      <text class="label">近期状态（箴言上下文）</text>
       <text class="loc-hint">自评近几日整体状态，非医疗记录。</text>
       <picker mode="selector" range="{{recentLabels}}" value="{{recentIndex}}" bindchange="onRecentPick">
         <view class="picker-val">{{recentLabels[recentIndex]}}</view>
       </picker>
     </view>
     <view class="field">
-      <text class="label">作息倾向（签运增强）</text>
+      <text class="label">作息倾向（箴言上下文）</text>
       <picker mode="selector" range="{{rhythmLabels}}" value="{{rhythmIndex}}" bindchange="onRhythmPick">
         <view class="picker-val">{{rhythmLabels[rhythmIndex]}}</view>
       </picker>
     </view>
     <view class="field">
-      <text class="label">近期关注领域（可多选，签运增强）</text>
+      <text class="label">近期关注领域（可多选，箴言上下文）</text>
       <text class="loc-hint">只选大类，不必填写具体事由。</text>
       <view class="tag-row">
         <view
@@ -32,7 +32,7 @@
       </view>
     </view>
     <view class="field">
-      <text class="label">签文释义展示偏好（签运增强）</text>
+      <text class="label">释义展示偏好（箴言上下文）</text>
       <picker mode="selector" range="{{styleLabels}}" value="{{styleIndex}}" bindchange="onStylePick">
         <view class="picker-val">{{styleLabels[styleIndex]}}</view>
       </picker>
@@ -40,7 +40,7 @@
 
     <view class="field">
       <text class="label">年龄</text>
-      <input class="input" type="number" placeholder="不填则签运中跳过年龄分支" value="{{age}}" bindinput="onAge" />
+      <input class="input" type="number" placeholder="不填则生成建议时跳过年龄分支" value="{{age}}" bindinput="onAge" />
     </view>
     <view class="field">
       <text class="label">性别</text>
@@ -99,14 +99,14 @@
   </view>
 
   <view class="card muted-card">
-    <text class="muted">未完成道性测验时，签文建议会略偏通用；测验后通常更贴个人状态。</text>
+    <text class="muted">未完成道性测验时，箴言建议会略偏通用；测验后通常更贴个人状态。</text>
   </view>
 
   <view class="card hall-links-card">
     <text class="title-lg hall-links-title">展馆</text>
-    <text class="subtitle hall-links-sub">查看已结缘卦签与签缘成就（与首页入口相同）。</text>
+    <text class="subtitle hall-links-sub">查看已收录条目与心象成就（与首页入口相同）。</text>
     <view class="hall-links-row">
-      <button class="btn-ghost hall-link-btn" bindtap="goLotHall">灵签展馆</button>
+      <button class="btn-ghost hall-link-btn" bindtap="goLotHall">心象展馆</button>
       <button class="btn-ghost hall-link-btn" bindtap="goAchieveHall">成就展馆</button>
     </view>
   </view>

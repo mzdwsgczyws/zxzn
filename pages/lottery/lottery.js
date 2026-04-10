@@ -28,9 +28,9 @@ Page({
       wx.showModal({
         title: '提示',
         content:
-          '完善个人档案可提高抽签准确性。若暂不完善，可先摇签，稍后在「个人档案」补充即可。',
+          '完善个人档案可提高匹配准确度。若暂不完善，可先摇动手机生成，稍后在「个人档案」补充即可。',
         confirmText: '去完善',
-        cancelText: '继续抽签',
+        cancelText: '继续抽取',
         success: (res) => {
           if (res.confirm) {
             wx.navigateTo({ url: '/pages/profile/profile' })
@@ -59,7 +59,7 @@ Page({
     recordShare('/pages/lottery/lottery')
     const { lot } = this.data
     return {
-      title: lot ? `今日灵签：${lot.tierLabel} · ${lot.title}` : '今日灵签 · 量化论道修身',
+      title: lot ? `今日心象箴言：${lot.tierLabel} · ${lot.title}` : '今日心象箴言 · 量化自修正念',
       path: '/pages/lottery/lottery'
     }
   },
@@ -68,7 +68,7 @@ Page({
     recordShare('timeline:lottery')
     const { lot } = this.data
     return {
-      title: lot ? `今日灵签 · ${lot.tierLabel} · ${lot.title}` : '今日灵签 · 量化论道修身'
+      title: lot ? `今日心象箴言 · ${lot.tierLabel} · ${lot.title}` : '今日心象箴言 · 量化自修正念'
     }
   },
 

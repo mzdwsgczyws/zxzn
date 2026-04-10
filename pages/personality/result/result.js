@@ -114,7 +114,7 @@ Page({
 
     ctx.setFillStyle('#a0907c')
     ctx.setFontSize(14)
-    ctx.fillText('道性修行 · 仅供文化参考', 28, H - 28)
+    ctx.fillText('道性自修 · 仅供文化参考', 28, H - 28)
 
     ctx.draw(false, () => {
       setTimeout(() => {
@@ -190,7 +190,7 @@ Page({
     y += 24
     ctx.setFillStyle('#3949ab')
     ctx.setFontSize(26)
-    ctx.fillText('修行建议（摘录）', 56, y)
+    ctx.fillText('自修建议（摘录）', 56, y)
     y += 40
     ctx.setFillStyle('#4a4034')
     ctx.setFontSize(22)
@@ -201,7 +201,7 @@ Page({
 
     ctx.setFillStyle('#a0907c')
     ctx.setFontSize(20)
-    ctx.fillText('道性修行小程序 · 仅供文化参考', 56, H - 56)
+    ctx.fillText('量化自修正念 · 仅供文化参考', 56, H - 56)
 
     ctx.draw(false, () => {
       setTimeout(() => {

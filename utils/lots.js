@@ -1,7 +1,7 @@
 /**
- * 64 签：上上 8、上 16、中 24、下 10、下下 6；文案见 lots-data.js
+ * 64 条：上上 8、上 16、中 24、下 10、下下 6；文案见 lots-data.js
  *
- * 等第按「签诗 + 释义」整体语气与常见卦象吉凶对齐，不再用 lotId 连续区间硬切，
+ * 等第按「诗句 + 释义」整体语气与常见卦象吉凶对齐，不再用 lotId 连续区间硬切，
  * 避免出现「讼、否、剥」等偏警示文案却标上上/上之类错位。
  * 下标与 lots-data 一致（周易六十四卦序）。
  */
@@ -107,7 +107,7 @@ function buildLots() {
       tier,
       tierLabel: tier,
       title: raw.title,
-      name: `${raw.title}·第${id + 1}签`,
+      name: `${raw.title}·第${id + 1}条`,
       poem: raw.poem,
       interpret: raw.interpret
     })

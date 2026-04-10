@@ -1,7 +1,7 @@
 <view class="home">
   <view class="custom-nav" style="padding-top: {{statusBarH}}px;">
     <view class="nav-inner">
-      <text class="nav-title">量化论道修身</text>
+      <text class="nav-title">量化自修正念</text>
     </view>
   </view>
 
@@ -13,38 +13,38 @@
       class="lot-scroll"
       style="height: {{mainScrollH}}px;"
     >
-      <!-- 未抽签：居中入口 -->
+      <!-- 未抽取：居中入口 -->
       <view class="lot-panel lot-idle" wx:if="{{phase === 'idle'}}">
         <view class="idle-warm-wrap">
-          <text class="idle-warm-tip">今日还未抽取灵签，快来抽一支试试吧！</text>
+          <text class="idle-warm-tip">今日还未抽取心象箴言，轻触开始试一试吧。</text>
         </view>
         <view class="idle-deco">
           <text class="idle-moon">☽</text>
         </view>
-        <text class="idle-tag">今日灵签</text>
-        <button class="idle-btn" bindtap="tapStartLottery">轻触启签 · 摇晃感应</button>
-        <text class="idle-hint">点击按钮后将感应手机摇动，约 12 次有效晃动后出签</text>
+        <text class="idle-tag">今日心象箴言</text>
+        <button class="idle-btn" bindtap="tapStartLottery">轻触开始 · 摇动揭晓</button>
+        <text class="idle-hint">点击按钮后感应手机摇动，约 12 次有效晃动后生成当日一条</text>
       </view>
 
-      <!-- 摇签中 / 动画 -->
+      <!-- 摇动中 / 动画 -->
       <view class="lot-panel lot-stage" wx:if="{{phase === 'shake' || phase === 'anim'}}">
         <view class="tube-wrap {{shaking ? 'shaking' : ''}}">
           <view class="tube"></view>
           <view class="sticks"></view>
         </view>
         <text class="shake-tip">{{shakeHint}}</text>
-        <text class="sim-tip" wx:if="{{phase === 'shake'}}" bindtap="simShake">模拟器无感应？点此出签</text>
+        <text class="sim-tip" wx:if="{{phase === 'shake'}}" bindtap="simShake">模拟器无感应？点此完成生成</text>
       </view>
 
-      <!-- 已出签 -->
+      <!-- 已生成 -->
       <view class="lot-panel lot-result" wx:if="{{phase === 'result'}}">
         <view class="result-head">
           <text class="tier" style="color: {{tierColor}};">{{lot.tierLabel}}</text>
-          <button class="btn-redraw" size="mini" bindtap="redrawLottery">重新抽签</button>
+          <button class="btn-redraw" size="mini" bindtap="redrawLottery">重新抽取</button>
         </view>
         <text class="lot-name" wx:if="{{revealed}}">{{lot.name}}</text>
         <view class="sealed" wx:else bindtap="reveal">
-          <text class="sealed-text">签文已就 · 点击查看</text>
+          <text class="sealed-text">箴言已就绪 · 点击查看</text>
         </view>
 
         <block wx:if="{{revealed}}">
@@ -91,7 +91,7 @@
           </view>
         </block>
 
-        <text class="fine-print">仅供自察与行愿参考，请勿替代专业帮助。</text>
+        <text class="fine-print">仅供自察与行动参考，请勿替代专业帮助。</text>
       </view>
     </scroll-view>
 
@@ -100,8 +100,8 @@
       <view class="hall-btns">
         <view class="hall-col" hover-class="hall-col-hover" bindtap="goLotHall">
           <view class="hall-circle hall-c1">
-            <text class="hall-circle-icon">签</text>
-            <text class="hall-circle-t">灵签展馆</text>
+            <text class="hall-circle-icon">箴</text>
+            <text class="hall-circle-t">心象展馆</text>
           </view>
           <text class="hall-meta">{{hallLotN}}/64</text>
         </view>
@@ -113,7 +113,7 @@
           <text class="hall-meta">{{hallAchUnlocked}}/{{hallAchTotal}}</text>
         </view>
       </view>
-      <text class="hall-whisper">首次结缘入库 · 成就长按趣评</text>
+      <text class="hall-whisper">首次收录入库 · 成就长按趣评</text>
     </view>
 
     <view class="bottom-dock" style="height: {{bottomBarH}}px;">
@@ -122,7 +122,7 @@
       </view>
       <view class="dock-divider"></view>
       <view class="dock-btn" hover-class="dock-btn-hover" bindtap="goTrack">
-        <text class="dock-btn-text">修行记录</text>
+        <text class="dock-btn-text">自修记录</text>
       </view>
       <view class="dock-divider"></view>
       <view class="dock-btn" hover-class="dock-btn-hover" bindtap="goProfile">

@@ -42,8 +42,8 @@
   </view>
 
   <view class="card" wx:else>
-    <text class="muted">保存记录后，点击下方生成基于近几日数据的修行侧重点。</text>
-    <button class="btn-primary" bindtap="runAnalysis">生成修行方案</button>
+    <text class="muted">保存记录后，点击下方生成基于近几日数据的自修侧重点。</text>
+    <button class="btn-primary" bindtap="runAnalysis">生成自修方案</button>
   </view>
 
   <view class="card" wx:if="{{records.length}}">

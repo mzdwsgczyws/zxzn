@@ -1,6 +1,6 @@
 <view class="page">
   <view class="hero">
-    <text class="hero-title">签缘成就</text>
+    <text class="hero-title">心象成就</text>
     <text class="hero-sub">长按成就块查看趣味评语 · 松开即消失</text>
     <view class="progress-wrap">
       <view class="progress-bar">
@@ -34,7 +34,7 @@
 
   <view class="press-layer" wx:if="{{pressVisible}}">
     <view class="press-panel">
-      <text class="press-title">签师碎碎念</text>
+      <text class="press-title">趣评碎碎念</text>
       <text class="press-body">{{pressComment}}</text>
     </view>
   </view>
