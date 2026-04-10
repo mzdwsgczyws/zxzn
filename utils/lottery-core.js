@@ -3,6 +3,9 @@
  */
 
 const KEYS = require('./storage-keys.js')
+
+/** 有效摇动累计次数达标后出结果（与首页提示文案一致） */
+const SHAKE_COUNT_NEED = 9
 const { appendLotteryDraw } = require('./lottery-history.js')
 const { recordBiz } = require('./usage-analytics.js')
 const { buildFortuneMeta, getGanZhiDaySeed } = require('./fortune.js')
@@ -117,8 +120,11 @@ function startAccel(page) {
     if (g > 1.65 && now - page.lastShake > 120) {
       page.lastShake = now
       page.shakeAccum += 1
-      page.setData({ shaking: true, shakeHint: `感应中… ${Math.min(page.shakeAccum, 12)}/12` })
-      if (page.shakeAccum >= 12) {
+      page.setData({
+        shaking: true,
+        shakeHint: `感应中… ${Math.min(page.shakeAccum, SHAKE_COUNT_NEED)}/${SHAKE_COUNT_NEED}`
+      })
+      if (page.shakeAccum >= SHAKE_COUNT_NEED) {
         stopAccel(page)
         drawLot(page)
       }
@@ -291,7 +297,7 @@ function paintLotToCanvas(page, w, h, lot) {
 
 function simShake(page) {
   if (page.data.phase !== 'shake') return
-  page.shakeAccum = 12
+  page.shakeAccum = SHAKE_COUNT_NEED
   stopAccel(page)
   drawLot(page)
 }

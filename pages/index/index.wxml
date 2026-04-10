@@ -23,7 +23,7 @@
         </view>
         <text class="idle-tag">今日心象箴言</text>
         <button class="idle-btn" bindtap="tapStartLottery">轻触开始 · 摇动揭晓</button>
-        <text class="idle-hint">点击按钮后感应手机摇动，约 12 次有效晃动后生成当日一条</text>
+        <text class="idle-hint">点击按钮后感应手机摇动，约 9 次有效晃动后生成当日一条</text>
       </view>
 
       <!-- 摇动中 / 动画 -->

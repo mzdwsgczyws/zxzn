@@ -1,6 +1,6 @@
 <view class="page">
   <view class="hint card" wx:if="{{phase === 'shake'}}">
-    <text>手持手机轻轻摇动，感应数次后即可生成。每日一条，箴言与建议仅供自察与行动参考。</text>
+    <text>手持手机轻轻摇动，约 9 次有效晃动后即可生成。每日一条，箴言与建议仅供自察与行动参考。</text>
   </view>
 
   <view class="stage" wx:if="{{phase === 'shake' || phase === 'anim'}}">
