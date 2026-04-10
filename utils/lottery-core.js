@@ -270,7 +270,8 @@ function paintLotToCanvas(page, w, h, lot) {
     drawLotArtWx(ctx, w, h, {
       id: lot.id,
       title: lot.title,
-      tierLabel: lot.tierLabel || ''
+      tierLabel: lot.tierLabel || '',
+      tier: lot.tier
     })
     ctx.draw(false)
   } catch (e) {

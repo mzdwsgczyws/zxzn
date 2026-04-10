@@ -1,44 +1,8 @@
 /**
  * 灵签画意：使用微信小程序旧版 Canvas API（wx.createCanvasContext），
  * 与 canvas-id 配合；避免 type="2d" 在部分基础库下合成失败只显示黑色。
- * 颜色一律 rgb/rgba。
+ * 颜色一律 rgb/rgba；背景与装饰按签等等级配色。
  */
-
-function hslToRgb(h, s, l) {
-  const hue = ((h % 360) + 360) % 360
-  const sat = Math.max(0, Math.min(100, s)) / 100
-  const light = Math.max(0, Math.min(100, l)) / 100
-  const c = (1 - Math.abs(2 * light - 1)) * sat
-  const hp = hue / 60
-  const x = c * (1 - Math.abs((hp % 2) - 1))
-  let r1 = 0
-  let g1 = 0
-  let b1 = 0
-  if (hp >= 0 && hp < 1) {
-    r1 = c
-    g1 = x
-  } else if (hp < 2) {
-    r1 = x
-    g1 = c
-  } else if (hp < 3) {
-    g1 = c
-    b1 = x
-  } else if (hp < 4) {
-    g1 = x
-    b1 = c
-  } else if (hp < 5) {
-    r1 = x
-    b1 = c
-  } else {
-    r1 = c
-    b1 = x
-  }
-  const m = light - c / 2
-  const r = Math.round((r1 + m) * 255)
-  const g = Math.round((g1 + m) * 255)
-  const b = Math.round((b1 + m) * 255)
-  return `rgb(${r},${g},${b})`
-}
 
 function wxStrokeRoundRect(ctx, x, y, rw, rh, radius, color, lw) {
   const r = Math.min(radius, rw / 2, rh / 2)
@@ -67,7 +31,96 @@ function mulberry32(a) {
   }
 }
 
-function drawCornerMarksWx(ctx, w, h, id) {
+/** 按签等等级配色：上上金、上红、中蓝、下灰、下下黑 */
+function getTierTheme(tier) {
+  const t = tier || '中'
+  if (t === '上上') {
+    return {
+      bg0: 'rgb(56, 46, 24)',
+      bg1: 'rgb(92, 74, 34)',
+      bg2: 'rgb(38, 32, 18)',
+      wave: 'rgba(255, 240, 200, 0.2)',
+      dotA: 'rgba(255, 215, 120, 0.5)',
+      dotB: 'rgba(190, 155, 70, 0.42)',
+      corner: 'rgba(235, 200, 100, 0.58)',
+      borderOuter: 'rgba(218, 185, 95, 0.88)',
+      borderInner: 'rgba(250, 238, 210, 0.38)',
+      moonFill: 'rgba(35, 30, 18, 0.42)',
+      moonStroke: 'rgba(218, 175, 55, 0.9)',
+      title: 'rgb(255, 252, 240)',
+      sub: 'rgb(232, 200, 110)'
+    }
+  }
+  if (t === '上') {
+    return {
+      bg0: 'rgb(68, 22, 28)',
+      bg1: 'rgb(108, 32, 42)',
+      bg2: 'rgb(48, 16, 22)',
+      wave: 'rgba(255, 210, 215, 0.18)',
+      dotA: 'rgba(255, 120, 130, 0.45)',
+      dotB: 'rgba(180, 70, 85, 0.4)',
+      corner: 'rgba(240, 130, 140, 0.55)',
+      borderOuter: 'rgba(230, 110, 120, 0.88)',
+      borderInner: 'rgba(255, 220, 225, 0.32)',
+      moonFill: 'rgba(45, 18, 22, 0.45)',
+      moonStroke: 'rgba(235, 100, 115, 0.9)',
+      title: 'rgb(255, 245, 246)',
+      sub: 'rgb(255, 160, 168)'
+    }
+  }
+  if (t === '下') {
+    return {
+      bg0: 'rgb(50, 52, 56)',
+      bg1: 'rgb(72, 74, 78)',
+      bg2: 'rgb(40, 42, 46)',
+      wave: 'rgba(220, 225, 230, 0.12)',
+      dotA: 'rgba(160, 168, 178, 0.38)',
+      dotB: 'rgba(110, 118, 128, 0.35)',
+      corner: 'rgba(170, 176, 186, 0.5)',
+      borderOuter: 'rgba(150, 156, 165, 0.78)',
+      borderInner: 'rgba(230, 232, 235, 0.22)',
+      moonFill: 'rgba(28, 30, 34, 0.5)',
+      moonStroke: 'rgba(165, 172, 182, 0.82)',
+      title: 'rgb(242, 244, 248)',
+      sub: 'rgb(185, 190, 198)'
+    }
+  }
+  if (t === '下下') {
+    return {
+      bg0: 'rgb(8, 8, 10)',
+      bg1: 'rgb(20, 20, 24)',
+      bg2: 'rgb(4, 4, 6)',
+      wave: 'rgba(120, 120, 128, 0.08)',
+      dotA: 'rgba(70, 70, 78, 0.35)',
+      dotB: 'rgba(45, 45, 50, 0.32)',
+      corner: 'rgba(90, 90, 98, 0.45)',
+      borderOuter: 'rgba(75, 75, 82, 0.7)',
+      borderInner: 'rgba(160, 160, 168, 0.15)',
+      moonFill: 'rgba(0, 0, 0, 0.35)',
+      moonStroke: 'rgba(100, 100, 108, 0.75)',
+      title: 'rgb(218, 218, 222)',
+      sub: 'rgb(130, 132, 138)'
+    }
+  }
+  /* 中 */
+  return {
+    bg0: 'rgb(22, 40, 72)',
+    bg1: 'rgb(34, 62, 108)',
+    bg2: 'rgb(16, 30, 55)',
+    wave: 'rgba(180, 210, 255, 0.14)',
+    dotA: 'rgba(120, 185, 255, 0.42)',
+    dotB: 'rgba(80, 130, 200, 0.38)',
+    corner: 'rgba(130, 185, 245, 0.52)',
+    borderOuter: 'rgba(110, 175, 245, 0.85)',
+    borderInner: 'rgba(220, 235, 255, 0.28)',
+    moonFill: 'rgba(18, 28, 48, 0.48)',
+    moonStroke: 'rgba(120, 185, 255, 0.88)',
+    title: 'rgb(240, 248, 255)',
+    sub: 'rgb(150, 200, 255)'
+  }
+}
+
+function drawCornerMarksWx(ctx, w, h, id, strokeColor) {
   const rnd = mulberry32(id * 10007 + 17)
   const s = Math.min(w, h) * 0.08
   const corners = [
@@ -77,7 +130,7 @@ function drawCornerMarksWx(ctx, w, h, id) {
     [w - 18, h - 18]
   ]
   ctx.save()
-  ctx.setStrokeStyle('rgba(212, 175, 55, 0.55)')
+  ctx.setStrokeStyle(strokeColor || 'rgba(212, 175, 55, 0.55)')
   ctx.setLineWidth(2)
   corners.forEach(([cx, cy], i) => {
     ctx.save()
@@ -98,27 +151,24 @@ function drawCornerMarksWx(ctx, w, h, id) {
  * @param {WechatMiniprogram.CanvasContext} ctx wx.createCanvasContext 返回值
  * @param {number} w 与 canvas 样式宽一致的逻辑像素
  * @param {number} h 与 canvas 样式高一致的逻辑像素
- * @param {{ id: number, title: string, tierLabel?: string }} lot
+ * @param {{ id: number, title: string, tierLabel?: string, tier?: string }} lot
  */
 function drawLotArtWx(ctx, w, h, lot) {
   const id = lot.id != null ? lot.id : 0
   const title = lot.title || '签'
   const titleLen = Array.from(title).length
-
-  const hue1 = (id * 53) % 360
-  const hue2 = (hue1 + 28 + (id % 9) * 12) % 360
-  const hue3 = (hue1 + 180 + (id % 5) * 7) % 360
+  const theme = getTierTheme(lot.tier)
 
   const bg = ctx.createLinearGradient(0, 0, w, h)
-  bg.addColorStop(0, hslToRgb(hue1, 44, 22))
-  bg.addColorStop(0.45, hslToRgb(hue2, 38, 15))
-  bg.addColorStop(1, hslToRgb(hue3, 42, 10))
+  bg.addColorStop(0, theme.bg0)
+  bg.addColorStop(0.48, theme.bg1)
+  bg.addColorStop(1, theme.bg2)
   ctx.setFillStyle(bg)
   ctx.fillRect(0, 0, w, h)
 
   ctx.save()
   ctx.setGlobalAlpha(0.18)
-  ctx.setStrokeStyle('rgb(232, 224, 210)')
+  ctx.setStrokeStyle(theme.wave)
   ctx.setLineWidth(1.2)
   const lines = 10 + (id % 6)
   for (let i = 0; i < lines; i++) {
@@ -141,26 +191,26 @@ function drawLotArtWx(ctx, w, h, lot) {
     const rr = 4 + rnd() * 20
     ctx.beginPath()
     ctx.arc(cx, cy, rr, 0, Math.PI * 2)
-    ctx.setFillStyle(rnd() > 0.5 ? 'rgba(212,175,55,0.55)' : 'rgba(140, 160, 185, 0.45)')
+    ctx.setFillStyle(rnd() > 0.5 ? theme.dotA : theme.dotB)
     ctx.fill()
   }
   ctx.restore()
 
-  drawCornerMarksWx(ctx, w, h, id)
+  drawCornerMarksWx(ctx, w, h, id, theme.corner)
 
-  wxStrokeRoundRect(ctx, 8, 8, w - 16, h - 16, 12, 'rgba(212, 175, 55, 0.75)', 2.5)
-  wxStrokeRoundRect(ctx, 14, 14, w - 28, h - 28, 8, 'rgba(245, 240, 232, 0.35)', 1.2)
+  wxStrokeRoundRect(ctx, 8, 8, w - 16, h - 16, 12, theme.borderOuter, 2.5)
+  wxStrokeRoundRect(ctx, 14, 14, w - 28, h - 28, 8, theme.borderInner, 1.2)
 
   const cx = w / 2
   const cy = h * 0.46
   const r = Math.min(w, h) * 0.24
   ctx.beginPath()
   ctx.arc(cx, cy, r, 0, Math.PI * 2)
-  ctx.setFillStyle('rgba(30, 35, 55, 0.35)')
+  ctx.setFillStyle(theme.moonFill)
   ctx.fill()
   ctx.beginPath()
   ctx.arc(cx, cy, r, 0, Math.PI * 2)
-  ctx.setStrokeStyle('rgba(212, 175, 55, 0.85)')
+  ctx.setStrokeStyle(theme.moonStroke)
   ctx.setLineWidth(2.5)
   ctx.stroke()
 
@@ -169,7 +219,7 @@ function drawLotArtWx(ctx, w, h, lot) {
     titleLen <= 1 ? Math.min(w, h) * 0.26 : titleLen === 2 ? Math.min(w, h) * 0.2 : Math.min(w, h) * 0.13
   )
 
-  ctx.setFillStyle('rgb(252, 248, 240)')
+  ctx.setFillStyle(theme.title)
   ctx.setFontSize(Math.floor(fontSize))
   ctx.setTextAlign('center')
   ctx.setTextBaseline('middle')
@@ -177,7 +227,7 @@ function drawLotArtWx(ctx, w, h, lot) {
 
   const sub = `${lot.tierLabel || ''} · 第${id + 1}签`
   ctx.setFontSize(Math.max(10, Math.floor(Math.min(w, h) * 0.062)))
-  ctx.setFillStyle('rgb(212, 175, 55)')
+  ctx.setFillStyle(theme.sub)
   ctx.fillText(sub, cx, h * 0.8)
 }
 
