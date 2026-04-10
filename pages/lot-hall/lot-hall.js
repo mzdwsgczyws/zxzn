@@ -1,7 +1,11 @@
 const { getFirstUnlockListSorted } = require('../../utils/lottery-history.js')
 const { TIER_COLORS } = require('../../utils/lottery-core.js')
 
+const pageAnalytics = require('../../behaviors/page-analytics.js')
+
 Page({
+  behaviors: [pageAnalytics],
+
   data: {
     rows: [],
     empty: true

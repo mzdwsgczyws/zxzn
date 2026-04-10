@@ -398,10 +398,41 @@
   z-index: 1;
   display: flex;
   flex-direction: row;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   gap: 56rpx;
   pointer-events: auto;
+}
+
+.hall-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10rpx;
+}
+
+.hall-col-hover {
+  opacity: 0.92;
+}
+
+.hall-meta {
+  font-size: 22rpx;
+  font-weight: 600;
+  color: #6d5d4a;
+  letter-spacing: 1rpx;
+}
+
+.hall-whisper {
+  position: relative;
+  z-index: 1;
+  display: block;
+  text-align: center;
+  font-size: 20rpx;
+  color: #9a8b7a;
+  letter-spacing: 2rpx;
+  margin-top: 4rpx;
+  padding: 0 24rpx;
+  pointer-events: none;
 }
 
 .hall-circle {
@@ -450,11 +481,6 @@
 
 .hall-c2 .hall-circle-t {
   color: #f5f0ff;
-}
-
-.hall-circle-hover {
-  opacity: 0.9;
-  transform: scale(0.96);
 }
 
 /* —— 底部三入口：紫底金文，与顶栏紫金统一 —— */

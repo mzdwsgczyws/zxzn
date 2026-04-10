@@ -53,15 +53,46 @@
       <input class="input" type="number" placeholder="用于简化斗数宫位映射" value="{{birthMonth}}" bindinput="onBirthMonth" />
     </view>
 
-    <view class="field">
-      <text class="label">参考位置（可选）</text>
-      <text class="loc-hint">用于灵签结合当地天气；不选则不会读取定位，也不请求天气。</text>
-      <view class="loc-row">
-        <button class="btn-ghost loc-pick" bindtap="pickLocation">在地图上选择</button>
-        <button wx:if="{{latitude != null}}" class="btn-ghost loc-clear" bindtap="clearLocation">清除</button>
+    <view class="field section-gap">
+      <text class="label">参考地区（可选）</text>
+      <text class="loc-hint">手动选择国家、省/直辖市与二级城市，可补充街道等文字；保存时将尝试解析经纬度以获取天气（不调用地图与定位权限）。</text>
+
+      <text class="label label-sm">国家 / 地区</text>
+      <picker mode="selector" range="{{countryLabels}}" value="{{countryIndex}}" bindchange="onCountryPick">
+        <view class="picker-val">{{countryLabels[countryIndex]}}</view>
+      </picker>
+
+      <text class="label label-sm">省 / 直辖市</text>
+      <picker wx:if="{{!addrIsOther}}" mode="selector" range="{{provinceLabels}}" value="{{provinceIndex}}" bindchange="onProvincePick">
+        <view class="picker-val">{{provinceLabels[provinceIndex]}}</view>
+      </picker>
+      <view wx:else class="picker-val picker-muted">—</view>
+
+      <text class="label label-sm">二级城市</text>
+      <picker wx:if="{{!addrIsOther}}" mode="selector" range="{{cityLabels}}" value="{{cityIndex}}" bindchange="onCityPick">
+        <view class="picker-val">{{cityLabels[cityIndex]}}</view>
+      </picker>
+      <view wx:else class="picker-val picker-muted">—</view>
+
+      <text class="label label-sm">详细地址（可选）</text>
+      <textarea
+        class="input textarea"
+        value="{{addrDetail}}"
+        bindinput="onAddrDetail"
+        placeholder="如：街道、小区、门牌等，选填"
+        maxlength="120"
+        auto-height
+      />
+
+      <view class="loc-row" wx:if="{{addrSummary}}">
+        <text class="loc-name">{{addrSummary}}</text>
       </view>
-      <text class="loc-name" wx:if="{{locationName}}">{{locationName}}</text>
-      <text class="loc-empty" wx:else>当前未保存位置</text>
+      <text class="loc-empty" wx:elif="{{!hasAddressText}}">当前未填写地区</text>
+      <text class="loc-hint" wx:if="{{geocodeHint}}">{{geocodeHint}}</text>
+
+      <view class="loc-row">
+        <button class="btn-ghost loc-clear" bindtap="clearAddress">清除地区</button>
+      </view>
     </view>
 
     <button class="btn-primary" bindtap="save">保存</button>
@@ -69,5 +100,14 @@
 
   <view class="card muted-card">
     <text class="muted">未完成道性测验时，签文建议会略偏通用；测验后通常更贴个人状态。</text>
+  </view>
+
+  <view class="card hall-links-card">
+    <text class="title-lg hall-links-title">展馆</text>
+    <text class="subtitle hall-links-sub">查看已结缘卦签与签缘成就（与首页入口相同）。</text>
+    <view class="hall-links-row">
+      <button class="btn-ghost hall-link-btn" bindtap="goLotHall">灵签展馆</button>
+      <button class="btn-ghost hall-link-btn" bindtap="goAchieveHall">成就展馆</button>
+    </view>
   </view>
 </view>

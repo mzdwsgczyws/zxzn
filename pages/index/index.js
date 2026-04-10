@@ -1,6 +1,9 @@
 const KEYS = require('../../utils/storage-keys.js')
 const core = require('../../utils/lottery-core.js')
 const { isLotteryProfileComplete } = require('../../utils/profile-lottery.js')
+const { getFirstUnlockListSorted, computeAchievements } = require('../../utils/lottery-history.js')
+const pageAnalytics = require('../../behaviors/page-analytics.js')
+const { recordShare } = require('../../utils/usage-analytics.js')
 
 /** 混元流式生文（内联在本文件：当前工具链不会把同目录 hunyuan.js 打进页面包） */
 const HUNYUAN_MODEL = 'hunyuan-turbos-latest'
@@ -61,6 +64,8 @@ function streamHunyuanText(messages, opts) {
 }
 
 Page({
+  behaviors: [pageAnalytics],
+
   data: Object.assign(core.lotteryDataDefaults(), {
     phase: 'idle',
     statusBarH: 20,
@@ -70,7 +75,10 @@ Page({
     hallStripH: 100,
     aiExpandLoading: false,
     aiExpandText: '',
-    aiExpandErr: ''
+    aiExpandErr: '',
+    hallLotN: 0,
+    hallAchUnlocked: 0,
+    hallAchTotal: 0
   }),
 
   onLoad() {
@@ -94,10 +102,24 @@ Page({
       hallStripH: hallStripPx
     })
     core.onLotteryLoad(this)
+    this.refreshHallStrip()
+  },
+
+  refreshHallStrip() {
+    try {
+      const n = getFirstUnlockListSorted().length
+      const { unlockedCount, total } = computeAchievements()
+      this.setData({
+        hallLotN: n,
+        hallAchUnlocked: unlockedCount,
+        hallAchTotal: total
+      })
+    } catch (e) {}
   },
 
   onShow() {
     core.restoreToday(this, { whenEmpty: 'idle' })
+    this.refreshHallStrip()
   },
 
   onHide() {
@@ -109,6 +131,7 @@ Page({
   },
 
   onShareAppMessage() {
+    recordShare('/pages/index/index')
     const { lot } = this.data
     return {
       title: lot ? `今日灵签：${lot.tierLabel} · ${lot.title}` : '量化论道修身',

@@ -1,12 +1,17 @@
 const KEYS = require('../../utils/storage-keys.js')
 const { analyzeRecords } = require('../../utils/analysis.js')
+const { recordBiz } = require('../../utils/usage-analytics.js')
 
 function todayStr() {
   const d = new Date()
   return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`
 }
 
+const pageAnalytics = require('../../behaviors/page-analytics.js')
+
 Page({
+  behaviors: [pageAnalytics],
+
   data: {
     form: {
       sleepHours: 7,
@@ -67,6 +72,7 @@ Page({
     records.push({ date: t, ...this.data.form, savedAt: Date.now() })
     records.sort((a, b) => (a.date > b.date ? 1 : -1))
     wx.setStorageSync(KEYS.TRACK_RECORDS, records)
+    recordBiz('track_save')
     wx.showToast({ title: '已保存' })
     this.loadRecords()
     this.runAnalysis()

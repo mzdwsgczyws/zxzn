@@ -4,6 +4,7 @@
 
 const KEYS = require('./storage-keys.js')
 const { appendLotteryDraw } = require('./lottery-history.js')
+const { recordBiz } = require('./usage-analytics.js')
 const { buildFortuneMeta, getGanZhiDaySeed } = require('./fortune.js')
 const { getLotById } = require('./lots.js')
 const { getHuangdaoPackage } = require('./almanac.js')
@@ -218,6 +219,7 @@ function finalizeDraw(page, lat, lng, weather) {
     tier: rawLot.tier,
     title: rawLot.title
   })
+  recordBiz('lot_draw', String(meta.lotId))
 
   setTimeout(() => {
     page.setData({

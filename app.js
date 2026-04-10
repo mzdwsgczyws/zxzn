@@ -1,10 +1,9 @@
 const { CLOUD_ENV } = require('./utils/cloud-env.js')
+const usageAnalytics = require('./utils/usage-analytics.js')
 
 App({
   onLaunch() {
-    const logs = wx.getStorageSync('logs') || []
-    logs.unshift(Date.now())
-    wx.setStorageSync('logs', logs.slice(0, 20))
+    usageAnalytics.onAppLaunch()
 
     if (wx.cloud) {
       wx.cloud.init({
@@ -13,6 +12,15 @@ App({
       })
     }
   },
+
+  onShow() {
+    usageAnalytics.onAppShow()
+  },
+
+  onHide() {
+    usageAnalytics.onAppHide()
+  },
+
   globalData: {
     userProfile: null
   }

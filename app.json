@@ -19,11 +19,5 @@
   "style": "v2",
   "sitemapLocation": "sitemap.json",
   "lazyCodeLoading": "requiredComponents",
-  "cloud": true,
-  "permission": {
-    "scope.userLocation": {
-      "desc": "档案内地图选点，用于本地天气与灵签参考"
-    }
-  },
-  "requiredPrivateInfos": ["chooseLocation"]
+  "cloud": true
 }

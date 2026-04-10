@@ -14,5 +14,7 @@ module.exports = {
   LOTTERY_TODAY: 'lotteryToday_v2',
   /** 每次成功出签追加一条，供展馆与成就统计 */
   LOTTERY_HISTORY: 'lotteryHistory_v1',
-  USER_PROFILE: 'userProfile_v2'
+  USER_PROFILE: 'userProfile_v2',
+  /** 本地使用统计（短键 JSON），见 utils/usage-analytics.js */
+  USAGE_STATS: 'usageStats_v1'
 }

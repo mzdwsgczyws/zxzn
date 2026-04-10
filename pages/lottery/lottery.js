@@ -1,8 +1,11 @@
 const KEYS = require('../../utils/storage-keys.js')
 const core = require('../../utils/lottery-core.js')
 const { isLotteryProfileComplete } = require('../../utils/profile-lottery.js')
+const pageAnalytics = require('../../behaviors/page-analytics.js')
+const { recordShare } = require('../../utils/usage-analytics.js')
 
 Page({
+  behaviors: [pageAnalytics],
   data: core.lotteryDataDefaults(),
 
   shakeAccum: 0,
@@ -53,6 +56,7 @@ Page({
   },
 
   onShareAppMessage() {
+    recordShare('/pages/lottery/lottery')
     const { lot } = this.data
     return {
       title: lot ? `今日灵签：${lot.tierLabel} · ${lot.title}` : '今日灵签 · 量化论道修身',
@@ -61,6 +65,7 @@ Page({
   },
 
   onShareTimeline() {
+    recordShare('timeline:lottery')
     const { lot } = this.data
     return {
       title: lot ? `今日灵签 · ${lot.tierLabel} · ${lot.title}` : '今日灵签 · 量化论道修身'

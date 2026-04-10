@@ -1,6 +1,10 @@
 const KEYS = require('../../../utils/storage-keys.js')
+const pageAnalytics = require('../../../behaviors/page-analytics.js')
+const { recordShare } = require('../../../utils/usage-analytics.js')
 
 Page({
+  behaviors: [pageAnalytics],
+
   data: {
     hasResult: false,
     result: null,
@@ -13,6 +17,7 @@ Page({
   },
 
   onShareAppMessage() {
+    recordShare('/pages/personality/result/result')
     const r = this.data.result
     return {
       title: r ? `我的道性状态更接近：${r.typeName}` : '道性十六型测验',
@@ -22,6 +27,7 @@ Page({
   },
 
   onShareTimeline() {
+    recordShare('timeline:personality_result')
     const r = this.data.result
     return {
       title: r ? `道性十六型 · ${r.typeName}` : '道性十六型 · 自我觉察',

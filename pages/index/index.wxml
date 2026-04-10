@@ -98,24 +98,31 @@
     <view class="hall-strip" style="height: {{hallStripH}}px; bottom: {{bottomBarH}}px;">
       <view class="hall-fade"></view>
       <view class="hall-btns">
-        <view class="hall-circle hall-c1" hover-class="hall-circle-hover" bindtap="goLotHall">
-          <text class="hall-circle-icon">签</text>
-          <text class="hall-circle-t">灵签展馆</text>
+        <view class="hall-col" hover-class="hall-col-hover" bindtap="goLotHall">
+          <view class="hall-circle hall-c1">
+            <text class="hall-circle-icon">签</text>
+            <text class="hall-circle-t">灵签展馆</text>
+          </view>
+          <text class="hall-meta">{{hallLotN}}/64</text>
         </view>
-        <view class="hall-circle hall-c2" hover-class="hall-circle-hover" bindtap="goAchieveHall">
-          <text class="hall-circle-icon">勋</text>
-          <text class="hall-circle-t">成就展馆</text>
+        <view class="hall-col" hover-class="hall-col-hover" bindtap="goAchieveHall">
+          <view class="hall-circle hall-c2">
+            <text class="hall-circle-icon">勋</text>
+            <text class="hall-circle-t">成就展馆</text>
+          </view>
+          <text class="hall-meta">{{hallAchUnlocked}}/{{hallAchTotal}}</text>
         </view>
       </view>
+      <text class="hall-whisper">首次结缘入库 · 成就长按趣评</text>
     </view>
 
     <view class="bottom-dock" style="height: {{bottomBarH}}px;">
       <view class="dock-btn" hover-class="dock-btn-hover" bindtap="goQuiz">
-        <text class="dock-btn-text">道性十六型测验</text>
+        <text class="dock-btn-text">道性测验</text>
       </view>
       <view class="dock-divider"></view>
       <view class="dock-btn" hover-class="dock-btn-hover" bindtap="goTrack">
-        <text class="dock-btn-text">量化修行记录</text>
+        <text class="dock-btn-text">修行记录</text>
       </view>
       <view class="dock-divider"></view>
       <view class="dock-btn" hover-class="dock-btn-hover" bindtap="goProfile">

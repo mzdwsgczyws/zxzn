@@ -1,6 +1,10 @@
 const { computeAchievements } = require('../../utils/lottery-history.js')
 
+const pageAnalytics = require('../../behaviors/page-analytics.js')
+
 Page({
+  behaviors: [pageAnalytics],
+
   data: {
     achievements: [],
     unlockedCount: 0,
