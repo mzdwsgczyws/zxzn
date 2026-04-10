@@ -99,10 +99,12 @@
       <view class="dock-btn" hover-class="dock-btn-hover" bindtap="goQuiz">
         <text class="dock-btn-text">道性十六型测验</text>
       </view>
+      <view class="dock-divider"></view>
       <view class="dock-btn" hover-class="dock-btn-hover" bindtap="goTrack">
         <text class="dock-btn-text">量化修行记录</text>
       </view>
-      <view class="dock-btn dock-btn-muted" hover-class="dock-btn-hover" bindtap="goProfile">
+      <view class="dock-divider"></view>
+      <view class="dock-btn" hover-class="dock-btn-hover" bindtap="goProfile">
         <text class="dock-btn-text">个人档案</text>
       </view>
     </view>
