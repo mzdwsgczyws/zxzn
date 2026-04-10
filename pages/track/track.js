@@ -1,6 +1,6 @@
 const KEYS = require('../../utils/storage-keys.js')
 const { analyzeRecords, TRACK_FOCUS_OPTIONS } = require('../../utils/cultivation-model.js')
-const { computeFiveElements, drawFiveRadar } = require('../../utils/five-elements-chart.js')
+const { computeFiveElements, drawFiveRadar, RADAR_FOOTER_LINES } = require('../../utils/five-elements-chart.js')
 const { recordBiz } = require('../../utils/usage-analytics.js')
 
 function scheduleDraw(cb) {
@@ -79,8 +79,8 @@ Page({
     priorityChips: buildPriorityChips([]),
     records: [],
     analysis: null,
-    fiveRows: [],
-    radarHint: ''
+    radarFooterLines: RADAR_FOOTER_LINES,
+    radarFooterExtra: ''
   },
 
   onShow() {
@@ -126,10 +126,7 @@ Page({
     const profile = wx.getStorageSync(KEYS.USER_PROFILE) || {}
     const personality = wx.getStorageSync(KEYS.PERSONALITY_RESULT) || null
     const fe = computeFiveElements(records, profile, personality)
-    this.setData({
-      fiveRows: fe.rows.map((r) => ({ name: r.name, value: r.value, tip: r.tip })),
-      radarHint: fe.hint
-    })
+    this.setData({ radarFooterExtra: fe.hint || '' })
     scheduleDraw(() => {
       const q = wx.createSelectorQuery().in(this)
       q.select('.five-radar-canvas')

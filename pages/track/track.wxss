@@ -1,6 +1,6 @@
 .page {
   min-height: 100vh;
-  padding: 24rpx 0 64rpx;
+  padding: 24rpx 0 48rpx;
 }
 
 .title-lg {
@@ -209,73 +209,30 @@
   margin-bottom: 24rpx;
 }
 
-.radar-sub {
-  margin-bottom: 16rpx;
+.card-radar .title-lg {
+  margin-bottom: 8rpx;
 }
 
+/* 雷达约占可视区域约 1/3，略设上下限以免过小或过大 */
 .five-radar-canvas {
   width: 100%;
-  height: 300rpx;
+  height: 33vh;
+  min-height: 220rpx;
+  max-height: 360rpx;
   display: block;
-  margin: 0 auto 8rpx;
+  margin: 0 auto;
 }
 
-.radar-hint {
-  display: block;
-  font-size: 22rpx;
-  color: #8d7b68;
-  line-height: 1.5;
-  margin-bottom: 20rpx;
-}
-
-.five-legend {
-  border-top: 1rpx solid #ece5d8;
+.track-page-footer {
+  margin: 32rpx 24rpx 0;
   padding-top: 16rpx;
+  border-top: 1rpx solid #e8e0d4;
 }
 
-.five-block {
-  margin-bottom: 14rpx;
-}
-
-.five-row {
-  display: flex;
-  align-items: center;
-  gap: 12rpx;
-}
-
-.five-name {
-  width: 36rpx;
-  font-size: 26rpx;
-  font-weight: 600;
-  color: #3949ab;
-}
-
-.five-bar-bg {
-  flex: 1;
-  height: 14rpx;
-  background: #ece5d8;
-  border-radius: 7rpx;
-  overflow: hidden;
-}
-
-.five-bar {
-  height: 100%;
-  background: linear-gradient(90deg, #7986cb, #3949ab);
-  border-radius: 7rpx;
-  min-width: 6rpx;
-}
-
-.five-val {
-  width: 48rpx;
-  font-size: 24rpx;
-  color: #5c4d3d;
-  text-align: right;
-}
-
-.five-tip-line {
+.track-footer-line {
   display: block;
-  font-size: 22rpx;
-  color: #8d7b68;
-  margin: 6rpx 0 0 48rpx;
-  line-height: 1.45;
+  font-size: 20rpx;
+  color: #9a8b7a;
+  line-height: 1.55;
+  margin-bottom: 10rpx;
 }

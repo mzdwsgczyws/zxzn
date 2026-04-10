@@ -30,6 +30,30 @@ const REFERENCE_WIKI = {
   stress: 'https://en.wikipedia.org/wiki/Stress_(biology)'
 }
 
+/** 自修页底部小字（静态说明 + 免责）；动态一句仍用 compute 返回的 hint */
+const RADAR_FOOTER_LINES = [
+  '五行雷达：自正上顺时针为 金 → 木 → 水 → 火 → 土。',
+  '计分参照维基百科「Wuxing (Chinese philosophy)」「Traditional Chinese medicine」「Stress (biology)」等综述；TCM 脏腑为功能模型，不等于西医解剖器官。',
+  '本页分数与图形仅供自我观察，非中医辨证、非医疗诊断、非命理预测。情绪或睡眠持续困扰时请寻求专业帮助。',
+  '参考文献：' +
+    REFERENCE_WIKI.wuxing +
+    ' · ' +
+    REFERENCE_WIKI.tcm +
+    ' · ' +
+    REFERENCE_WIKI.stress
+]
+
+function splitTipLines(s, lineLen) {
+  const L = lineLen || 9
+  if (!s || !String(s).length) return ['', '']
+  const t = String(s)
+  if (t.length <= L) return [t, '']
+  const a = t.slice(0, L)
+  const rest = t.slice(L)
+  if (rest.length <= L) return [a, rest]
+  return [a, rest.slice(0, L - 1) + '…']
+}
+
 function clamp(x, a, b) {
   return Math.max(a, Math.min(b, x))
 }
@@ -203,21 +227,24 @@ function computeFiveElements(recordsAsc, profile, personality) {
 }
 
 /**
- * 旧版 Canvas API 绘制五边形雷达（canvas-id）
- * @param {string} canvasId
- * @param {Page|Component} pageOrComp
- * @param {{ width: number, height: number }} rect boundingClientRect
- * @param {{ jin:number, mu:number, shui:number, huo:number, tu:number }} scores
+ * 旧版 Canvas API 绘制五边形雷达（canvas-id）；顶点外缘写「名 + 分 + 两行释义」。
+ * @param fe computeFiveElements 的完整返回值（含 jin…tu 与 rows）
  */
-function drawFiveRadar(canvasId, pageOrComp, rect, scores) {
+function drawFiveRadar(canvasId, pageOrComp, rect, fe) {
   const width = rect.width
   const height = rect.height
   if (width < 10 || height < 10) return
 
   const ctx = wx.createCanvasContext(canvasId, pageOrComp)
   const cx = width / 2
-  const cy = height / 2 + 4
-  const R = Math.min(width, height) * 0.34
+  const cy = height * 0.48
+  const R = Math.min(width, height) * 0.22
+
+  const fsName = Math.max(10, Math.min(12, Math.floor(width / 30)))
+  const fsTip = Math.max(8, fsName - 2)
+  const d1 = R + 12
+  const d2 = R + 24
+  const d3 = R + 36
 
   ctx.setFillStyle('rgb(252, 250, 246)')
   ctx.fillRect(0, 0, width, height)
@@ -248,7 +275,7 @@ function drawFiveRadar(canvasId, pageOrComp, rect, scores) {
     ctx.stroke()
   }
 
-  const vals = [scores.jin, scores.mu, scores.shui, scores.huo, scores.tu]
+  const vals = [fe.jin, fe.mu, fe.shui, fe.huo, fe.tu]
   ctx.beginPath()
   for (let i = 0; i < 5; i++) {
     const angle = -Math.PI / 2 + (i * 2 * Math.PI) / 5
@@ -266,15 +293,25 @@ function drawFiveRadar(canvasId, pageOrComp, rect, scores) {
   ctx.setLineWidth(2)
   ctx.stroke()
 
-  const names = ['金', '木', '水', '火', '土']
-  ctx.setFontSize(Math.max(11, Math.floor(width / 28)))
-  ctx.setFillStyle('#3e3428')
+  const rows = Array.isArray(fe.rows) ? fe.rows : []
+  const fallback = ['金', '木', '水', '火', '土']
+  ctx.setTextAlign('center')
+  ctx.setTextBaseline('middle')
+
   for (let i = 0; i < 5; i++) {
     const angle = -Math.PI / 2 + (i * 2 * Math.PI) / 5
-    const lr = R + 16
-    const x = cx + lr * Math.cos(angle)
-    const y = cy + lr * Math.sin(angle)
-    ctx.fillText(names[i], x - 6, y + 4)
+    const row = rows[i] || { name: fallback[i], value: vals[i], tip: '' }
+    const line1 = `${row.name} ${row.value}`
+    const [t1, t2] = splitTipLines(row.tip, width < 280 ? 8 : 9)
+
+    ctx.setFontSize(fsName)
+    ctx.setFillStyle('#1a237e')
+    ctx.fillText(line1, cx + d1 * Math.cos(angle), cy + d1 * Math.sin(angle))
+
+    ctx.setFontSize(fsTip)
+    ctx.setFillStyle('#6d5d4a')
+    if (t1) ctx.fillText(t1, cx + d2 * Math.cos(angle), cy + d2 * Math.sin(angle))
+    if (t2) ctx.fillText(t2, cx + d3 * Math.cos(angle), cy + d3 * Math.sin(angle))
   }
 
   ctx.draw()
@@ -284,5 +321,6 @@ module.exports = {
   computeFiveElements,
   drawFiveRadar,
   WINDOW,
-  REFERENCE_WIKI
+  REFERENCE_WIKI,
+  RADAR_FOOTER_LINES
 }

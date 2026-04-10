@@ -1,25 +1,11 @@
 <view class="page">
   <view class="card card-radar">
     <text class="title-lg">五行意象雷达</text>
-    <text class="subtitle radar-sub">自正上顺时针：金 → 木 → 水 → 火 → 土。计分对齐维基百科「Traditional Chinese medicine」中五行–五脏配属与常见五志归类，并结合「Stress (biology)」对慢性应激的综述，将睡眠、情绪、屏时等自填项加权；TCM 脏腑多为功能模型，≠ 西医解剖器官，仅供自我观察。</text>
     <canvas
       canvas-id="fiveRadar"
       class="five-radar-canvas"
       disable-scroll="true"
     ></canvas>
-    <text class="radar-hint">{{radarHint}}</text>
-    <view class="five-legend">
-      <view class="five-block" wx:for="{{fiveRows}}" wx:key="name">
-        <view class="five-row">
-          <text class="five-name">{{item.name}}</text>
-          <view class="five-bar-bg">
-            <view class="five-bar" style="width: {{item.value}}%;"></view>
-          </view>
-          <text class="five-val">{{item.value}}</text>
-        </view>
-        <text class="five-tip-line">{{item.tip}}</text>
-      </view>
-    </view>
   </view>
 
   <view class="card">
@@ -136,5 +122,10 @@
       <text class="d">{{item.date}}</text>
       <text class="r">睡{{item.sleepHours}}h · 恢{{item.recoveryScore != null ? item.recoveryScore : '—'}} · 耗{{item.drainScore != null ? item.drainScore : '—'}} · {{item.phaseShort}}</text>
     </view>
+  </view>
+
+  <view class="track-page-footer">
+    <text class="track-footer-line" wx:for="{{radarFooterLines}}" wx:key="*this">{{item}}</text>
+    <text class="track-footer-line" wx:if="{{radarFooterExtra}}">{{radarFooterExtra}}</text>
   </view>
 </view>
