@@ -145,6 +145,23 @@
   color: #9a8b7a;
 }
 
+.theory-card {
+  border-left: 6rpx solid rgba(201, 162, 39, 0.55);
+}
+
+.theory-card-title {
+  color: #3949ab;
+}
+
+.theory-card-sub {
+  margin-bottom: 20rpx !important;
+}
+
+.theory-card-btn {
+  width: 100%;
+  margin-top: 4rpx;
+}
+
 .hall-links-card .hall-links-title {
   font-size: 30rpx;
 }

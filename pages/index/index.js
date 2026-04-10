@@ -78,7 +78,8 @@ Page({
     aiExpandErr: '',
     hallLotN: 0,
     hallAchUnlocked: 0,
-    hallAchTotal: 0
+    hallAchTotal: 0,
+    theoryBannerEligible: false
   }),
 
   onLoad() {
@@ -103,6 +104,7 @@ Page({
     })
     core.onLotteryLoad(this)
     this.refreshHallStrip()
+    this.refreshTheoryBannerFlag()
   },
 
   refreshHallStrip() {
@@ -120,6 +122,31 @@ Page({
   onShow() {
     core.restoreToday(this, { whenEmpty: 'idle' })
     this.refreshHallStrip()
+    this.refreshTheoryBannerFlag()
+  },
+
+  refreshTheoryBannerFlag() {
+    let dismissed = false
+    try {
+      dismissed = !!wx.getStorageSync(KEYS.THEORY_INTRO_BANNER_DISMISSED)
+    } catch (e) {}
+    this.setData({ theoryBannerEligible: !dismissed })
+  },
+
+  dismissTheoryBanner() {
+    try {
+      wx.setStorageSync(KEYS.THEORY_INTRO_BANNER_DISMISSED, true)
+    } catch (e) {}
+    this.setData({ theoryBannerEligible: false })
+  },
+
+  readTheoryIntro() {
+    this.dismissTheoryBanner()
+    wx.navigateTo({ url: '/pages/theory-intro/theory-intro' })
+  },
+
+  openTheoryIntro() {
+    wx.navigateTo({ url: '/pages/theory-intro/theory-intro' })
   },
 
   onHide() {

@@ -102,6 +102,12 @@
     <text class="muted">未完成道性测验时，箴言建议会略偏通用；测验后通常更贴个人状态。</text>
   </view>
 
+  <view class="card theory-card">
+    <text class="title-lg theory-card-title">量化 × 修道</text>
+    <text class="subtitle theory-card-sub">文化意象与系统科学的类比简介，可随时回看，不必每次阅读。</text>
+    <button class="btn-ghost theory-card-btn" bindtap="goTheoryIntro">查看简介</button>
+  </view>
+
   <view class="card hall-links-card">
     <text class="title-lg hall-links-title">展馆</text>
     <text class="subtitle hall-links-sub">查看已收录条目与心象成就（与首页入口相同）。</text>

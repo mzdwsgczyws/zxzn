@@ -1,0 +1,46 @@
+<view class="page">
+  <view class="card lead-card">
+    <text class="lead-title">简介</text>
+    <text class="lead-body" selectable="{{true}}">
+      道教谈「道」，常指向世界与自我中那条长期稳定的底层规律；在量化语言里，它最接近你为自己写下的目标函数与约束——你究竟优化什么、牺牲什么、以何为底线。阴阳可看作正负反馈：收敛与恢复、驱动与扩张若长期失衡，系统就会振荡或耗竭。五行可类比状态转移：身心并非静止标签，而在不同模态间切换；记录与统计，是为了看见「卡在哪一段关系链上」。所谓修炼，即在约束下持续迭代参数；所谓无为，则是正则化与防过拟合——不对噪声过度反应，不把控制当作唯一美德。风水在此可冷静地读作环境外生变量：天气、节律、空间与社交负荷，都会进入你的状态方程。用量化修道，不是把信仰还原成数字，而是让修养可观察、可复盘、可温和调整：以工程诚实面对自己，以道家智慧提醒勿被指标反噬。
+    </text>
+    <text class="lead-note">以上为文化意象与系统科学的类比说明，非宗教教义或医疗建议。</text>
+  </view>
+
+  <view class="card">
+    <text class="sec-title">概念与工程类比</text>
+    <view class="table-row">
+      <text class="col-a">道</text>
+      <text class="col-b">底层规律 / 目标函数（objective）：在多目标间显式优先级与约束。</text>
+    </view>
+    <view class="table-row">
+      <text class="col-a">阴阳</text>
+      <text class="col-b">多空、正负反馈：记录「收/放」双侧指标，避免长期单极失衡。</text>
+    </view>
+    <view class="table-row">
+      <text class="col-a">五行</text>
+      <text class="col-b">状态转移：把一周看作在多种身心模态间的轨迹，检视是否卡死。</text>
+    </view>
+    <view class="table-row">
+      <text class="col-a">修炼</text>
+      <text class="col-b">系统优化：小步迭代、可测反馈，在时间与身体的约束下调整参数。</text>
+    </view>
+    <view class="table-row">
+      <text class="col-a">无为</text>
+      <text class="col-b">不过拟合：正则化与留白，减少对噪声的过度控制与反应。</text>
+    </view>
+    <view class="table-row table-row-last">
+      <text class="col-a">风水</text>
+      <text class="col-b">外部环境因子：天气、日程、空间与社交等外生变量，可写入备注对照。</text>
+    </view>
+  </view>
+
+  <view class="card">
+    <text class="sec-title">可操作的闭环</text>
+    <text class="para">1）为「道」选代理指标（如稳定节律优于短期鸡血）；2）阴阳面板尽量成对记录；3）用周轨迹看五行式模态是否僵化；4）每次只动 1～2 个杠杆并观察 7～14 天；5）设「不优化日」或阈值，实践无为；6）环境因子入库，减少把一切归因于意志。</text>
+  </view>
+
+  <view class="card muted-card">
+    <text class="muted">本小程序中的记录、箴言与建议仅供自我观察与文化参照；持续困扰请寻求专业帮助。</text>
+  </view>
+</view>

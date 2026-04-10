@@ -1,12 +1,76 @@
 <view class="page">
+  <view class="card card-radar">
+    <text class="title-lg">五行意象雷达</text>
+    <text class="subtitle radar-sub">自正上顺时针：金 → 木 → 水 → 火 → 土。计分对齐维基百科「Traditional Chinese medicine」中五行–五脏配属与常见五志归类，并结合「Stress (biology)」对慢性应激的综述，将睡眠、情绪、屏时等自填项加权；TCM 脏腑多为功能模型，≠ 西医解剖器官，仅供自我观察。</text>
+    <canvas
+      canvas-id="fiveRadar"
+      class="five-radar-canvas"
+      disable-scroll="true"
+    ></canvas>
+    <text class="radar-hint">{{radarHint}}</text>
+    <view class="five-legend">
+      <view class="five-block" wx:for="{{fiveRows}}" wx:key="name">
+        <view class="five-row">
+          <text class="five-name">{{item.name}}</text>
+          <view class="five-bar-bg">
+            <view class="five-bar" style="width: {{item.value}}%;"></view>
+          </view>
+          <text class="five-val">{{item.value}}</text>
+        </view>
+        <text class="five-tip-line">{{item.tip}}</text>
+      </view>
+    </view>
+  </view>
+
   <view class="card">
     <text class="title-lg">今日记录</text>
-    <text class="subtitle">记录可量化指标，便于观察趋势（非医疗诊断）。</text>
+    <text class="subtitle">记录可量化指标，便于观察趋势（非医疗诊断）。新增字段用于阴/阳与模态画像；旧记录会自动补默认。</text>
+
+    <text class="sec-title sec-title-inline">自修重点（最多 3 项，用于排序建议）</text>
+    <text class="chip-hint">勾选后，相关建议会略提前；不选则各维度均衡。</text>
+    <view class="chip-row">
+      <view
+        class="chip {{item.on ? 'chip-on' : ''}}"
+        wx:for="{{priorityChips}}"
+        wx:key="id"
+        data-id="{{item.id}}"
+        bindtap="togglePriority"
+      >{{item.label}}</view>
+    </view>
 
     <view class="field">
       <text class="label">睡眠时长（小时）</text>
       <slider min="0" max="12" step="0.5" show-value value="{{form.sleepHours}}" bindchange="onSleep" />
     </view>
+    <view class="field">
+      <text class="label">主观恢复感（1 低—5 高）</text>
+      <slider min="1" max="5" step="1" show-value value="{{form.recoveryScore}}" bindchange="onRecovery" />
+    </view>
+    <view class="field">
+      <text class="label">耗竭 / 支出感（1 低—5 高）</text>
+      <slider min="1" max="5" step="1" show-value value="{{form.drainScore}}" bindchange="onDrain" />
+    </view>
+    <view class="field">
+      <text class="label">社交负荷（场次/强度综合，0—5）</text>
+      <slider min="0" max="5" step="1" show-value value="{{form.socialLoad}}" bindchange="onSocial" />
+    </view>
+    <view class="field">
+      <text class="label">今日主模态（意象）</text>
+      <picker mode="selector" range="{{phaseLabels}}" value="{{phaseIndex}}" bindchange="onPhase">
+        <view class="picker-val">{{phaseLabels[phaseIndex]}}</view>
+      </picker>
+    </view>
+    <view class="field">
+      <text class="label">主动留白 / 放空（分钟，非 KPI）</text>
+      <slider min="0" max="60" step="5" show-value value="{{form.blankMinutes}}" bindchange="onBlank" />
+    </view>
+    <view class="field row-switch">
+      <text class="label">今日有一件微行动完成</text>
+      <switch checked="{{form.miniActionDone}}" bindchange="onMiniAction" />
+    </view>
+
+    <view class="divider-label">以下为原有量化项</view>
+
     <view class="field">
       <text class="label">生气 / 强烈烦躁（次）</text>
       <slider min="0" max="20" step="1" show-value value="{{form.angerCount}}" bindchange="onAnger" />
@@ -34,10 +98,30 @@
   <view class="card" wx:if="{{analysis}}">
     <text class="title-lg">{{analysis.title}}</text>
     <text class="para" wx:for="{{analysis.lines}}" wx:key="*this">{{item}}</text>
+
+    <view class="focus-wrap" wx:if="{{analysis.modules}}">
+      <text class="sec-title">模块摘要</text>
+      <text class="li sm">· 阴阳：{{analysis.modules.yinyang.headline}}</text>
+      <text class="li sm muted-li" wx:if="{{analysis.modules.yinyang.detail}}">{{analysis.modules.yinyang.detail}}</text>
+      <text class="li sm">· {{analysis.modules.phase.headline}}：{{analysis.modules.phase.detail}}</text>
+      <text class="li sm">· {{analysis.modules.wuwei.headline}}：{{analysis.modules.wuwei.detail}}</text>
+    </view>
+
+    <view class="focus-wrap" wx:if="{{analysis.recommendations.length}}">
+      <text class="sec-title">排序建议（含调整与理由）</text>
+      <view class="rec-card" wx:for="{{analysis.recommendations}}" wx:key="priority">
+        <text class="rec-p">优先级 {{item.priority}}</text>
+        <text class="rec-title">{{item.title}}</text>
+        <text class="rec-block"><text class="rec-k">调整：</text>{{item.adjust}}</text>
+        <text class="rec-block"><text class="rec-k">理由：</text>{{item.reason}}</text>
+      </view>
+    </view>
+
     <view class="focus-wrap" wx:if="{{analysis.focus.length}}">
-      <text class="sec-title">可执行侧重点</text>
+      <text class="sec-title">可执行一句话</text>
       <text class="li" wx:for="{{analysis.focus}}" wx:key="*this">· {{item}}</text>
     </view>
+    <text class="muted tiny" wx:if="{{analysis.meta.disclaimer}}">{{analysis.meta.disclaimer}}</text>
     <button class="btn-ghost" bindtap="runAnalysis">刷新分析</button>
   </view>
 
@@ -50,7 +134,7 @@
     <text class="title-lg">最近记录</text>
     <view class="row" wx:for="{{records}}" wx:key="date">
       <text class="d">{{item.date}}</text>
-      <text class="r">睡{{item.sleepHours}}h · 怒{{item.angerCount}} · 烦{{item.worryCount}}</text>
+      <text class="r">睡{{item.sleepHours}}h · 恢{{item.recoveryScore != null ? item.recoveryScore : '—'}} · 耗{{item.drainScore != null ? item.drainScore : '—'}} · {{item.phaseShort}}</text>
     </view>
   </view>
 </view>

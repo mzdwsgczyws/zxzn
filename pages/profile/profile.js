@@ -96,6 +96,10 @@ Page({
     wx.navigateTo({ url: '/pages/achieve-hall/achieve-hall' })
   },
 
+  goTheoryIntro() {
+    wx.navigateTo({ url: '/pages/theory-intro/theory-intro' })
+  },
+
   applyCountryIndex(ci, resetPc) {
     const countryLabels = getCountryLabels()
     const idx = Math.max(0, Math.min(countryLabels.length - 1, ci | 0))
