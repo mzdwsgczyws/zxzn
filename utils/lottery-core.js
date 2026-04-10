@@ -3,6 +3,7 @@
  */
 
 const KEYS = require('./storage-keys.js')
+const { appendLotteryDraw } = require('./lottery-history.js')
 const { buildFortuneMeta, getGanZhiDaySeed } = require('./fortune.js')
 const { getLotById } = require('./lots.js')
 const { getHuangdaoPackage } = require('./almanac.js')
@@ -210,6 +211,13 @@ function finalizeDraw(page, lat, lng, weather) {
     lotStylePref: stylePref
   }
   wx.setStorageSync(KEYS.LOTTERY_TODAY, payload)
+  appendLotteryDraw({
+    ts: now.getTime(),
+    dateStr: meta.dateStr,
+    lotId: meta.lotId,
+    tier: rawLot.tier,
+    title: rawLot.title
+  })
 
   setTimeout(() => {
     page.setData({

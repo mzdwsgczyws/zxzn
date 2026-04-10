@@ -12,5 +12,7 @@ module.exports = {
   PERSONALITY_RESULT: 'personalityResult_v1',
   TRACK_RECORDS: 'trackRecords_v1',
   LOTTERY_TODAY: 'lotteryToday_v2',
+  /** 每次成功出签追加一条，供展馆与成就统计 */
+  LOTTERY_HISTORY: 'lotteryHistory_v1',
   USER_PROFILE: 'userProfile_v2'
 }

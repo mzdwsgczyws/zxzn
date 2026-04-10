@@ -22,7 +22,9 @@
 wx_program/
 ├── app.js / app.json / app.wxss
 ├── pages/
-│   ├── index/          # 首页：灵签主流程 + 底部三入口
+│   ├── index/          # 首页：灵签主流程 + 展馆圆钮 + 底部三入口
+│   ├── lot-hall/       # 灵签展馆（每签首次获得时间）
+│   ├── achieve-hall/   # 成就展馆（长按评语）
 │   ├── personality/    # quiz / result 测验与结果
 │   ├── track/            # 修行记录与同页分析摘要
 │   ├── lottery/          # 独立灵签页（与首页共用 lottery-core）
@@ -31,6 +33,7 @@ wx_program/
 │   ├── personality.js    # 36 题 + 十六型 + calculatePersonality
 │   ├── fortune.js        # 签运种子 buildFortuneMeta
 │   ├── lottery-core.js   # 摇签、出签、缓存、画布
+│   ├── lottery-history.js # 出签历史追加、展馆列表、成就计算
 │   ├── lottery-advice.js # 建议列表决策与抽样
 │   ├── lots.js / lots-data.js  # 64 签文案与等第映射
 │   ├── almanac.js        # 节气、建除、宜忌（本地表）
@@ -107,7 +110,7 @@ wx_program/
 
 ## 三、今日灵签：全流程逻辑
 
-灵签业务集中在 **`utils/lottery-core.js`**，首页与 `pages/lottery` 共用同一套本地缓存 **`lotteryToday_v2`**。
+灵签业务集中在 **`utils/lottery-core.js`**，首页与 `pages/lottery` 共用同一套本地缓存 **`lotteryToday_v2`**。每次成功出签会往 **`lotteryHistory_v1`**（见 `utils/lottery-history.js`）追加一条，供灵签展馆与成就统计。
 
 ### 3.1 用户操作路径（首页）
 
@@ -195,6 +198,7 @@ wx_program/
 | `PERSONALITY_RESULT` | 道性测验最新结果 |
 | `TRACK_RECORDS` | 修行记录列表 |
 | `LOTTERY_TODAY` | 当日灵签缓存（lotId、revealed、adviceList、lotStylePref 等） |
+| `LOTTERY_HISTORY` | 历次出签时间线（ts、dateStr、lotId、tier、title），用于展馆与成就 |
 | `USER_PROFILE` | 个人档案与签运增强 |
 
 隔离说明见 `storage-keys.js` 文件头注释（按微信账号沙箱，非服务端用户 id）。

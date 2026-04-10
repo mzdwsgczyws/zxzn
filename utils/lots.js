@@ -122,4 +122,13 @@ function getLotById(id) {
   return LOTS[i]
 }
 
-module.exports = { LOTS, getLotById, TIER_NAMES, tierForId, TIERS_BY_LOT_ID }
+/** @param {'上上'|'上'|'中'|'下'|'下下'} tierName */
+function getLotIdsByTier(tierName) {
+  const ids = []
+  for (let i = 0; i < 64; i++) {
+    if (TIERS_BY_LOT_ID[i] === tierName) ids.push(i)
+  }
+  return ids
+}
+
+module.exports = { LOTS, getLotById, TIER_NAMES, tierForId, TIERS_BY_LOT_ID, getLotIdsByTier }

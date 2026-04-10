@@ -1,6 +1,8 @@
 {
   "pages": [
     "pages/index/index",
+    "pages/lot-hall/lot-hall",
+    "pages/achieve-hall/achieve-hall",
     "pages/personality/quiz/quiz",
     "pages/personality/result/result",
     "pages/track/track",

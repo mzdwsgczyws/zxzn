@@ -67,6 +67,7 @@ Page({
     navTotalPx: 64,
     mainScrollH: 400,
     bottomBarH: 120,
+    hallStripH: 100,
     aiExpandLoading: false,
     aiExpandText: '',
     aiExpandErr: ''
@@ -83,12 +84,14 @@ Page({
     const navTotal = sb + navContentPx
     // 底部三入口：在约 1/7 屏高基础上再缩小 1/3（≈2/21 屏）；主区留给灵签滚动
     const bottomPx = Math.max(68, Math.floor((win.windowHeight / 7) * (2 / 3)))
-    const mainH = Math.max(200, win.windowHeight - navTotal - bottomPx)
+    const hallStripPx = Math.max(72, Math.floor(132 * rpx2px))
+    const mainH = Math.max(200, win.windowHeight - navTotal - bottomPx - hallStripPx)
     this.setData({
       statusBarH: sb,
       navTotalPx: navTotal,
       mainScrollH: mainH,
-      bottomBarH: bottomPx
+      bottomBarH: bottomPx,
+      hallStripH: hallStripPx
     })
     core.onLotteryLoad(this)
   },
@@ -214,5 +217,13 @@ Page({
 
   goProfile() {
     wx.navigateTo({ url: '/pages/profile/profile' })
+  },
+
+  goLotHall() {
+    wx.navigateTo({ url: '/pages/lot-hall/lot-hall' })
+  },
+
+  goAchieveHall() {
+    wx.navigateTo({ url: '/pages/achieve-hall/achieve-hall' })
   }
 })

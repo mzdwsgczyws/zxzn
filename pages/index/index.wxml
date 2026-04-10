@@ -95,6 +95,20 @@
       </view>
     </scroll-view>
 
+    <view class="hall-strip" style="height: {{hallStripH}}px; bottom: {{bottomBarH}}px;">
+      <view class="hall-fade"></view>
+      <view class="hall-btns">
+        <view class="hall-circle hall-c1" hover-class="hall-circle-hover" bindtap="goLotHall">
+          <text class="hall-circle-icon">签</text>
+          <text class="hall-circle-t">灵签展馆</text>
+        </view>
+        <view class="hall-circle hall-c2" hover-class="hall-circle-hover" bindtap="goAchieveHall">
+          <text class="hall-circle-icon">勋</text>
+          <text class="hall-circle-t">成就展馆</text>
+        </view>
+      </view>
+    </view>
+
     <view class="bottom-dock" style="height: {{bottomBarH}}px;">
       <view class="dock-btn" hover-class="dock-btn-hover" bindtap="goQuiz">
         <text class="dock-btn-text">道性十六型测验</text>

@@ -1,0 +1,41 @@
+<view class="page">
+  <view class="hero">
+    <text class="hero-title">签缘成就</text>
+    <text class="hero-sub">长按成就块查看趣味评语 · 松开即消失</text>
+    <view class="progress-wrap">
+      <view class="progress-bar">
+        <view class="progress-fill" style="width: {{progressPct}}%;"></view>
+      </view>
+      <text class="progress-text">已解锁 {{unlockedCount}} / {{total}}</text>
+    </view>
+  </view>
+
+  <scroll-view scroll-y class="scroll" enhanced="{{true}}">
+    <view class="grid">
+      <view
+        wx:for="{{achievements}}"
+        wx:key="id"
+        class="ach acc-{{item.accent}} {{item.unlocked ? 'ach-on' : 'ach-off'}}"
+        catchtouchstart="onAchPressStart"
+        catchtouchend="onAchPressEnd"
+        catchtouchcancel="onAchPressEnd"
+        data-id="{{item.id}}"
+      >
+        <view class="ach-inner">
+          <view class="ach-crown">{{item.unlocked ? '✦' : '◇'}}</view>
+          <text class="ach-name">{{item.name}}</text>
+          <text class="ach-sub">{{item.subtitle}}</text>
+          <text class="ach-hint">长按看评语</text>
+        </view>
+      </view>
+    </view>
+    <view class="footer-space"></view>
+  </scroll-view>
+
+  <view class="press-layer" wx:if="{{pressVisible}}">
+    <view class="press-panel">
+      <text class="press-title">签师碎碎念</text>
+      <text class="press-body">{{pressComment}}</text>
+    </view>
+  </view>
+</view>

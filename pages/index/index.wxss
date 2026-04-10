@@ -368,6 +368,95 @@
   line-height: 1.45;
 }
 
+/* —— 灵签 / 成就 圆形入口（贴在底栏上方） —— */
+.hall-strip {
+  position: fixed;
+  left: 0;
+  right: 0;
+  z-index: 950;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding-bottom: 6rpx;
+  box-sizing: border-box;
+  pointer-events: none;
+}
+
+.hall-fade {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 0;
+  background: linear-gradient(180deg, transparent 0%, rgba(245, 240, 232, 0.55) 55%, rgba(245, 240, 232, 0.92) 100%);
+  pointer-events: none;
+}
+
+.hall-btns {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 56rpx;
+  pointer-events: auto;
+}
+
+.hall-circle {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  border: 3rpx solid rgba(212, 175, 55, 0.65);
+  box-shadow:
+    0 8rpx 28rpx rgba(45, 34, 74, 0.2),
+    inset 0 2rpx 0 rgba(255, 255, 255, 0.35);
+}
+
+.hall-c1 {
+  background: linear-gradient(160deg, #f0dfa0 0%, #c9a227 48%, #8a6a1f 100%);
+}
+
+.hall-c2 {
+  background: linear-gradient(160deg, #d4c4f0 0%, #8b6bc4 45%, #5a3d8a 100%);
+}
+
+.hall-circle-icon {
+  font-size: 34rpx;
+  font-weight: 700;
+  color: rgba(42, 31, 21, 0.88);
+  line-height: 1;
+  margin-bottom: 6rpx;
+}
+
+.hall-c2 .hall-circle-icon {
+  color: rgba(255, 252, 245, 0.95);
+}
+
+.hall-circle-t {
+  font-size: 20rpx;
+  font-weight: 600;
+  color: #2a1f15;
+  letter-spacing: 1rpx;
+  transform: scale(0.92);
+  transform-origin: center;
+}
+
+.hall-c2 .hall-circle-t {
+  color: #f5f0ff;
+}
+
+.hall-circle-hover {
+  opacity: 0.9;
+  transform: scale(0.96);
+}
+
 /* —— 底部三入口：紫底金文，与顶栏紫金统一 —— */
 .bottom-dock {
   position: fixed;
