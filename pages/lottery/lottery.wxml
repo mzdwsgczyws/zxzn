@@ -3,10 +3,32 @@
     <text>手持手机轻轻摇动，约 9 次有效晃动后即可生成。每日一条，箴言与建议仅供自察与行动参考。</text>
   </view>
 
-  <view class="stage" wx:if="{{phase === 'shake' || phase === 'anim'}}">
-    <view class="tube-wrap {{shaking ? 'shaking' : ''}}">
-      <view class="tube"></view>
-      <view class="sticks"></view>
+  <view class="stage stage--bamboo" wx:if="{{phase === 'shake' || phase === 'anim'}}">
+    <view class="bamboo-ambient"></view>
+    <view
+      class="bamboo-wrap {{shaking ? 'bamboo-wrap--shaking' : ''}} {{phase === 'anim' ? 'bamboo-wrap--drawing' : ''}}"
+    >
+      <view class="bamboo-crown"></view>
+      <view class="bamboo-slips">
+        <view class="bamboo-slip bamboo-slip--1"></view>
+        <view class="bamboo-slip bamboo-slip--2"></view>
+        <view class="bamboo-slip bamboo-slip--3"></view>
+        <view class="bamboo-slip bamboo-slip--4"></view>
+        <view class="bamboo-slip bamboo-slip--5"></view>
+        <view class="bamboo-slip bamboo-slip--6"></view>
+        <view class="bamboo-slip bamboo-slip--7"></view>
+      </view>
+      <view class="bamboo-tube">
+        <view class="bamboo-tube-patina"></view>
+        <view class="bamboo-tube-grain"></view>
+        <view class="bamboo-tube-crack"></view>
+        <view class="bamboo-node bamboo-node--a"></view>
+        <view class="bamboo-node bamboo-node--b"></view>
+        <view class="bamboo-node bamboo-node--c"></view>
+        <view class="bamboo-tube-gloss"></view>
+      </view>
+      <view class="bamboo-base-ring"></view>
+      <view class="bamboo-ground"></view>
     </view>
     <text class="shake-tip">{{shakeHint}}</text>
     <text class="sim-tip" wx:if="{{phase === 'shake'}}" bindtap="simShake">模拟器无感应？点此模拟摇动</text>

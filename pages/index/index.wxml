@@ -26,11 +26,33 @@
         <text class="idle-hint">点击按钮后感应手机摇动，约 9 次有效晃动后生成当日一条</text>
       </view>
 
-      <!-- 摇动中 / 动画 -->
-      <view class="lot-panel lot-stage" wx:if="{{phase === 'shake' || phase === 'anim'}}">
-        <view class="tube-wrap {{shaking ? 'shaking' : ''}}">
-          <view class="tube"></view>
-          <view class="sticks"></view>
+      <!-- 摇动中 / 动画：竹筒 -->
+      <view class="lot-panel lot-stage--bamboo" wx:if="{{phase === 'shake' || phase === 'anim'}}">
+        <view class="bamboo-ambient"></view>
+        <view
+          class="bamboo-wrap {{shaking ? 'bamboo-wrap--shaking' : ''}} {{phase === 'anim' ? 'bamboo-wrap--drawing' : ''}}"
+        >
+          <view class="bamboo-crown"></view>
+          <view class="bamboo-slips">
+            <view class="bamboo-slip bamboo-slip--1"></view>
+            <view class="bamboo-slip bamboo-slip--2"></view>
+            <view class="bamboo-slip bamboo-slip--3"></view>
+            <view class="bamboo-slip bamboo-slip--4"></view>
+            <view class="bamboo-slip bamboo-slip--5"></view>
+            <view class="bamboo-slip bamboo-slip--6"></view>
+            <view class="bamboo-slip bamboo-slip--7"></view>
+          </view>
+          <view class="bamboo-tube">
+            <view class="bamboo-tube-patina"></view>
+            <view class="bamboo-tube-grain"></view>
+            <view class="bamboo-tube-crack"></view>
+            <view class="bamboo-node bamboo-node--a"></view>
+            <view class="bamboo-node bamboo-node--b"></view>
+            <view class="bamboo-node bamboo-node--c"></view>
+            <view class="bamboo-tube-gloss"></view>
+          </view>
+          <view class="bamboo-base-ring"></view>
+          <view class="bamboo-ground"></view>
         </view>
         <text class="shake-tip">{{shakeHint}}</text>
         <text class="sim-tip" wx:if="{{phase === 'shake'}}" bindtap="simShake">模拟器无感应？点此完成生成</text>
