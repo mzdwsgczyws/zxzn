@@ -127,6 +127,17 @@
     </view>
 
     <view class="bottom-dock" style="height: {{bottomBarH}}px;">
+      <view class="dock-home" hover-class="dock-home-hover" bindtap="goHome">
+        <view class="dock-home-temple">
+          <view class="dock-home-temple-bead"></view>
+          <view class="dock-home-temple-roof"></view>
+          <view class="dock-home-temple-eave"></view>
+          <view class="dock-home-temple-hall">
+            <view class="dock-home-temple-door"></view>
+          </view>
+        </view>
+      </view>
+      <view class="dock-divider dock-divider--home"></view>
       <view class="dock-btn" hover-class="dock-btn-hover" bindtap="goQuiz">
         <text class="dock-btn-text">道性测验</text>
       </view>

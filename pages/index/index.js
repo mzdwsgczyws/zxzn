@@ -90,7 +90,7 @@ Page({
     const rpx2px = win.windowWidth / 750
     const navContentPx = Math.ceil(88 * rpx2px)
     const navTotal = sb + navContentPx
-    // 底部三入口：在约 1/7 屏高基础上再缩小 1/3（≈2/21 屏）；主区留给心象箴言滚动
+    // 底栏（主页 + 三入口）：在约 1/7 屏高基础上再缩小 1/3（≈2/21 屏）；主区留给心象箴言滚动
     const bottomPx = Math.max(68, Math.floor((win.windowHeight / 7) * (2 / 3)))
     const hallStripPx = Math.max(72, Math.floor(132 * rpx2px))
     const mainH = Math.max(200, win.windowHeight - navTotal - bottomPx - hallStripPx)
@@ -223,6 +223,10 @@ Page({
     if (this.data.aiExpandLoading) return
     this.setData({ aiExpandText: '', aiExpandErr: '' })
     this.tapAiExpand()
+  },
+
+  goHome() {
+    wx.reLaunch({ url: '/pages/index/index' })
   },
 
   goQuiz() {
