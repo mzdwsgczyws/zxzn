@@ -127,7 +127,7 @@ const PERSONALITY_TYPES = [
   {
     id: 10,
     name: '阳潜流形型',
-    figure: '徐霞客',
+    figure: '玄奘',
     vector: [0.84, 0.26, 0.88, 0.16],
     summary: '你当前更接近内敛而好探索、以行走与体验扩展认知的状态。',
     traits: ['好奇心强', '身体与空间感重要', '不喜空谈'],
@@ -139,7 +139,7 @@ const PERSONALITY_TYPES = [
   {
     id: 11,
     name: '阳潜归核型',
-    figure: '李时珍',
+    figure: '司马迁',
     vector: [0.76, 0.38, 0.22, 0.12],
     summary: '你当前更接近沉潜钻研、以实证与积累成学的状态。',
     traits: ['耐心细致', '重证据与细节', '少炫耀'],
@@ -151,7 +151,7 @@ const PERSONALITY_TYPES = [
   {
     id: 12,
     name: '阴潜外化型',
-    figure: '左宗棠',
+    figure: '岳飞',
     vector: [0.38, 0.7, 0.48, 0.1],
     summary: '你当前更接近外刚内韧、先难后获、善于承压的状态。',
     traits: ['意志坚定', '能扛事', '表达偏节制'],
@@ -163,7 +163,7 @@ const PERSONALITY_TYPES = [
   {
     id: 13,
     name: '阴潜定道型',
-    figure: '周敦颐',
+    figure: '朱熹',
     vector: [0.28, 0.8, 0.26, 0.08],
     summary: '你当前更接近内求理路、清静自守、重品格与义理的状态。',
     traits: ['自律', '喜读书与抽象思考', '情绪内敛'],
@@ -175,7 +175,7 @@ const PERSONALITY_TYPES = [
   {
     id: 14,
     name: '阴潜游化型',
-    figure: '王维',
+    figure: '曹雪芹',
     vector: [0.32, 0.24, 0.82, 0.12],
     summary: '你当前更接近内秀、审美与意境敏感、在静中流动的状态。',
     traits: ['感知细腻', '喜艺术与自然', '不喜冲突'],
