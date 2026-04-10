@@ -2,6 +2,7 @@
  * 心象箴言配图：使用微信小程序旧版 Canvas API（wx.createCanvasContext），
  * 与 canvas-id 配合；避免 type="2d" 在部分基础库下合成失败只显示黑色。
  * 颜色一律 rgb/rgba；背景与装饰按等第配色。
+ * 卦名与副标题文字：优先使用隶书（wx.loadFontFace，见 utils/lot-font.js 与 fonts/README.md）。
  */
 
 function wxStrokeRoundRect(ctx, x, y, rw, rh, radius, color, lw) {
@@ -151,7 +152,8 @@ function drawCornerMarksWx(ctx, w, h, id, strokeColor) {
  * @param {WechatMiniprogram.CanvasContext} ctx wx.createCanvasContext 返回值
  * @param {number} w 与 canvas 样式宽一致的逻辑像素
  * @param {number} h 与 canvas 样式高一致的逻辑像素
- * @param {{ id: number, title: string, tierLabel?: string, tier?: string }} lot
+ * @param {{ id: number, title: string, tierLabel?: string, tier?: string, lishuFontFamily?: string }} lot
+ *        lishuFontFamily：已 loadFontFace 的 family 名；缺省则仅 setFontSize（系统字体）
  */
 function drawLotArtWx(ctx, w, h, lot) {
   const id = lot.id != null ? lot.id : 0
@@ -218,16 +220,35 @@ function drawLotArtWx(ctx, w, h, lot) {
     10,
     titleLen <= 1 ? Math.min(w, h) * 0.26 : titleLen === 2 ? Math.min(w, h) * 0.2 : Math.min(w, h) * 0.13
   )
+  const titlePx = Math.floor(fontSize)
+  const subPx = Math.max(10, Math.floor(Math.min(w, h) * 0.062))
+  const ff = lot.lishuFontFamily
 
   ctx.setFillStyle(theme.title)
-  ctx.setFontSize(Math.floor(fontSize))
   ctx.setTextAlign('center')
   ctx.setTextBaseline('middle')
+  if (ff) {
+    try {
+      ctx.font = `normal normal ${titlePx}px "${ff}"`
+    } catch (e) {
+      ctx.setFontSize(titlePx)
+    }
+  } else {
+    ctx.setFontSize(titlePx)
+  }
   ctx.fillText(title, cx, cy)
 
   const sub = `${lot.tierLabel || ''} · 第${id + 1}条`
-  ctx.setFontSize(Math.max(10, Math.floor(Math.min(w, h) * 0.062)))
   ctx.setFillStyle(theme.sub)
+  if (ff) {
+    try {
+      ctx.font = `normal normal ${subPx}px "${ff}"`
+    } catch (e) {
+      ctx.setFontSize(subPx)
+    }
+  } else {
+    ctx.setFontSize(subPx)
+  }
   ctx.fillText(sub, cx, h * 0.8)
 }
 

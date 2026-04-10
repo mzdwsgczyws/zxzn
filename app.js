@@ -1,9 +1,11 @@
 const { CLOUD_ENV } = require('./utils/cloud-env.js')
 const usageAnalytics = require('./utils/usage-analytics.js')
+const { ensureLotArtFont } = require('./utils/lot-font.js')
 
 App({
   onLaunch() {
     usageAnalytics.onAppLaunch()
+    ensureLotArtFont()
 
     if (wx.cloud) {
       wx.cloud.init({

@@ -14,6 +14,7 @@ const { getHuangdaoPackage } = require('./almanac.js')
 const { fetchWeather } = require('./weather.js')
 const { computeLotteryAdvices } = require('./lottery-advice.js')
 const { drawLotArtWx } = require('./lot-art.js')
+const { ensureLotArtFont, FONT_FAMILY } = require('./lot-font.js')
 const { applyLotStylePref } = require('./lot-display.js')
 
 function todayStr() {
@@ -281,18 +282,22 @@ function renderLotArt(page, retry) {
 
 function paintLotToCanvas(page, w, h, lot) {
   if (!lot || w < 2 || h < 2) return
-  try {
-    const ctx = wx.createCanvasContext(getCanvasId(page), page)
-    drawLotArtWx(ctx, w, h, {
-      id: lot.id,
-      title: lot.title,
-      tierLabel: lot.tierLabel || '',
-      tier: lot.tier
-    })
-    ctx.draw(false)
-  } catch (e) {
-    console.warn('lot canvas draw', e)
+  const draw = (lishuOk) => {
+    try {
+      const ctx = wx.createCanvasContext(getCanvasId(page), page)
+      drawLotArtWx(ctx, w, h, {
+        id: lot.id,
+        title: lot.title,
+        tierLabel: lot.tierLabel || '',
+        tier: lot.tier,
+        lishuFontFamily: lishuOk ? FONT_FAMILY : ''
+      })
+      ctx.draw(false)
+    } catch (e) {
+      console.warn('lot canvas draw', e)
+    }
   }
+  ensureLotArtFont().then(draw)
 }
 
 function simShake(page) {
