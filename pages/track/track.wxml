@@ -1,11 +1,21 @@
 <view class="page">
   <view class="card card-radar">
     <text class="title-lg">五行意象雷达</text>
+    <text class="radar-lead">图形为近 7 天加权；分数与说明在下方卡片（与顶点顺序一致：上起顺时针 金→木→水→火→土）。</text>
     <canvas
       canvas-id="fiveRadar"
       class="five-radar-canvas"
       disable-scroll="true"
     ></canvas>
+    <view class="radar-axis-panel">
+      <view class="radar-axis-card" wx:for="{{fiveRows}}" wx:key="name">
+        <view class="radar-axis-top">
+          <text class="radar-axis-name">{{item.name}}</text>
+          <text class="radar-axis-val">{{item.value}}</text>
+        </view>
+        <text class="radar-axis-tip">{{item.tip}}</text>
+      </view>
+    </view>
   </view>
 
   <view class="card">

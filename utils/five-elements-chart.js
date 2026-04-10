@@ -43,17 +43,6 @@ const RADAR_FOOTER_LINES = [
     REFERENCE_WIKI.stress
 ]
 
-function splitTipLines(s, lineLen) {
-  const L = lineLen || 9
-  if (!s || !String(s).length) return ['', '']
-  const t = String(s)
-  if (t.length <= L) return [t, '']
-  const a = t.slice(0, L)
-  const rest = t.slice(L)
-  if (rest.length <= L) return [a, rest]
-  return [a, rest.slice(0, L - 1) + '…']
-}
-
 function clamp(x, a, b) {
   return Math.max(a, Math.min(b, x))
 }
@@ -227,8 +216,8 @@ function computeFiveElements(recordsAsc, profile, personality) {
 }
 
 /**
- * 旧版 Canvas API 绘制五边形雷达（canvas-id）；顶点外缘写「名 + 分 + 两行释义」。
- * @param fe computeFiveElements 的完整返回值（含 jin…tu 与 rows）
+ * 旧版 Canvas API：只绘制网格与数据多边形；文字由页面 WXML 卡片展示，避免重叠。
+ * @param fe computeFiveElements 的完整返回值（含 jin…tu）
  */
 function drawFiveRadar(canvasId, pageOrComp, rect, fe) {
   const width = rect.width
@@ -237,14 +226,8 @@ function drawFiveRadar(canvasId, pageOrComp, rect, fe) {
 
   const ctx = wx.createCanvasContext(canvasId, pageOrComp)
   const cx = width / 2
-  const cy = height * 0.48
-  const R = Math.min(width, height) * 0.22
-
-  const fsName = Math.max(10, Math.min(12, Math.floor(width / 30)))
-  const fsTip = Math.max(8, fsName - 2)
-  const d1 = R + 12
-  const d2 = R + 24
-  const d3 = R + 36
+  const cy = height / 2
+  const R = Math.min(width, height) * 0.4
 
   ctx.setFillStyle('rgb(252, 250, 246)')
   ctx.fillRect(0, 0, width, height)
@@ -260,8 +243,8 @@ function drawFiveRadar(canvasId, pageOrComp, rect, fe) {
       else ctx.lineTo(x, y)
     }
     ctx.closePath()
-    ctx.setStrokeStyle(level === 5 ? 'rgba(93, 84, 72, 0.42)' : 'rgba(210, 200, 186, 0.5)')
-    ctx.setLineWidth(level === 5 ? 1.1 : 0.55)
+    ctx.setStrokeStyle(level === 5 ? 'rgba(93, 84, 72, 0.45)' : 'rgba(210, 200, 186, 0.55)')
+    ctx.setLineWidth(level === 5 ? 1.2 : 0.55)
     ctx.stroke()
   }
 
@@ -270,8 +253,8 @@ function drawFiveRadar(canvasId, pageOrComp, rect, fe) {
     ctx.beginPath()
     ctx.moveTo(cx, cy)
     ctx.lineTo(cx + R * Math.cos(angle), cy + R * Math.sin(angle))
-    ctx.setStrokeStyle('rgba(200, 192, 178, 0.4)')
-    ctx.setLineWidth(0.5)
+    ctx.setStrokeStyle('rgba(200, 192, 178, 0.45)')
+    ctx.setLineWidth(0.6)
     ctx.stroke()
   }
 
@@ -280,38 +263,28 @@ function drawFiveRadar(canvasId, pageOrComp, rect, fe) {
   for (let i = 0; i < 5; i++) {
     const angle = -Math.PI / 2 + (i * 2 * Math.PI) / 5
     const t = clamp(vals[i] / 100, 0, 1)
-    const rr = R * (0.2 + 0.8 * t)
+    const rr = R * (0.18 + 0.82 * t)
     const x = cx + rr * Math.cos(angle)
     const y = cy + rr * Math.sin(angle)
     if (i === 0) ctx.moveTo(x, y)
     else ctx.lineTo(x, y)
   }
   ctx.closePath()
-  ctx.setFillStyle('rgba(57, 73, 171, 0.22)')
+  ctx.setFillStyle('rgba(57, 73, 171, 0.26)')
   ctx.fill()
-  ctx.setStrokeStyle('rgba(40, 53, 147, 0.88)')
-  ctx.setLineWidth(2)
+  ctx.setStrokeStyle('rgba(40, 53, 147, 0.92)')
+  ctx.setLineWidth(2.5)
   ctx.stroke()
 
-  const rows = Array.isArray(fe.rows) ? fe.rows : []
-  const fallback = ['金', '木', '水', '火', '土']
+  const tick = ['金', '木', '水', '火', '土']
   ctx.setTextAlign('center')
   ctx.setTextBaseline('middle')
-
+  ctx.setFontSize(Math.max(12, Math.floor(Math.min(width, height) / 22)))
+  ctx.setFillStyle('#5c4d3d')
+  const labelR = R + 14
   for (let i = 0; i < 5; i++) {
     const angle = -Math.PI / 2 + (i * 2 * Math.PI) / 5
-    const row = rows[i] || { name: fallback[i], value: vals[i], tip: '' }
-    const line1 = `${row.name} ${row.value}`
-    const [t1, t2] = splitTipLines(row.tip, width < 280 ? 8 : 9)
-
-    ctx.setFontSize(fsName)
-    ctx.setFillStyle('#1a237e')
-    ctx.fillText(line1, cx + d1 * Math.cos(angle), cy + d1 * Math.sin(angle))
-
-    ctx.setFontSize(fsTip)
-    ctx.setFillStyle('#6d5d4a')
-    if (t1) ctx.fillText(t1, cx + d2 * Math.cos(angle), cy + d2 * Math.sin(angle))
-    if (t2) ctx.fillText(t2, cx + d3 * Math.cos(angle), cy + d3 * Math.sin(angle))
+    ctx.fillText(tick[i], cx + labelR * Math.cos(angle), cy + labelR * Math.sin(angle))
   }
 
   ctx.draw()

@@ -80,7 +80,8 @@ Page({
     records: [],
     analysis: null,
     radarFooterLines: RADAR_FOOTER_LINES,
-    radarFooterExtra: ''
+    radarFooterExtra: '',
+    fiveRows: []
   },
 
   onShow() {
@@ -126,7 +127,10 @@ Page({
     const profile = wx.getStorageSync(KEYS.USER_PROFILE) || {}
     const personality = wx.getStorageSync(KEYS.PERSONALITY_RESULT) || null
     const fe = computeFiveElements(records, profile, personality)
-    this.setData({ radarFooterExtra: fe.hint || '' })
+    this.setData({
+      radarFooterExtra: fe.hint || '',
+      fiveRows: (fe.rows || []).map((r) => ({ name: r.name, value: r.value, tip: r.tip }))
+    })
     scheduleDraw(() => {
       const q = wx.createSelectorQuery().in(this)
       q.select('.five-radar-canvas')
