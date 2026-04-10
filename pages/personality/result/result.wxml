@@ -1,0 +1,55 @@
+<view class="page" wx:if="{{hasResult}}">
+  <view class="top-bar">
+    <text class="retest-link" bindtap="retest">重新测验</text>
+  </view>
+  <view class="banner">
+    <text class="tip">你当前更接近以下状态（非固定标签，可随修行与境遇变化）</text>
+  </view>
+
+  <view class="card main-card">
+    <text class="type-name">{{result.typeName}}</text>
+    <text class="figure">历史形象取意：{{result.figure}}</text>
+    <text class="summary">{{result.summary}}</text>
+
+    <view class="scores">
+      <view class="score-item" wx:for="{{scoreList}}" wx:key="k">
+        <text class="sk">{{item.k}}</text>
+        <view class="bar-bg">
+          <view class="bar-fill" style="width: {{item.v}}%;"></view>
+        </view>
+        <text class="sv">{{item.v}}%</text>
+      </view>
+    </view>
+
+    <view class="section">
+      <text class="sec-title">核心特征</text>
+      <text class="li" wx:for="{{result.traits}}" wx:key="*this">· {{item}}</text>
+    </view>
+    <view class="section">
+      <text class="sec-title">风险点</text>
+      <text class="li" wx:for="{{result.risks}}" wx:key="*this">· {{item}}</text>
+    </view>
+    <view class="section">
+      <text class="sec-title">修行建议</text>
+      <text class="li" wx:for="{{result.advice}}" wx:key="*this">· {{item}}</text>
+    </view>
+    <view class="section">
+      <text class="sec-title">详细说明</text>
+      <text class="para">{{result.detail}}</text>
+    </view>
+  </view>
+
+  <view class="actions safe-bottom">
+    <button class="btn-primary share-friend" open-type="share">分享给好友（卡片图）</button>
+    <button class="btn-primary" bindtap="savePoster">保存高清海报到相册</button>
+    <button class="btn-ghost" bindtap="retest">重新测验</button>
+  </view>
+
+  <canvas canvas-id="shareCanvas" class="hidden-canvas" style="width: 500px; height: 400px;"></canvas>
+  <canvas canvas-id="posterCanvas" class="hidden-canvas" style="width: 750px; height: 1200px;"></canvas>
+</view>
+
+<view class="empty page" wx:else>
+  <text class="empty-text">还没有测验结果</text>
+  <button class="btn-primary" bindtap="startQuiz">开始测验</button>
+</view>

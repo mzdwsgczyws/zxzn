@@ -1,0 +1,17 @@
+<view class="page">
+  <view class="progress-wrap">
+    <view class="progress-bar">
+      <view class="progress-fill" style="width: {{progress}}%;"></view>
+    </view>
+    <text class="progress-text">{{currentIndex + 1}} / {{total}}</text>
+  </view>
+
+  <view class="card question-card" wx:if="{{current}}">
+    <text class="q-label">第 {{current.id}} 题</text>
+    <text class="q-text">{{current.text}}</text>
+    <button class="opt" bindtap="choose" data-side="a">{{current.a.label}}</button>
+    <button class="opt" bindtap="choose" data-side="b">{{current.b.label}}</button>
+  </view>
+
+  <view class="hint">提示：没有标准答案，按「通常情况」选择即可。</view>
+</view>

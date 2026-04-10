@@ -1,0 +1,160 @@
+.page {
+  min-height: 100vh;
+  padding-bottom: 48rpx;
+}
+
+.top-bar {
+  display: flex;
+  justify-content: flex-end;
+  padding: 16rpx 32rpx 0;
+}
+
+.retest-link {
+  font-size: 26rpx;
+  color: #3949ab;
+  text-decoration: underline;
+}
+
+.banner {
+  margin: 8rpx 32rpx 0;
+  padding: 20rpx 24rpx;
+  background: rgba(57, 73, 171, 0.08);
+  border-radius: 12rpx;
+  border-left: 6rpx solid #3949ab;
+}
+
+.tip {
+  font-size: 24rpx;
+  color: #5c4d3d;
+  line-height: 1.6;
+}
+
+.main-card {
+  margin-top: 20rpx;
+}
+
+.type-name {
+  display: block;
+  font-size: 40rpx;
+  font-weight: 700;
+  color: #1a237e;
+}
+
+.figure {
+  display: block;
+  margin-top: 12rpx;
+  font-size: 26rpx;
+  color: #8d6e63;
+}
+
+.summary {
+  display: block;
+  margin-top: 24rpx;
+  font-size: 28rpx;
+  color: #3e3428;
+  line-height: 1.65;
+}
+
+.scores {
+  margin-top: 28rpx;
+  padding-top: 24rpx;
+  border-top: 1rpx solid #ece5d8;
+}
+
+.score-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16rpx;
+}
+
+.sk {
+  width: 48rpx;
+  font-size: 26rpx;
+  color: #6d5d4a;
+}
+
+.bar-bg {
+  flex: 1;
+  height: 16rpx;
+  background: #e8e0d4;
+  border-radius: 8rpx;
+  margin: 0 16rpx;
+  overflow: hidden;
+}
+
+.bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #7e57c2, #3949ab);
+  border-radius: 8rpx;
+}
+
+.sv {
+  width: 72rpx;
+  font-size: 24rpx;
+  color: #78909c;
+  text-align: right;
+}
+
+.section {
+  margin-top: 28rpx;
+}
+
+.sec-title {
+  display: block;
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #3949ab;
+  margin-bottom: 12rpx;
+}
+
+.li {
+  display: block;
+  font-size: 26rpx;
+  color: #4a4034;
+  line-height: 1.65;
+  margin-bottom: 6rpx;
+}
+
+.para {
+  display: block;
+  font-size: 26rpx;
+  color: #5c4d3d;
+  line-height: 1.7;
+}
+
+.actions {
+  padding: 32rpx 48rpx 48rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.actions .btn-primary,
+.actions .btn-ghost,
+.actions .share-friend {
+  width: 100%;
+}
+
+.share-friend::after {
+  border: none;
+}
+
+.hidden-canvas {
+  position: fixed;
+  left: -2000px;
+  top: 0;
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 120rpx 48rpx;
+}
+
+.empty-text {
+  font-size: 28rpx;
+  color: #8d7b68;
+  margin-bottom: 40rpx;
+}

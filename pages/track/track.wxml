@@ -1,0 +1,56 @@
+<view class="page">
+  <view class="card">
+    <text class="title-lg">今日记录</text>
+    <text class="subtitle">记录可量化指标，便于观察趋势（非医疗诊断）。</text>
+
+    <view class="field">
+      <text class="label">睡眠时长（小时）</text>
+      <slider min="0" max="12" step="0.5" show-value value="{{form.sleepHours}}" bindchange="onSleep" />
+    </view>
+    <view class="field">
+      <text class="label">生气 / 强烈烦躁（次）</text>
+      <slider min="0" max="20" step="1" show-value value="{{form.angerCount}}" bindchange="onAnger" />
+    </view>
+    <view class="field">
+      <text class="label">烦恼念头登记（次）</text>
+      <slider min="0" max="30" step="1" show-value value="{{form.worryCount}}" bindchange="onWorry" />
+    </view>
+    <view class="field">
+      <text class="label">娱乐屏幕（小时）</text>
+      <slider min="0" max="16" step="0.5" show-value value="{{form.screenHours}}" bindchange="onScreen" />
+    </view>
+    <view class="field">
+      <text class="label">步行（分钟）</text>
+      <slider min="0" max="180" step="5" show-value value="{{form.walkMinutes}}" bindchange="onWalk" />
+    </view>
+    <view class="field">
+      <text class="label">静坐 / 正念（分钟）</text>
+      <slider min="0" max="120" step="5" show-value value="{{form.calmMinutes}}" bindchange="onCalm" />
+    </view>
+
+    <button class="btn-primary save-btn" bindtap="saveToday">保存今日</button>
+  </view>
+
+  <view class="card" wx:if="{{analysis}}">
+    <text class="title-lg">{{analysis.title}}</text>
+    <text class="para" wx:for="{{analysis.lines}}" wx:key="*this">{{item}}</text>
+    <view class="focus-wrap" wx:if="{{analysis.focus.length}}">
+      <text class="sec-title">可执行侧重点</text>
+      <text class="li" wx:for="{{analysis.focus}}" wx:key="*this">· {{item}}</text>
+    </view>
+    <button class="btn-ghost" bindtap="runAnalysis">刷新分析</button>
+  </view>
+
+  <view class="card" wx:else>
+    <text class="muted">保存记录后，点击下方生成基于近几日数据的修行侧重点。</text>
+    <button class="btn-primary" bindtap="runAnalysis">生成修行方案</button>
+  </view>
+
+  <view class="card" wx:if="{{records.length}}">
+    <text class="title-lg">最近记录</text>
+    <view class="row" wx:for="{{records}}" wx:key="date">
+      <text class="d">{{item.date}}</text>
+      <text class="r">睡{{item.sleepHours}}h · 怒{{item.angerCount}} · 烦{{item.worryCount}}</text>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,130 @@
+.page {
+  min-height: 100vh;
+  padding: 24rpx 0 64rpx;
+}
+
+.title-lg {
+  display: block;
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #1a237e;
+}
+
+.subtitle {
+  display: block;
+  margin: 12rpx 0 32rpx;
+  font-size: 24rpx;
+  color: #6d5d4a;
+  line-height: 1.55;
+}
+
+.section-gap {
+  margin-top: 8rpx;
+  padding-top: 24rpx;
+  border-top: 1rpx dashed rgba(139, 115, 85, 0.35);
+}
+
+.field {
+  margin-bottom: 28rpx;
+}
+
+.tag-row {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 16rpx;
+  margin-top: 8rpx;
+}
+
+.tag-chip {
+  padding: 12rpx 22rpx;
+  border-radius: 999rpx;
+  font-size: 26rpx;
+  color: #5d4d3d;
+  background: #f0ebe3;
+  border: 2rpx solid #e0d8c8;
+}
+
+.tag-on {
+  color: #fff;
+  background: linear-gradient(135deg, #5c4d8a 0%, #3d2b69 100%);
+  border-color: rgba(212, 175, 55, 0.45);
+}
+
+.label {
+  display: block;
+  font-size: 26rpx;
+  color: #4a4034;
+  margin-bottom: 12rpx;
+}
+
+.input {
+  background: #f8f6f0;
+  border: 2rpx solid #e0d8c8;
+  border-radius: 12rpx;
+  padding: 20rpx 24rpx;
+  font-size: 28rpx;
+}
+
+.picker-val {
+  background: #f8f6f0;
+  border: 2rpx solid #e0d8c8;
+  border-radius: 12rpx;
+  padding: 20rpx 24rpx;
+  font-size: 28rpx;
+  color: #2c2416;
+}
+
+.muted-card {
+  background: rgba(120, 144, 156, 0.08);
+}
+
+.muted {
+  font-size: 24rpx;
+  color: #78909c;
+  line-height: 1.6;
+}
+
+.loc-hint {
+  display: block;
+  font-size: 22rpx;
+  color: #8d7b68;
+  line-height: 1.5;
+  margin-bottom: 16rpx;
+}
+
+.loc-row {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 16rpx;
+  align-items: center;
+  margin-bottom: 12rpx;
+}
+
+.loc-pick,
+.loc-clear {
+  margin: 0 !important;
+  flex: 1;
+  min-width: 200rpx;
+  font-size: 26rpx !important;
+  padding: 16rpx 20rpx !important;
+}
+
+.loc-clear {
+  flex: 0 0 auto;
+  min-width: 120rpx;
+}
+
+.loc-name {
+  display: block;
+  font-size: 26rpx;
+  color: #3949ab;
+  line-height: 1.45;
+}
+
+.loc-empty {
+  display: block;
+  font-size: 24rpx;
+  color: #9a8b7a;
+}

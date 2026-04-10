@@ -1,0 +1,184 @@
+.page {
+  min-height: 100vh;
+  padding: 24rpx 0 48rpx;
+}
+
+.hint {
+  margin: 0 24rpx 24rpx;
+  font-size: 24rpx;
+  color: #5c4d3d;
+  line-height: 1.65;
+}
+
+.stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 48rpx 0 80rpx;
+}
+
+.tube-wrap {
+  position: relative;
+  width: 200rpx;
+  height: 320rpx;
+}
+
+.tube-wrap.shaking {
+  animation: shake 0.4s ease-in-out infinite;
+}
+
+@keyframes shake {
+  0% {
+    transform: rotate(-6deg) translateX(0);
+  }
+  50% {
+    transform: rotate(8deg) translateX(6rpx);
+  }
+  100% {
+    transform: rotate(-6deg) translateX(0);
+  }
+}
+
+.tube {
+  position: absolute;
+  left: 20rpx;
+  right: 20rpx;
+  bottom: 0;
+  top: 40rpx;
+  background: linear-gradient(180deg, #5d4037 0%, #3e2723 100%);
+  border-radius: 20rpx 20rpx 12rpx 12rpx;
+  box-shadow: inset 0 -20rpx 40rpx rgba(0, 0, 0, 0.35);
+  border: 4rpx solid #8d6e63;
+}
+
+.sticks {
+  position: absolute;
+  left: 56rpx;
+  right: 56rpx;
+  top: 0;
+  height: 120rpx;
+  background: repeating-linear-gradient(
+    90deg,
+    #d7ccc8 0,
+    #d7ccc8 8rpx,
+    #a1887f 8rpx,
+    #a1887f 16rpx
+  );
+  border-radius: 8rpx 8rpx 0 0;
+}
+
+.shake-tip {
+  margin-top: 40rpx;
+  font-size: 28rpx;
+  color: #6d5d4a;
+}
+
+.sim-tip {
+  margin-top: 24rpx;
+  font-size: 24rpx;
+  color: #78909c;
+  text-decoration: underline;
+  padding: 16rpx;
+}
+
+.result-card {
+  margin: 0 24rpx;
+}
+
+.tier {
+  display: block;
+  font-size: 36rpx;
+  font-weight: 700;
+  margin-bottom: 16rpx;
+}
+
+.lot-name {
+  display: block;
+  font-size: 34rpx;
+  font-weight: 600;
+  color: #2c2416;
+  margin-bottom: 24rpx;
+}
+
+.sealed {
+  padding: 48rpx;
+  background: linear-gradient(135deg, #ede7dc, #d7ccc8);
+  border-radius: 16rpx;
+  text-align: center;
+  margin-bottom: 24rpx;
+  border: 2rpx dashed #8d6e63;
+}
+
+.sealed-text {
+  font-size: 30rpx;
+  color: #4e342e;
+}
+
+.poem {
+  display: block;
+  font-size: 28rpx;
+  color: #3e3428;
+  line-height: 1.75;
+  margin-bottom: 20rpx;
+  font-style: italic;
+}
+
+/* 签图区域：约一屏高度的 1/5，介于诗句与释义之间 */
+.lot-art-wrap {
+  width: 100%;
+  height: 20vh;
+  min-height: 180rpx;
+  max-height: 340rpx;
+  margin: 8rpx 0 28rpx;
+  border-radius: 16rpx;
+  overflow: hidden;
+  background: #2c3e55;
+  box-shadow: 0 10rpx 28rpx rgba(26, 35, 126, 0.15);
+}
+
+/* 宽高由 lotArtW/lotArtH（px）与内联 style 指定；签图使用 canvas-id 旧版接口绘制 */
+.lot-art-canvas {
+  display: block;
+}
+
+.block {
+  margin-bottom: 24rpx;
+}
+
+.b-title {
+  display: block;
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #3949ab;
+  margin-bottom: 8rpx;
+}
+
+.b-body {
+  display: block;
+  font-size: 26rpx;
+  color: #4a4034;
+  line-height: 1.65;
+}
+
+.adv-line {
+  display: block;
+  font-size: 26rpx;
+  color: #3e3428;
+  line-height: 1.7;
+  margin-top: 14rpx;
+  padding-left: 8rpx;
+  border-left: 4rpx solid rgba(57, 73, 171, 0.35);
+}
+
+.share-btn::after {
+  border: none;
+}
+
+.share-btn {
+  width: 100%;
+  margin-bottom: 16rpx;
+}
+
+.footer {
+  padding: 24rpx 48rpx;
+}

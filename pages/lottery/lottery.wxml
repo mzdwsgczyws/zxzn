@@ -1,0 +1,47 @@
+<view class="page">
+  <view class="hint card" wx:if="{{phase === 'shake'}}">
+    <text>手持手机轻轻摇动签筒，感应数次后即可出签。每日一支，签文与建议仅供自察与行愿参考。</text>
+  </view>
+
+  <view class="stage" wx:if="{{phase === 'shake' || phase === 'anim'}}">
+    <view class="tube-wrap {{shaking ? 'shaking' : ''}}">
+      <view class="tube"></view>
+      <view class="sticks"></view>
+    </view>
+    <text class="shake-tip">{{shakeHint}}</text>
+    <text class="sim-tip" wx:if="{{phase === 'shake'}}" bindtap="simShake">模拟器无感应？点此模拟摇动</text>
+  </view>
+
+  <view class="card result-card" wx:if="{{phase === 'result'}}">
+    <text class="tier" style="color: {{tierColor}};">{{lot.tierLabel}}</text>
+    <text class="lot-name" wx:if="{{revealed}}">{{lot.name}}</text>
+    <view class="sealed" wx:else bindtap="reveal">
+      <text class="sealed-text">签文已就 · 点击查看</text>
+    </view>
+
+    <block wx:if="{{revealed}}">
+      <text class="poem">{{lot.poem}}</text>
+      <view class="lot-art-wrap">
+        <canvas
+          canvas-id="lotArtCanvas"
+          class="lot-art-canvas"
+          style="width: {{lotArtW}}px; height: {{lotArtH}}px;"
+          disable-scroll="{{true}}"
+        ></canvas>
+      </view>
+      <view class="block">
+        <text class="b-title">释义</text>
+        <text class="b-body">{{lot.interpret}}</text>
+      </view>
+      <view class="block">
+        <text class="b-title">建议</text>
+        <text class="adv-line" wx:for="{{adviceList}}" wx:key="*this">{{item}}</text>
+      </view>
+    </block>
+  </view>
+
+  <view class="footer safe-bottom" wx:if="{{phase === 'result' && revealed}}">
+    <button class="btn-primary share-btn" open-type="share">分享给好友</button>
+    <button class="btn-ghost" bindtap="shareHint">分享说明</button>
+  </view>
+</view>

@@ -1,0 +1,27 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/personality/quiz/quiz",
+    "pages/personality/result/result",
+    "pages/track/track",
+    "pages/lottery/lottery",
+    "pages/profile/profile"
+  ],
+  "window": {
+    "navigationBarTitleText": "量化论道修身",
+    "navigationBarBackgroundColor": "#1a237e",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#f5f0e8",
+    "backgroundTextStyle": "dark"
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents",
+  "cloud": true,
+  "permission": {
+    "scope.userLocation": {
+      "desc": "档案内地图选点，用于本地天气与灵签参考"
+    }
+  },
+  "requiredPrivateInfos": ["chooseLocation"]
+}

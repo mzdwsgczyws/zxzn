@@ -1,0 +1,110 @@
+<view class="home">
+  <view class="custom-nav" style="padding-top: {{statusBarH}}px;">
+    <view class="nav-inner">
+      <text class="nav-title">量化论道修身</text>
+    </view>
+  </view>
+
+  <view class="main-column" style="padding-top: {{navTotalPx}}px;">
+    <scroll-view
+      scroll-y="{{true}}"
+      enhanced="{{true}}"
+      show-scrollbar="{{true}}"
+      class="lot-scroll"
+      style="height: {{mainScrollH}}px;"
+    >
+      <!-- 未抽签：居中入口 -->
+      <view class="lot-panel lot-idle" wx:if="{{phase === 'idle'}}">
+        <view class="idle-warm-wrap">
+          <text class="idle-warm-tip">今日还未抽取灵签，快来抽一支试试吧！</text>
+        </view>
+        <view class="idle-deco">
+          <text class="idle-moon">☽</text>
+        </view>
+        <text class="idle-tag">今日灵签</text>
+        <button class="idle-btn" bindtap="tapStartLottery">轻触启签 · 摇晃感应</button>
+        <text class="idle-hint">点击按钮后将感应手机摇动，约 12 次有效晃动后出签</text>
+      </view>
+
+      <!-- 摇签中 / 动画 -->
+      <view class="lot-panel lot-stage" wx:if="{{phase === 'shake' || phase === 'anim'}}">
+        <view class="tube-wrap {{shaking ? 'shaking' : ''}}">
+          <view class="tube"></view>
+          <view class="sticks"></view>
+        </view>
+        <text class="shake-tip">{{shakeHint}}</text>
+        <text class="sim-tip" wx:if="{{phase === 'shake'}}" bindtap="simShake">模拟器无感应？点此出签</text>
+      </view>
+
+      <!-- 已出签 -->
+      <view class="lot-panel lot-result" wx:if="{{phase === 'result'}}">
+        <view class="result-head">
+          <text class="tier" style="color: {{tierColor}};">{{lot.tierLabel}}</text>
+          <button class="btn-redraw" size="mini" bindtap="redrawLottery">重新抽签</button>
+        </view>
+        <text class="lot-name" wx:if="{{revealed}}">{{lot.name}}</text>
+        <view class="sealed" wx:else bindtap="reveal">
+          <text class="sealed-text">签文已就 · 点击查看</text>
+        </view>
+
+        <block wx:if="{{revealed}}">
+          <text class="poem">{{lot.poem}}</text>
+          <view class="lot-art-wrap">
+            <canvas
+              canvas-id="lotArtCanvas"
+              class="lot-art-canvas"
+              style="width: {{lotArtW}}px; height: {{lotArtH}}px;"
+              disable-scroll="{{true}}"
+            ></canvas>
+          </view>
+          <view class="block">
+            <text class="b-title">释义</text>
+            <text class="b-body">{{lot.interpret}}</text>
+          </view>
+          <view class="block">
+            <text class="b-title">建议</text>
+            <text class="adv-line" wx:for="{{adviceList}}" wx:key="*this">{{item}}</text>
+          </view>
+
+          <view class="block ai-block">
+            <text class="b-title">混元 · 延展漫谈</text>
+            <view
+              class="btn-ai {{aiExpandLoading ? 'btn-ai-disabled' : ''}}"
+              hover-class="btn-ai-hover"
+              bindtap="tapAiExpand"
+              wx:if="{{!aiExpandText && !aiExpandErr}}"
+            >
+              <text>生成延展漫谈（AI）</text>
+            </view>
+            <view
+              class="btn-ai {{aiExpandLoading ? 'btn-ai-disabled' : ''}}"
+              hover-class="btn-ai-hover"
+              bindtap="tapAiRegenerate"
+              wx:if="{{aiExpandText}}"
+            >
+              <text>重新生成</text>
+            </view>
+            <text class="ai-loading" wx:if="{{aiExpandLoading}}">生成中…</text>
+            <text class="ai-err" wx:if="{{aiExpandErr}}">{{aiExpandErr}}</text>
+            <text class="ai-body" wx:if="{{aiExpandText}}" selectable="{{true}}">{{aiExpandText}}</text>
+            <text class="ai-note">由腾讯混元大模型生成，仅供文化休闲阅读；上架需合规类目与备案，请勿替代专业意见。</text>
+          </view>
+        </block>
+
+        <text class="fine-print">仅供自察与行愿参考，请勿替代专业帮助。</text>
+      </view>
+    </scroll-view>
+
+    <view class="bottom-dock" style="height: {{bottomBarH}}px;">
+      <view class="dock-btn" hover-class="dock-btn-hover" bindtap="goQuiz">
+        <text class="dock-btn-text">道性十六型测验</text>
+      </view>
+      <view class="dock-btn" hover-class="dock-btn-hover" bindtap="goTrack">
+        <text class="dock-btn-text">量化修行记录</text>
+      </view>
+      <view class="dock-btn dock-btn-muted" hover-class="dock-btn-hover" bindtap="goProfile">
+        <text class="dock-btn-text">个人档案</text>
+      </view>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,79 @@
+.page {
+  min-height: 100vh;
+  padding: 24rpx 0 48rpx;
+}
+
+.progress-wrap {
+  padding: 0 32rpx 24rpx;
+}
+
+.progress-bar {
+  height: 12rpx;
+  background: #e8e0d4;
+  border-radius: 8rpx;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #5c6bc0, #3949ab);
+  border-radius: 8rpx;
+  transition: width 0.2s ease;
+}
+
+.progress-text {
+  display: block;
+  margin-top: 12rpx;
+  font-size: 24rpx;
+  color: #8d7b68;
+  text-align: right;
+}
+
+.question-card {
+  margin: 0 24rpx;
+}
+
+.q-label {
+  display: block;
+  font-size: 24rpx;
+  color: #78909c;
+  margin-bottom: 12rpx;
+}
+
+.q-text {
+  display: block;
+  font-size: 34rpx;
+  font-weight: 600;
+  color: #2c2416;
+  line-height: 1.55;
+  margin-bottom: 32rpx;
+}
+
+.opt {
+  display: block;
+  width: 100%;
+  margin-bottom: 20rpx;
+  padding: 28rpx 24rpx;
+  font-size: 28rpx;
+  line-height: 1.5;
+  text-align: left;
+  background: #f8f6f0;
+  color: #2c2416;
+  border-radius: 16rpx;
+  border: 2rpx solid #e0d8c8;
+}
+
+.opt::after {
+  border: none;
+}
+
+.opt:active {
+  background: #ede8dc;
+}
+
+.hint {
+  margin: 32rpx 40rpx;
+  font-size: 24rpx;
+  color: #a0907c;
+  line-height: 1.6;
+}
