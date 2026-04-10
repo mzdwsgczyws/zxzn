@@ -100,18 +100,193 @@
   margin-bottom: 24rpx;
 }
 
-.sealed {
-  padding: 48rpx;
-  background: linear-gradient(135deg, #ede7dc, #d7ccc8);
-  border-radius: 16rpx;
-  text-align: center;
+/* 未揭晓：与箴言配图同尺寸的神秘黑金闪动封面 */
+.sealed-mystery-outer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
   margin-bottom: 24rpx;
-  border: 2rpx dashed #8d6e63;
+  box-sizing: border-box;
 }
 
-.sealed-text {
-  font-size: 30rpx;
-  color: #4e342e;
+.sealed-mystery--hover {
+  opacity: 0.88;
+}
+
+.sealed-mystery {
+  position: relative;
+  max-width: 100%;
+  box-sizing: border-box;
+  border-radius: 16rpx;
+  overflow: hidden;
+  box-shadow:
+    0 12rpx 40rpx rgba(0, 0, 0, 0.35),
+    0 0 0 1rpx rgba(201, 162, 39, 0.25);
+}
+
+.sealed-mystery-base {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(155deg, #050505 0%, #12100c 38%, #1c1810 72%, #0a0906 100%);
+}
+
+.sealed-mystery-veins {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  opacity: 0.55;
+  background:
+    radial-gradient(ellipse 90% 55% at 15% 25%, rgba(212, 175, 55, 0.35), transparent 52%),
+    radial-gradient(ellipse 70% 50% at 88% 78%, rgba(180, 140, 50, 0.22), transparent 48%),
+    radial-gradient(circle at 50% 50%, transparent 30%, rgba(0, 0, 0, 0.45) 100%);
+}
+
+.sealed-mystery-grid {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  opacity: 0.4;
+  background-image:
+    repeating-linear-gradient(
+      -42deg,
+      transparent,
+      transparent 5rpx,
+      rgba(201, 162, 39, 0.07) 5rpx,
+      rgba(201, 162, 39, 0.07) 6rpx
+    ),
+    repeating-linear-gradient(
+      38deg,
+      transparent,
+      transparent 5rpx,
+      rgba(140, 110, 50, 0.06) 5rpx,
+      rgba(140, 110, 50, 0.06) 6rpx
+    );
+}
+
+.sealed-mystery-shine {
+  position: absolute;
+  top: 0;
+  left: -60%;
+  width: 55%;
+  height: 100%;
+  background: linear-gradient(
+    100deg,
+    transparent 0%,
+    rgba(255, 236, 180, 0.08) 40%,
+    rgba(255, 248, 220, 0.38) 50%,
+    rgba(255, 236, 180, 0.1) 60%,
+    transparent 100%
+  );
+  animation: sealed-mystery-sweep 2.6s ease-in-out infinite;
+}
+
+.sealed-mystery-spark {
+  position: absolute;
+  top: -20%;
+  right: -30%;
+  width: 70%;
+  height: 70%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 230, 160, 0.2) 0%,
+    rgba(201, 162, 39, 0.06) 35%,
+    transparent 65%
+  );
+  animation: sealed-mystery-spark 3.4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.sealed-mystery-frame {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 16rpx;
+  border: 2rpx solid rgba(201, 162, 39, 0.45);
+  box-shadow:
+    inset 0 0 50rpx rgba(0, 0, 0, 0.55),
+    0 0 28rpx rgba(201, 162, 39, 0.2);
+  pointer-events: none;
+  animation: sealed-mystery-glow 2.2s ease-in-out infinite;
+}
+
+.sealed-mystery-caption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 16rpx 12rpx 18rpx;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.55));
+  pointer-events: none;
+}
+
+.sealed-mystery-hint {
+  font-size: 22rpx;
+  letter-spacing: 12rpx;
+  color: rgba(232, 212, 160, 0.85);
+  text-shadow:
+    0 0 16rpx rgba(201, 162, 39, 0.7),
+    0 2rpx 8rpx rgba(0, 0, 0, 0.8);
+  animation: sealed-mystery-hint-pulse 2s ease-in-out infinite;
+}
+
+@keyframes sealed-mystery-sweep {
+  0% {
+    transform: translateX(0) skewX(-6deg);
+  }
+  100% {
+    transform: translateX(320%) skewX(-6deg);
+  }
+}
+
+@keyframes sealed-mystery-spark {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scale(1) translate(0, 0);
+  }
+  50% {
+    opacity: 0.85;
+    transform: scale(1.08) translate(-4%, 4%);
+  }
+}
+
+@keyframes sealed-mystery-glow {
+  0%,
+  100% {
+    border-color: rgba(201, 162, 39, 0.4);
+    box-shadow:
+      inset 0 0 50rpx rgba(0, 0, 0, 0.55),
+      0 0 22rpx rgba(201, 162, 39, 0.18);
+  }
+  50% {
+    border-color: rgba(255, 224, 130, 0.65);
+    box-shadow:
+      inset 0 0 40rpx rgba(0, 0, 0, 0.45),
+      0 0 40rpx rgba(255, 215, 120, 0.35);
+  }
+}
+
+@keyframes sealed-mystery-hint-pulse {
+  0%,
+  100% {
+    opacity: 0.65;
+  }
+  50% {
+    opacity: 1;
+  }
 }
 
 .poem {
