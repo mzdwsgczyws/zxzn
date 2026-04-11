@@ -96,21 +96,22 @@
               class="lot-art-canvas"
               style="width: {{lotArtW}}px; height: {{lotArtH}}px;"
               disable-scroll="{{true}}"
-            ></canvas>
-            <cover-view
-              wx:if="{{lotArtOverlay}}"
-              class="lot-art-cover-root"
-              style="width: {{lotArtW}}px; height: {{lotArtH}}px;"
             >
               <cover-view
-                class="lot-art-title-cv"
-                style="color: {{lotArtOverlay.titleColor}}; font-size: {{lotArtOverlay.titleFontPx}}px;"
-              >{{lotArtOverlay.title}}</cover-view>
-              <cover-view
-                class="lot-art-sub-cv"
-                style="color: {{lotArtOverlay.subColor}}; font-size: {{lotArtOverlay.subFontPx}}px;"
-              >{{lotArtOverlay.subLine}}</cover-view>
-            </cover-view>
+                wx:if="{{lotArtOverlay}}"
+                class="lot-art-cover-root"
+                style="width: {{lotArtW}}px; height: {{lotArtH}}px;"
+              >
+                <cover-view
+                  class="lot-art-title-cv"
+                  style="color: {{lotArtOverlay.titleColor}}; font-size: {{lotArtOverlay.titleFontPx}}px;"
+                >{{lotArtOverlay.title}}</cover-view>
+                <cover-view
+                  class="lot-art-sub-cv"
+                  style="color: {{lotArtOverlay.subColor}}; font-size: {{lotArtOverlay.subFontPx}}px;"
+                >{{lotArtOverlay.subLine}}</cover-view>
+              </cover-view>
+            </canvas>
           </view>
           <view class="block">
             <text class="b-title">释义</text>

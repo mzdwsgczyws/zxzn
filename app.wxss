@@ -86,7 +86,7 @@ page {
   margin-top: 12rpx;
 }
 
-/* 心象箴言配图：cover-view 叠在原生 canvas 上，隶书由 wx.loadFontFace 的 DaoLotLiShu 生效 */
+/* 心象箴言配图：cover-view 作为 canvas 子节点叠字，避免在 scroll-view 内与画布错位；隶书见 DaoLotLiShu */
 .lot-art-wrap {
   position: relative;
 }

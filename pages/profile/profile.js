@@ -10,13 +10,13 @@ const { geocodeFromProfileParts } = require('../../utils/geocode.js')
 const GENDER_KEYS = ['unknown', 'male', 'female']
 const GENDER_LABELS = ['保密 / 跳过', '男', '女']
 
-const RECENT_LABELS = ['未选择（抽取时将提示完善）', '偏低沉 / 易疲', '平稳', '较充沛 / 偏积极']
+const RECENT_LABELS = ['-', '偏低沉 / 易疲', '平稳', '较充沛 / 偏积极']
 const RECENT_VALUES = [null, 'low', 'mid', 'high']
 
-const RHYTHM_LABELS = ['未选择（抽取时将提示完善）', '偏早起', '偏夜猫', '作息不太规律']
+const RHYTHM_LABELS = ['-', '偏早起', '偏夜猫', '作息不太规律']
 const RHYTHM_VALUES = [null, 'early', 'night', 'irregular']
 
-const STYLE_LABELS = ['未选择（抽取时将提示完善）', '简练', '详尽', '略偏文言感', '白话分行（易读）']
+const STYLE_LABELS = ['-', '简练', '详尽', '略偏文言感', '白话分行（易读）']
 const STYLE_VALUES = [null, 'brief', 'rich', 'classical', 'plain']
 
 const FOCUS_OPTIONS = [
