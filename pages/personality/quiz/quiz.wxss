@@ -52,8 +52,8 @@
 .opt {
   display: block;
   width: 100%;
-  margin-bottom: 20rpx;
-  padding: 28rpx 24rpx;
+  margin-bottom: 16rpx;
+  padding: 24rpx 24rpx;
   font-size: 28rpx;
   line-height: 1.5;
   text-align: left;
@@ -72,27 +72,13 @@
   background: #ede8dc;
 }
 
-.opt--neutral {
-  text-align: center;
-  color: #78909c;
-  font-size: 26rpx;
-  background: #f2f0ec;
-  border-style: dashed;
-}
-
 .opt--selected {
   background: #e8e2f0;
   border-color: #7e57c2;
   color: #4a148c;
 }
 
-.opt--neutral.opt--selected {
-  background: #ede8f5;
-  border-color: #9575cd;
-  color: #5e35b1;
-}
-
-/* 导航行：上一题 */
+/* 导航行 */
 .nav-row {
   display: flex;
   flex-direction: row;

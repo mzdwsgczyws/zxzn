@@ -11,7 +11,7 @@ Page({
     current: null,
     progress: 0,
     answers: {},
-    selectedSide: ''
+    selectedIdx: -1
   },
 
   onLoad() {
@@ -21,19 +21,23 @@ Page({
   setQuestion(index) {
     const current = QUESTIONS[index]
     const progress = Math.round(((index + 1) / QUESTIONS.length) * 100)
-    const existing = this.data.answers[current.id] || ''
-    this.setData({ currentIndex: index, current, progress, selectedSide: existing })
+    const existing = this.data.answers[current.id]
+    this.setData({
+      currentIndex: index,
+      current,
+      progress,
+      selectedIdx: existing != null ? existing : -1
+    })
   },
 
   choose(e) {
-    const side = e.currentTarget.dataset.side
+    const idx = Number(e.currentTarget.dataset.idx)
     const { currentIndex, answers, total } = this.data
     const q = QUESTIONS[currentIndex]
-    const next = { ...answers, [q.id]: side }
+    const next = { ...answers, [q.id]: idx }
 
-    this.setData({ answers: next, selectedSide: side })
+    this.setData({ answers: next, selectedIdx: idx })
 
-    // Auto-advance after a short delay so user sees their selection
     setTimeout(() => {
       if (currentIndex + 1 >= total) {
         recordBiz('quiz_done')

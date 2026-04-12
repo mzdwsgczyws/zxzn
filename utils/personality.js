@@ -1,6 +1,14 @@
 /**
  * 道性十六型：动/静、刚/柔、散/聚、显/藏
- * 问卷计分后得到四维比例 [dong, gang, san, xian] ∈ [0,1]，与 16 型质心最近邻匹配
+ *
+ * 每题 5 个选项，按倾向程度分配权重：
+ *   选项 1 — 强 A 端（权重 1.0 : 0.0）
+ *   选项 2 — 偏 A 端（权重 0.75 : 0.25）
+ *   选项 3 — 中性 / 不确定（权重 0.5 : 0.5）
+ *   选项 4 — 偏 B 端（权重 0.25 : 0.75）
+ *   选项 5 — 强 B 端（权重 0.0 : 1.0）
+ *
+ * 计分后得到四维比例 [dong, gang, san, xian] ∈ [0,1]，与 16 型质心最近邻匹配。
  */
 
 const PERSONALITY_TYPES = [
@@ -198,43 +206,377 @@ const PERSONALITY_TYPES = [
   }
 ]
 
+/**
+ * 36 题，每题 5 个选项 options[]。
+ * 每个 option: { label: string, w: { [key]: number } }
+ *   w 中 key 为 dong/jing/gang/rou/san/ju/xian/cang，值为该选项对该端的贡献权重。
+ *   强 A 端 = 1.0:0.0 | 偏 A = 0.75:0.25 | 中性 = 0.5:0.5 | 偏 B = 0.25:0.75 | 强 B = 0.0:1.0
+ */
 const QUESTIONS = [
-  { id: 1, text: '约好晨跑那天下起雨来，你多半会？', dim: 'dj', a: { label: '改去室内或找别的运动补上', key: 'dong' }, b: { label: '顺势休息，改天再说', key: 'jing' } },
-  { id: 2, text: '第一次到陌生城市出差，傍晚有一小段空档，你更可能？', dim: 'dj', a: { label: '出门随便走两条街感受一下', key: 'dong' }, b: { label: '待在酒店整理次日事、看会儿剧', key: 'jing' } },
-  { id: 3, text: '工作群里突然有人@全体说「很急」，你通常会？', dim: 'dj', a: { label: '先回一句正在看，能插手就先动', key: 'dong' }, b: { label: '先判断是不是自己的事再决定回不回复', key: 'jing' } },
-  { id: 4, text: '做饭做到一半发现少一味调料，你更常？', dim: 'dj', a: { label: '下楼或叫个外卖马上补上', key: 'dong' }, b: { label: '用冰箱里别的代替，能成菜就行', key: 'jing' } },
-  { id: 5, text: '长假最后一天下午，返程路上你更倾向？', dim: 'dj', a: { label: '提早动身，怕堵在路上', key: 'dong' }, b: { label: '笃悠悠待到傍晚再走也行', key: 'jing' } },
-  { id: 6, text: '玩剧本杀时你拿到一条关键线索，你更可能？', dim: 'dj', a: { label: '当场说出来推剧情', key: 'dong' }, b: { label: '先记在心里，多看几轮再提', key: 'jing' } },
-  { id: 7, text: '听说常去的那家店下周要歇业，你更可能？', dim: 'dj', a: { label: '这周末一定再去吃一趟', key: 'dong' }, b: { label: '记在心里，难过一下就算了', key: 'jing' } },
-  { id: 8, text: '取咖啡时前面有人打电话很慢，队伍不动，你更常？', dim: 'dj', a: { label: '轻声提醒后面还有人排队', key: 'dong' }, b: { label: '刷会儿手机，多等一会儿', key: 'jing' } },
-  { id: 9, text: '学一样完全陌生的技能（比如乐器），你更习惯？', dim: 'dj', a: { label: '先摸一摸、弹两下再找教程', key: 'dong' }, b: { label: '先把基础说明看完再上手练', key: 'jing' } },
-  { id: 10, text: '合租室友总把袜子丢进公用洗衣机，你更可能？', dim: 'gr', a: { label: '贴条或直接说清楚卫生规则', key: 'gang' }, b: { label: '自己多洗一遍，少起冲突', key: 'rou' } },
-  { id: 11, text: '看电影时邻座小声剧透，你更可能？', dim: 'gr', a: { label: '提醒他别说了，大家都要看', key: 'gang' }, b: { label: '忍一下，继续看自己的', key: 'rou' } },
-  { id: 12, text: '课上老师讲的内容你确定有一处不严谨，你更可能？', dim: 'gr', a: { label: '下课单独去问或指出', key: 'gang' }, b: { label: '记在心里，回去对照书自己分辨', key: 'rou' } },
-  { id: 13, text: '分组作业里有人明显划水，你更可能？', dim: 'gr', a: { label: '把分工和截止时间说清楚', key: 'gang' }, b: { label: '自己多做一点，换小组太平', key: 'rou' } },
-  { id: 14, text: '朋友说你的新发型「不太适合你」，你更可能？', dim: 'gr', a: { label: '问清楚哪里不好再决定换不换', key: 'gang' }, b: { label: '笑笑说我就喜欢这样', key: 'rou' } },
-  { id: 15, text: '拼车司机明显绕了一点路，多收几块钱，你更可能？', dim: 'gr', a: { label: '指出导航，请按合理路线走', key: 'gang' }, b: { label: '金额不大就算了，别吵架', key: 'rou' } },
-  { id: 16, text: '亲戚饭桌上拿别人家孩子成绩来比较，你更可能？', dim: 'gr', a: { label: '直接说每个孩子节奏不一样', key: 'gang' }, b: { label: '打圆场夸两句，把话题岔开', key: 'rou' } },
-  { id: 17, text: '店家结账时少找了你几块钱，你更可能？', dim: 'gr', a: { label: '当场点清，请对方补上', key: 'gang' }, b: { label: '块八毛就算了', key: 'rou' } },
-  { id: 18, text: '父母催婚催得紧，你更常？', dim: 'gr', a: { label: '坦诚讲自己的节奏和底线', key: 'gang' }, b: { label: '打哈哈混过去，少伤和气', key: 'rou' } },
-  { id: 19, text: '写报告写到一半，邮箱连弹三封新邮件，你更可能？', dim: 'sj', a: { label: '扫一眼标题，要紧的先回一句', key: 'san' }, b: { label: '开勿扰，把这一段写完再说', key: 'ju' } },
-  { id: 20, text: '手机桌面上 App 小红点一堆，你更常？', dim: 'sj', a: { label: '习惯顺手一个个点开清掉', key: 'san' }, b: { label: '只处理聊天和支付，别的随缘', key: 'ju' } },
-  { id: 21, text: '相册一年没整理，照片几千张，你更觉得？', dim: 'sj', a: { label: '滑着翻也挺好，像翻日记', key: 'san' }, b: { label: '会抽半天按时间或事件归档', key: 'ju' } },
-  { id: 22, text: '同一天朋友约了三场聚会，你更可能？', dim: 'sj', a: { label: '能赶几场赶几场', key: 'san' }, b: { label: '选一场聚透，其余改天', key: 'ju' } },
-  { id: 23, text: '背单词/学语言时，你更习惯？', dim: 'sj', a: { label: '换几个 App 轮着来，保持新鲜感', key: 'san' }, b: { label: '一本词书或一个课跟到底', key: 'ju' } },
-  { id: 24, text: '书架上未拆封的书越堆越多时，你更常？', dim: 'sj', a: { label: '看到想买的还是会买，总有一天看', key: 'san' }, b: { label: '控制先读完手头的再进新书', key: 'ju' } },
-  { id: 25, text: '午休只有二十分钟，你更可能？', dim: 'sj', a: { label: '刷几条短视频再趴一会儿', key: 'san' }, b: { label: '闭目养神或单纯趴桌', key: 'ju' } },
-  { id: 26, text: '规划「一年要读的书」，你更倾向？', dim: 'sj', a: { label: '先列一长串，能读几本算几本', key: 'san' }, b: { label: '先定三本读完，再列下一批', key: 'ju' } },
-  { id: 27, text: '同时在追三部剧都在更新，你更可能？', dim: 'sj', a: { label: '三部轮着追，都别落下', key: 'san' }, b: { label: '一部追平再开下一部', key: 'ju' } },
-  { id: 28, text: '公司年会抽到你上台领奖，你更可能？', dim: 'xz', a: { label: '自然走过去，简单说两句', key: 'xian' }, b: { label: '心里更希望有人代领或快一点结束', key: 'cang' } },
-  { id: 29, text: '自己默默坚持跑步三个月，你更可能？', dim: 'xz', a: { label: '偶尔发一条记录，给自己打气', key: 'xian' }, b: { label: '从不发，跑给自己看就行', key: 'cang' } },
-  { id: 30, text: '心里有件烦心事一时过不去，你更常？', dim: 'xz', a: { label: '找信任的人喝一杯、说一说', key: 'xian' }, b: { label: '自己消化，写写日记或去运动', key: 'cang' } },
-  { id: 31, text: '新买的鞋被同事注意到并夸好看，你更可能？', dim: 'xz', a: { label: '顺着聊两句哪里买的、脚感', key: 'xian' }, b: { label: '谢谢带过，把话题轻轻岔开', key: 'cang' } },
-  { id: 32, text: '会上领导方案你有不同看法，你更可能？', dim: 'xz', a: { label: '当场简短表态', key: 'xian' }, b: { label: '散会后私聊或写邮件说明', key: 'cang' } },
-  { id: 33, text: '老同学聚会上被提起一件童年糗事，你更可能？', dim: 'xz', a: { label: '一起哈哈当段子讲', key: 'xian' }, b: { label: '有点尴尬，希望快点翻篇', key: 'cang' } },
-  { id: 34, text: '做了个特别离谱的梦，早上醒来你更可能？', dim: 'xz', a: { label: '当笑话讲给身边人听', key: 'xian' }, b: { label: '醒了就忘，不值得一提', key: 'cang' } },
-  { id: 35, text: '有一笔自己的「小金库」计划（比如旅行基金），你更可能？', dim: 'xz', a: { label: '和伴侣或家人透明商量怎么存', key: 'xian' }, b: { label: '自己有数就行，不必事事摊开', key: 'cang' } },
-  { id: 36, text: '别人夸你「最近瘦了」，你更可能？', dim: 'xz', a: { label: '开心接话，多聊几句', key: 'xian' }, b: { label: '说声谢谢，不想多聊身材话题', key: 'cang' } }
+  // ═══════════ 动/静 (dj) 题 1–9 ═══════════
+  {
+    id: 1, text: '约好晨跑那天下起雨来，你多半会？', dim: 'dj',
+    options: [
+      { label: '立刻换装去健身房或跑楼梯，不能断', w: { dong: 1.0 } },
+      { label: '改去室内做点简单运动补上', w: { dong: 0.75, jing: 0.25 } },
+      { label: '看雨大不大再决定，没太强偏好', w: { dong: 0.5, jing: 0.5 } },
+      { label: '大概率休息，但心里会记着明天补', w: { dong: 0.25, jing: 0.75 } },
+      { label: '顺势休息，改天再说', w: { jing: 1.0 } }
+    ]
+  },
+  {
+    id: 2, text: '第一次到陌生城市出差，傍晚有一小段空档，你更可能？', dim: 'dj',
+    options: [
+      { label: '查好攻略直奔当地特色街区逛一圈', w: { dong: 1.0 } },
+      { label: '出门随便走两条街感受一下', w: { dong: 0.75, jing: 0.25 } },
+      { label: '看心情，可能出去也可能不出去', w: { dong: 0.5, jing: 0.5 } },
+      { label: '在酒店附近散散步，不走远', w: { dong: 0.25, jing: 0.75 } },
+      { label: '待在酒店整理次日事、看会儿剧', w: { jing: 1.0 } }
+    ]
+  },
+  {
+    id: 3, text: '工作群里突然有人@全体说「很急」，你通常会？', dim: 'dj',
+    options: [
+      { label: '秒回并主动问需要什么帮助', w: { dong: 1.0 } },
+      { label: '先回一句正在看，能插手就先动', w: { dong: 0.75, jing: 0.25 } },
+      { label: '点开看一眼，视情况决定回不回', w: { dong: 0.5, jing: 0.5 } },
+      { label: '先判断是不是自己的事再决定', w: { dong: 0.25, jing: 0.75 } },
+      { label: '忙完手头的再看，急的事自然会找到我', w: { jing: 1.0 } }
+    ]
+  },
+  {
+    id: 4, text: '做饭做到一半发现少一味调料，你更常？', dim: 'dj',
+    options: [
+      { label: '下楼或叫个外卖马上补上，菜不能将就', w: { dong: 1.0 } },
+      { label: '先看看邻居能不能借一点', w: { dong: 0.75, jing: 0.25 } },
+      { label: '想想有没有替代品，有就换没有再说', w: { dong: 0.5, jing: 0.5 } },
+      { label: '用冰箱里别的凑合代替', w: { dong: 0.25, jing: 0.75 } },
+      { label: '不放也行，少一味无所谓', w: { jing: 1.0 } }
+    ]
+  },
+  {
+    id: 5, text: '长假最后一天下午，返程路上你更倾向？', dim: 'dj',
+    options: [
+      { label: '一大早就出发，绝不冒堵车风险', w: { dong: 1.0 } },
+      { label: '提早动身，怕堵在路上', w: { dong: 0.75, jing: 0.25 } },
+      { label: '看实时路况再定出发时间', w: { dong: 0.5, jing: 0.5 } },
+      { label: '不太着急，下午慢慢走', w: { dong: 0.25, jing: 0.75 } },
+      { label: '笃悠悠待到傍晚再走也行', w: { jing: 1.0 } }
+    ]
+  },
+  {
+    id: 6, text: '玩剧本杀时你拿到一条关键线索，你更可能？', dim: 'dj',
+    options: [
+      { label: '当场说出来推剧情，越快越好', w: { dong: 1.0 } },
+      { label: '找个合适时机抛出来引导讨论', w: { dong: 0.75, jing: 0.25 } },
+      { label: '看场上气氛，该说就说', w: { dong: 0.5, jing: 0.5 } },
+      { label: '先记在心里，多看几轮再提', w: { dong: 0.25, jing: 0.75 } },
+      { label: '藏着不说，等别人自己发现', w: { jing: 1.0 } }
+    ]
+  },
+  {
+    id: 7, text: '听说常去的那家店下周要歇业，你更可能？', dim: 'dj',
+    options: [
+      { label: '今天就去，还要叫上朋友一起', w: { dong: 1.0 } },
+      { label: '这周末一定再去吃一趟', w: { dong: 0.75, jing: 0.25 } },
+      { label: '有空就去，没空也不勉强', w: { dong: 0.5, jing: 0.5 } },
+      { label: '心里惦记一下，但不一定专门跑一趟', w: { dong: 0.25, jing: 0.75 } },
+      { label: '记在心里，难过一下就算了', w: { jing: 1.0 } }
+    ]
+  },
+  {
+    id: 8, text: '取咖啡时前面有人打电话很慢，队伍不动，你更常？', dim: 'dj',
+    options: [
+      { label: '直接提醒对方让一让，后面排着队呢', w: { dong: 1.0 } },
+      { label: '轻声提醒后面还有人排队', w: { dong: 0.75, jing: 0.25 } },
+      { label: '看情况，等太久可能会说一声', w: { dong: 0.5, jing: 0.5 } },
+      { label: '刷会儿手机，多等一会儿', w: { dong: 0.25, jing: 0.75 } },
+      { label: '无所谓，不急这几分钟', w: { jing: 1.0 } }
+    ]
+  },
+  {
+    id: 9, text: '学一样完全陌生的技能（比如乐器），你更习惯？', dim: 'dj',
+    options: [
+      { label: '拿到手就开始摸索，边玩边学', w: { dong: 1.0 } },
+      { label: '先摸一摸、弹两下再找教程', w: { dong: 0.75, jing: 0.25 } },
+      { label: '教程和实操穿插着来', w: { dong: 0.5, jing: 0.5 } },
+      { label: '先把基础说明看完再上手练', w: { dong: 0.25, jing: 0.75 } },
+      { label: '系统学完理论再动手，不想走弯路', w: { jing: 1.0 } }
+    ]
+  },
+  // ═══════════ 刚/柔 (gr) 题 10–18 ═══════════
+  {
+    id: 10, text: '合租室友总把袜子丢进公用洗衣机，你更可能？', dim: 'gr',
+    options: [
+      { label: '当面严肃说清楚，不改就换室友', w: { gang: 1.0 } },
+      { label: '贴条或直接说清楚卫生规则', w: { gang: 0.75, rou: 0.25 } },
+      { label: '先暗示一下，不行再正式提', w: { gang: 0.5, rou: 0.5 } },
+      { label: '自己多洗一遍，少起冲突', w: { gang: 0.25, rou: 0.75 } },
+      { label: '算了，各人有各人的习惯', w: { rou: 1.0 } }
+    ]
+  },
+  {
+    id: 11, text: '看电影时邻座小声剧透，你更可能？', dim: 'gr',
+    options: [
+      { label: '直接说请不要剧透，语气坚定', w: { gang: 1.0 } },
+      { label: '提醒他别说了，大家都要看', w: { gang: 0.75, rou: 0.25 } },
+      { label: '看对方态度，太过分就说一声', w: { gang: 0.5, rou: 0.5 } },
+      { label: '忍一下，继续看自己的', w: { gang: 0.25, rou: 0.75 } },
+      { label: '戴上耳机或换个座，不想起冲突', w: { rou: 1.0 } }
+    ]
+  },
+  {
+    id: 12, text: '课上老师讲的内容你确定有一处不严谨，你更可能？', dim: 'gr',
+    options: [
+      { label: '当堂举手指出，学术问题不该含糊', w: { gang: 1.0 } },
+      { label: '下课单独去问或指出', w: { gang: 0.75, rou: 0.25 } },
+      { label: '看情况，如果影响理解就提一下', w: { gang: 0.5, rou: 0.5 } },
+      { label: '记在心里，回去对照书自己分辨', w: { gang: 0.25, rou: 0.75 } },
+      { label: '可能是我理解有误，不多想了', w: { rou: 1.0 } }
+    ]
+  },
+  {
+    id: 13, text: '分组作业里有人明显划水，你更可能？', dim: 'gr',
+    options: [
+      { label: '在群里点名说清楚各自任务和后果', w: { gang: 1.0 } },
+      { label: '把分工和截止时间说清楚', w: { gang: 0.75, rou: 0.25 } },
+      { label: '私下提醒一次，不行再公开说', w: { gang: 0.5, rou: 0.5 } },
+      { label: '自己多做一点，换小组太平', w: { gang: 0.25, rou: 0.75 } },
+      { label: '默默补上，大家都不容易', w: { rou: 1.0 } }
+    ]
+  },
+  {
+    id: 14, text: '朋友说你的新发型「不太适合你」，你更可能？', dim: 'gr',
+    options: [
+      { label: '直接说我觉得挺好，审美各有不同', w: { gang: 1.0 } },
+      { label: '问清楚哪里不好再决定换不换', w: { gang: 0.75, rou: 0.25 } },
+      { label: '听听意见，但不一定改', w: { gang: 0.5, rou: 0.5 } },
+      { label: '笑笑说我就喜欢这样', w: { gang: 0.25, rou: 0.75 } },
+      { label: '嗯嗯好的，下次换个试试', w: { rou: 1.0 } }
+    ]
+  },
+  {
+    id: 15, text: '拼车司机明显绕了一点路，多收几块钱，你更可能？', dim: 'gr',
+    options: [
+      { label: '截图导航投诉，原则问题不让步', w: { gang: 1.0 } },
+      { label: '指出导航，请按合理路线走', w: { gang: 0.75, rou: 0.25 } },
+      { label: '提一句绕路了，看司机怎么说', w: { gang: 0.5, rou: 0.5 } },
+      { label: '金额不大就算了，别吵架', w: { gang: 0.25, rou: 0.75 } },
+      { label: '无所谓，到了就行', w: { rou: 1.0 } }
+    ]
+  },
+  {
+    id: 16, text: '亲戚饭桌上拿别人家孩子成绩来比较，你更可能？', dim: 'gr',
+    options: [
+      { label: '认真反驳，这种比较不合适', w: { gang: 1.0 } },
+      { label: '直接说每个孩子节奏不一样', w: { gang: 0.75, rou: 0.25 } },
+      { label: '看场合，适当回应几句', w: { gang: 0.5, rou: 0.5 } },
+      { label: '打圆场夸两句，把话题岔开', w: { gang: 0.25, rou: 0.75 } },
+      { label: '笑笑不接话，吃自己的菜', w: { rou: 1.0 } }
+    ]
+  },
+  {
+    id: 17, text: '店家结账时少找了你几块钱，你更可能？', dim: 'gr',
+    options: [
+      { label: '当场核对账单，一分不差', w: { gang: 1.0 } },
+      { label: '当场点清，请对方补上', w: { gang: 0.75, rou: 0.25 } },
+      { label: '金额大就说，小就看心情', w: { gang: 0.5, rou: 0.5 } },
+      { label: '块八毛就算了', w: { gang: 0.25, rou: 0.75 } },
+      { label: '完全不在意这点零头', w: { rou: 1.0 } }
+    ]
+  },
+  {
+    id: 18, text: '父母催婚催得紧，你更常？', dim: 'gr',
+    options: [
+      { label: '严肃谈一次，划清边界', w: { gang: 1.0 } },
+      { label: '坦诚讲自己的节奏和底线', w: { gang: 0.75, rou: 0.25 } },
+      { label: '有时认真说，有时也敷衍', w: { gang: 0.5, rou: 0.5 } },
+      { label: '打哈哈混过去，少伤和气', w: { gang: 0.25, rou: 0.75 } },
+      { label: '顺着说好好好，反正他们开心就行', w: { rou: 1.0 } }
+    ]
+  },
+  // ═══════════ 散/聚 (sj) 题 19–27 ═══════════
+  {
+    id: 19, text: '写报告写到一半，邮箱连弹三封新邮件，你更可能？', dim: 'sj',
+    options: [
+      { label: '全部点开处理完再回来写', w: { san: 1.0 } },
+      { label: '扫一眼标题，要紧的先回一句', w: { san: 0.75, ju: 0.25 } },
+      { label: '看标题判断，紧急的回，不急的待会儿', w: { san: 0.5, ju: 0.5 } },
+      { label: '开勿扰，把这一段写完再说', w: { san: 0.25, ju: 0.75 } },
+      { label: '完全不看，写完整篇再统一处理', w: { ju: 1.0 } }
+    ]
+  },
+  {
+    id: 20, text: '手机桌面上 App 小红点一堆，你更常？', dim: 'sj',
+    options: [
+      { label: '一个个全部点开清掉才舒服', w: { san: 1.0 } },
+      { label: '习惯顺手一个个点开清掉', w: { san: 0.75, ju: 0.25 } },
+      { label: '重要的清一下，其他随缘', w: { san: 0.5, ju: 0.5 } },
+      { label: '只处理聊天和支付，别的随缘', w: { san: 0.25, ju: 0.75 } },
+      { label: '完全无视，小红点不影响我', w: { ju: 1.0 } }
+    ]
+  },
+  {
+    id: 21, text: '相册一年没整理，照片几千张，你更觉得？', dim: 'sj',
+    options: [
+      { label: '无所谓，想看随手翻就好', w: { san: 1.0 } },
+      { label: '滑着翻也挺好，像翻日记', w: { san: 0.75, ju: 0.25 } },
+      { label: '偶尔整理一下，但不强求', w: { san: 0.5, ju: 0.5 } },
+      { label: '会抽半天按时间或事件归档', w: { san: 0.25, ju: 0.75 } },
+      { label: '必须分类归档，乱了找不到', w: { ju: 1.0 } }
+    ]
+  },
+  {
+    id: 22, text: '同一天朋友约了三场聚会，你更可能？', dim: 'sj',
+    options: [
+      { label: '三场全去，赶场也开心', w: { san: 1.0 } },
+      { label: '能赶几场赶几场', w: { san: 0.75, ju: 0.25 } },
+      { label: '去两场，留点时间给自己', w: { san: 0.5, ju: 0.5 } },
+      { label: '选一场聚透，其余改天', w: { san: 0.25, ju: 0.75 } },
+      { label: '只去最想去的一场，其余全推', w: { ju: 1.0 } }
+    ]
+  },
+  {
+    id: 23, text: '背单词/学语言时，你更习惯？', dim: 'sj',
+    options: [
+      { label: '同时用好几个 App 和方法，哪个有趣用哪个', w: { san: 1.0 } },
+      { label: '换几个 App 轮着来，保持新鲜感', w: { san: 0.75, ju: 0.25 } },
+      { label: '主要用一个，偶尔换换口味', w: { san: 0.5, ju: 0.5 } },
+      { label: '一本词书或一个课跟到底', w: { san: 0.25, ju: 0.75 } },
+      { label: '只用一种方法，深入吃透', w: { ju: 1.0 } }
+    ]
+  },
+  {
+    id: 24, text: '书架上未拆封的书越堆越多时，你更常？', dim: 'sj',
+    options: [
+      { label: '继续买，书多是好事', w: { san: 1.0 } },
+      { label: '看到想买的还是会买，总有一天看', w: { san: 0.75, ju: 0.25 } },
+      { label: '稍微控制一下，但遇到好书还是忍不住', w: { san: 0.5, ju: 0.5 } },
+      { label: '控制先读完手头的再进新书', w: { san: 0.25, ju: 0.75 } },
+      { label: '严格一本读完再买下一本', w: { ju: 1.0 } }
+    ]
+  },
+  {
+    id: 25, text: '午休只有二十分钟，你更可能？', dim: 'sj',
+    options: [
+      { label: '刷视频、回消息、吃零食同时进行', w: { san: 1.0 } },
+      { label: '刷几条短视频再趴一会儿', w: { san: 0.75, ju: 0.25 } },
+      { label: '看心情，有时刷手机有时闭眼', w: { san: 0.5, ju: 0.5 } },
+      { label: '闭目养神或单纯趴桌', w: { san: 0.25, ju: 0.75 } },
+      { label: '什么都不做，安静休息', w: { ju: 1.0 } }
+    ]
+  },
+  {
+    id: 26, text: '规划「一年要读的书」，你更倾向？', dim: 'sj',
+    options: [
+      { label: '不列计划，遇到什么读什么', w: { san: 1.0 } },
+      { label: '先列一长串，能读几本算几本', w: { san: 0.75, ju: 0.25 } },
+      { label: '列个大概范围，灵活调整', w: { san: 0.5, ju: 0.5 } },
+      { label: '先定三本读完，再列下一批', w: { san: 0.25, ju: 0.75 } },
+      { label: '严格按计划一本本推进', w: { ju: 1.0 } }
+    ]
+  },
+  {
+    id: 27, text: '同时在追三部剧都在更新，你更可能？', dim: 'sj',
+    options: [
+      { label: '三部轮着追，还可能再开新剧', w: { san: 1.0 } },
+      { label: '三部轮着追，都别落下', w: { san: 0.75, ju: 0.25 } },
+      { label: '主追一两部，第三部随缘', w: { san: 0.5, ju: 0.5 } },
+      { label: '一部追平再开下一部', w: { san: 0.25, ju: 0.75 } },
+      { label: '只追一部，看完再说', w: { ju: 1.0 } }
+    ]
+  },
+  // ═══════════ 显/藏 (xz) 题 28–36 ═══════════
+  {
+    id: 28, text: '公司年会抽到你上台领奖，你更可能？', dim: 'xz',
+    options: [
+      { label: '大方上台，顺便讲两句感言', w: { xian: 1.0 } },
+      { label: '自然走过去，简单说两句', w: { xian: 0.75, cang: 0.25 } },
+      { label: '上去领了就好，不多不少', w: { xian: 0.5, cang: 0.5 } },
+      { label: '心里有点紧张，但还是会去', w: { xian: 0.25, cang: 0.75 } },
+      { label: '心里更希望有人代领或快一点结束', w: { cang: 1.0 } }
+    ]
+  },
+  {
+    id: 29, text: '自己默默坚持跑步三个月，你更可能？', dim: 'xz',
+    options: [
+      { label: '发朋友圈记录，也鼓励别人一起', w: { xian: 1.0 } },
+      { label: '偶尔发一条记录，给自己打气', w: { xian: 0.75, cang: 0.25 } },
+      { label: '朋友问起会说，但不主动提', w: { xian: 0.5, cang: 0.5 } },
+      { label: '从不发，跑给自己看就行', w: { xian: 0.25, cang: 0.75 } },
+      { label: '连身边人都不知道我在跑步', w: { cang: 1.0 } }
+    ]
+  },
+  {
+    id: 30, text: '心里有件烦心事一时过不去，你更常？', dim: 'xz',
+    options: [
+      { label: '找好几个朋友倾诉，说出来就好了', w: { xian: 1.0 } },
+      { label: '找信任的人喝一杯、说一说', w: { xian: 0.75, cang: 0.25 } },
+      { label: '看情况，有时说有时自己扛', w: { xian: 0.5, cang: 0.5 } },
+      { label: '自己消化，写写日记或去运动', w: { xian: 0.25, cang: 0.75 } },
+      { label: '闷在心里，过几天自然就淡了', w: { cang: 1.0 } }
+    ]
+  },
+  {
+    id: 31, text: '新买的鞋被同事注意到并夸好看，你更可能？', dim: 'xz',
+    options: [
+      { label: '开心地聊起来，分享链接和穿搭心得', w: { xian: 1.0 } },
+      { label: '顺着聊两句哪里买的、脚感', w: { xian: 0.75, cang: 0.25 } },
+      { label: '说声谢谢，简单回应', w: { xian: 0.5, cang: 0.5 } },
+      { label: '谢谢带过，把话题轻轻岔开', w: { xian: 0.25, cang: 0.75 } },
+      { label: '有点不自在，希望别人别注意到', w: { cang: 1.0 } }
+    ]
+  },
+  {
+    id: 32, text: '会上领导方案你有不同看法，你更可能？', dim: 'xz',
+    options: [
+      { label: '当场详细阐述自己的方案', w: { xian: 1.0 } },
+      { label: '当场简短表态', w: { xian: 0.75, cang: 0.25 } },
+      { label: '看氛围，合适就说不合适就等', w: { xian: 0.5, cang: 0.5 } },
+      { label: '散会后私聊或写邮件说明', w: { xian: 0.25, cang: 0.75 } },
+      { label: '不说了，执行就好', w: { cang: 1.0 } }
+    ]
+  },
+  {
+    id: 33, text: '老同学聚会上被提起一件童年糗事，你更可能？', dim: 'xz',
+    options: [
+      { label: '自己主动加料讲，逗大家开心', w: { xian: 1.0 } },
+      { label: '一起哈哈当段子讲', w: { xian: 0.75, cang: 0.25 } },
+      { label: '笑笑配合，不深聊', w: { xian: 0.5, cang: 0.5 } },
+      { label: '有点尴尬，希望快点翻篇', w: { xian: 0.25, cang: 0.75 } },
+      { label: '很不舒服，想赶紧换话题', w: { cang: 1.0 } }
+    ]
+  },
+  {
+    id: 34, text: '做了个特别离谱的梦，早上醒来你更可能？', dim: 'xz',
+    options: [
+      { label: '发条动态分享，配上搞笑评论', w: { xian: 1.0 } },
+      { label: '当笑话讲给身边人听', w: { xian: 0.75, cang: 0.25 } },
+      { label: '有人聊天时可能顺嘴提一下', w: { xian: 0.5, cang: 0.5 } },
+      { label: '醒了就忘，不值得一提', w: { xian: 0.25, cang: 0.75 } },
+      { label: '从不跟人说自己的梦', w: { cang: 1.0 } }
+    ]
+  },
+  {
+    id: 35, text: '有一笔自己的「小金库」计划（比如旅行基金），你更可能？', dim: 'xz',
+    options: [
+      { label: '和家人朋友都聊聊，一起规划', w: { xian: 1.0 } },
+      { label: '和伴侣或家人透明商量怎么存', w: { xian: 0.75, cang: 0.25 } },
+      { label: '跟最亲近的人提一下就好', w: { xian: 0.5, cang: 0.5 } },
+      { label: '自己有数就行，不必事事摊开', w: { xian: 0.25, cang: 0.75 } },
+      { label: '完全保密，这是我自己的事', w: { cang: 1.0 } }
+    ]
+  },
+  {
+    id: 36, text: '别人夸你「最近瘦了」，你更可能？', dim: 'xz',
+    options: [
+      { label: '开心分享自己的减肥方法和心得', w: { xian: 1.0 } },
+      { label: '开心接话，多聊几句', w: { xian: 0.75, cang: 0.25 } },
+      { label: '谢谢，简单回应一下', w: { xian: 0.5, cang: 0.5 } },
+      { label: '说声谢谢，不想多聊身材话题', w: { xian: 0.25, cang: 0.75 } },
+      { label: '有点不好意思，赶紧转移话题', w: { cang: 1.0 } }
+    ]
+  }
 ]
 
 function dist2(a, b) {
@@ -246,19 +588,27 @@ function dist2(a, b) {
   return s
 }
 
+/**
+ * 计分：遍历每题，根据用户所选选项的 w 权重累加到对应维度计数器。
+ * answers: { [questionId]: optionIndex (0–4) }
+ *
+ * 兼容旧版 'a'/'b'/'n' 格式：a→0, b→4, n→2
+ */
 function calculatePersonality(answers) {
   const count = { dong: 0, jing: 0, gang: 0, rou: 0, san: 0, ju: 0, xian: 0, cang: 0 }
   QUESTIONS.forEach((q) => {
-    const v = answers[q.id]
-    if (!v) return
-    if (v === 'n') {
-      // 中性选项：两侧各加 0.5，不偏向任何一端
-      count[q.a.key] = (count[q.a.key] || 0) + 0.5
-      count[q.b.key] = (count[q.b.key] || 0) + 0.5
-      return
-    }
-    const side = v === 'a' ? q.a.key : q.b.key
-    count[side] = (count[side] || 0) + 1
+    let v = answers[q.id]
+    if (v == null) return
+    // 兼容旧版字符串格式
+    if (v === 'a') v = 0
+    else if (v === 'b') v = 4
+    else if (v === 'n') v = 2
+    const idx = typeof v === 'number' ? v : parseInt(v, 10)
+    if (isNaN(idx) || idx < 0 || idx >= q.options.length) return
+    const w = q.options[idx].w
+    Object.keys(w).forEach((k) => {
+      count[k] = (count[k] || 0) + w[k]
+    })
   })
   const dong = count.dong + count.jing > 0 ? count.dong / (count.dong + count.jing) : 0.5
   const gang = count.gang + count.rou > 0 ? count.gang / (count.gang + count.rou) : 0.5
