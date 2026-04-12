@@ -259,29 +259,22 @@ function renderLotArt(page, retry) {
   const lot = page.data.lot
   if (!lot || !page.data.revealed) return
   const n = retry == null ? 0 : retry
-  wx.createSelectorQuery()
-    .in(page)
-    .select('.lot-art-wrap')
-    .boundingClientRect()
-    .exec((res) => {
-      const rect = res && res[0]
-      let w
-      let h
-      if (rect && rect.width >= 2 && rect.height >= 2) {
-        w = Math.floor(rect.width)
-        h = Math.floor(rect.height)
-      } else if (n < 15) {
-        setTimeout(() => renderLotArt(page, n + 1), 80)
-        return
-      } else {
-        const d = defaultLotCanvasSize()
-        w = d.w
-        h = d.h
-      }
-      page.setData({ lotArtW: w, lotArtH: h }, () => {
-        wx.nextTick(() => setTimeout(() => paintLotToCanvas(page, w, h, lot), 30))
-      })
-    })
+  // 使用已计算好的 lotArtW/lotArtH（精确 px），避免 iOS 上 boundingClientRect 返回 0
+  const w = page.data.lotArtW
+  const h = page.data.lotArtH
+  if (w >= 2 && h >= 2) {
+    wx.nextTick(() => setTimeout(() => paintLotToCanvas(page, w, h, lot), 30))
+    return
+  }
+  // 回退：等待布局完成后重试
+  if (n < 15) {
+    setTimeout(() => renderLotArt(page, n + 1), 80)
+    return
+  }
+  const d = defaultLotCanvasSize()
+  page.setData({ lotArtW: d.w, lotArtH: d.h }, () => {
+    wx.nextTick(() => setTimeout(() => paintLotToCanvas(page, d.w, d.h, lot), 30))
+  })
 }
 
 function paintLotToCanvas(page, w, h, lot) {

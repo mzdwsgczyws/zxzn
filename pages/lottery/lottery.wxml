@@ -53,28 +53,27 @@
 
     <block wx:if="{{revealed}}">
       <text class="poem">{{lot.poem}}</text>
-      <view class="lot-art-wrap">
+      <view class="lot-art-wrap" style="width: {{lotArtW}}px; height: {{lotArtH}}px;">
         <canvas
           canvas-id="lotArtCanvas"
           class="lot-art-canvas"
           style="width: {{lotArtW}}px; height: {{lotArtH}}px;"
           disable-scroll="{{true}}"
+        ></canvas>
+        <view
+          wx:if="{{lotArtOverlay}}"
+          class="lot-art-overlay"
+          style="width: {{lotArtW}}px; height: {{lotArtH}}px;"
         >
-          <cover-view
-            wx:if="{{lotArtOverlay}}"
-            class="lot-art-cover-root"
-            style="width: {{lotArtW}}px; height: {{lotArtH}}px;"
-          >
-            <cover-view
-              class="lot-art-title-cv"
-              style="color: {{lotArtOverlay.titleColor}}; font-size: {{lotArtOverlay.titleFontPx}}px;"
-            >{{lotArtOverlay.title}}</cover-view>
-            <cover-view
-              class="lot-art-sub-cv"
-              style="color: {{lotArtOverlay.subColor}}; font-size: {{lotArtOverlay.subFontPx}}px;"
-            >{{lotArtOverlay.subLine}}</cover-view>
-          </cover-view>
-        </canvas>
+          <text
+            class="lot-art-title-text"
+            style="color: {{lotArtOverlay.titleColor}}; font-size: {{lotArtOverlay.titleFontPx}}px;"
+          >{{lotArtOverlay.title}}</text>
+          <text
+            class="lot-art-sub-text"
+            style="color: {{lotArtOverlay.subColor}}; font-size: {{lotArtOverlay.subFontPx}}px;"
+          >{{lotArtOverlay.subLine}}</text>
+        </view>
       </view>
       <view class="block">
         <text class="b-title">释义</text>

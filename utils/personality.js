@@ -251,6 +251,12 @@ function calculatePersonality(answers) {
   QUESTIONS.forEach((q) => {
     const v = answers[q.id]
     if (!v) return
+    if (v === 'n') {
+      // 中性选项：两侧各加 0.5，不偏向任何一端
+      count[q.a.key] = (count[q.a.key] || 0) + 0.5
+      count[q.b.key] = (count[q.b.key] || 0) + 0.5
+      return
+    }
     const side = v === 'a' ? q.a.key : q.b.key
     count[side] = (count[side] || 0) + 1
   })

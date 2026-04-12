@@ -9,9 +9,15 @@
   <view class="card question-card" wx:if="{{current}}">
     <text class="q-label">第 {{current.id}} 题</text>
     <text class="q-text">{{current.text}}</text>
-    <button class="opt" bindtap="choose" data-side="a">{{current.a.label}}</button>
-    <button class="opt" bindtap="choose" data-side="b">{{current.b.label}}</button>
+    <button class="opt {{selectedSide === 'a' ? 'opt--selected' : ''}}" bindtap="choose" data-side="a">{{current.a.label}}</button>
+    <button class="opt opt--neutral {{selectedSide === 'n' ? 'opt--selected' : ''}}" bindtap="choose" data-side="n">不太确定 / 都有可能</button>
+    <button class="opt {{selectedSide === 'b' ? 'opt--selected' : ''}}" bindtap="choose" data-side="b">{{current.b.label}}</button>
   </view>
 
-  <view class="hint">提示：没有标准答案，按「通常情况」选择即可。</view>
+  <view class="nav-row" wx:if="{{current}}">
+    <button class="nav-btn nav-prev {{currentIndex <= 0 ? 'nav-btn--disabled' : ''}}" bindtap="goPrev" disabled="{{currentIndex <= 0}}">上一题</button>
+    <text class="nav-mid-hint">{{selectedSide ? '已选，自动进入下一题' : '请选择一项'}}</text>
+  </view>
+
+  <view class="hint">提示：没有标准答案，按「通常情况」选择即可。不确定时可选中间项。</view>
 </view>

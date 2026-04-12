@@ -666,13 +666,10 @@
   font-style: italic;
 }
 
-/* 配图区域：约一屏高度的 1/5，介于诗句与释义之间 */
+/* 配图区域：宽高由 lotArtW/lotArtH 精确控制，避免 iOS 百分比高度错位 */
 .lot-art-wrap {
-  width: 100%;
-  height: 20vh;
-  min-height: 180rpx;
-  max-height: 340rpx;
-  margin: 8rpx 0 28rpx;
+  position: relative;
+  margin: 8rpx auto 28rpx;
   border-radius: 16rpx;
   overflow: hidden;
   background: #2c3e55;
@@ -682,6 +679,34 @@
 /* 宽高由 lotArtW/lotArtH（px）与内联 style 指定；配图使用 canvas-id 旧版接口绘制 */
 .lot-art-canvas {
   display: block;
+  position: relative;
+  z-index: 1;
+}
+
+.lot-art-overlay {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.lot-art-title-text {
+  display: block;
+  text-align: center;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.lot-art-sub-text {
+  display: block;
+  text-align: center;
+  margin-top: 8rpx;
+  line-height: 1.2;
 }
 
 .block {
