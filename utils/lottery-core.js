@@ -280,7 +280,11 @@ function renderLotArt(page, retry) {
 function paintLotToCanvas(page, w, h, lot) {
   if (!lot || w < 2 || h < 2) return
   const overlay = buildLotArtOverlay(lot, w, h)
-  const drawCanvas = () => {
+  let painted = false
+  const doPaint = () => {
+    if (painted) return
+    painted = true
+    page.setData({ lotArtOverlay: overlay })
     try {
       const ctx = wx.createCanvasContext(getCanvasId(page), page)
       drawLotArtWx(ctx, w, h, {
@@ -295,9 +299,11 @@ function paintLotToCanvas(page, w, h, lot) {
       console.warn('lot canvas draw', e)
     }
   }
+  // 超时兜底：字体加载卡住也不阻塞绘制
+  const fallbackTimer = setTimeout(doPaint, 5000)
   ensureLotArtFont().then(() => {
-    page.setData({ lotArtOverlay: overlay })
-    drawCanvas()
+    clearTimeout(fallbackTimer)
+    doPaint()
   })
 }
 
