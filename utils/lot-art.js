@@ -1,8 +1,7 @@
 /**
  * 心象箴言配图：使用微信小程序旧版 Canvas API（wx.createCanvasContext），
  * 与 canvas-id 配合；避免 type="2d" 在部分基础库下合成失败只显示黑色。
- * 颜色一律 rgb/rgba；背景与装饰按等第配色。
- * 卦名与副标题：真机上旧版 Canvas 常无法使用 loadFontFace 字体，故由页面 cover-view 叠字（buildLotArtOverlay + DaoLotLiShu）。
+ * 颜色一律 rgb/rgba；背景与装饰按等第配色；卦名与副标题用系统默认字体（简体）。
  */
 
 function wxStrokeRoundRect(ctx, x, y, rw, rh, radius, color, lw) {
@@ -152,9 +151,7 @@ function drawCornerMarksWx(ctx, w, h, id, strokeColor) {
  * @param {WechatMiniprogram.CanvasContext} ctx wx.createCanvasContext 返回值
  * @param {number} w 与 canvas 样式宽一致的逻辑像素
  * @param {number} h 与 canvas 样式高一致的逻辑像素
- * @param {{ id: number, title: string, tierLabel?: string, tier?: string, lishuFontFamily?: string, skipText?: boolean }} lot
- *        skipText：为 true 时不绘制文字（由页面 cover-view 显示隶书）。
- *        lishuFontFamily：仅在不跳过 Canvas 文字时使用。
+ * @param {{ id: number, title: string, tierLabel?: string, tier?: string }} lot
  */
 function drawLotArtWx(ctx, w, h, lot) {
   const id = lot.id != null ? lot.id : 0
@@ -217,67 +214,23 @@ function drawLotArtWx(ctx, w, h, lot) {
   ctx.setLineWidth(2.5)
   ctx.stroke()
 
-  if (lot.skipText) return
-
   const fontSize = Math.max(
     10,
     titleLen <= 1 ? Math.min(w, h) * 0.26 : titleLen === 2 ? Math.min(w, h) * 0.2 : Math.min(w, h) * 0.13
   )
   const titlePx = Math.floor(fontSize)
   const subPx = Math.max(10, Math.floor(Math.min(w, h) * 0.062))
-  const ff = lot.lishuFontFamily
 
   ctx.setFillStyle(theme.title)
   ctx.setTextAlign('center')
   ctx.setTextBaseline('middle')
-  if (ff) {
-    try {
-      ctx.font = `normal normal ${titlePx}px "${ff}"`
-    } catch (e) {
-      ctx.setFontSize(titlePx)
-    }
-  } else {
-    ctx.setFontSize(titlePx)
-  }
+  ctx.setFontSize(titlePx)
   ctx.fillText(title, cx, cy)
 
   const sub = `${lot.tierLabel || ''} · 第${id + 1}条`
   ctx.setFillStyle(theme.sub)
-  if (ff) {
-    try {
-      ctx.font = `normal normal ${subPx}px "${ff}"`
-    } catch (e) {
-      ctx.setFontSize(subPx)
-    }
-  } else {
-    ctx.setFontSize(subPx)
-  }
+  ctx.setFontSize(subPx)
   ctx.fillText(sub, cx, h * 0.8)
 }
 
-/**
- * 与 drawLotArtWx(skipText) 配套：供 cover-view 叠字，真机可应用 loadFontFace 的隶书。
- */
-function buildLotArtOverlay(lot, w, h) {
-  const id = lot.id != null ? lot.id : 0
-  const title = lot.title || '箴'
-  const titleLen = Array.from(title).length
-  const theme = getTierTheme(lot.tier)
-  const fontSize = Math.max(
-    10,
-    titleLen <= 1 ? Math.min(w, h) * 0.26 : titleLen === 2 ? Math.min(w, h) * 0.2 : Math.min(w, h) * 0.13
-  )
-  const titlePx = Math.floor(fontSize)
-  const subPx = Math.max(10, Math.floor(Math.min(w, h) * 0.062))
-  const subLine = `${lot.tierLabel || ''} · 第${id + 1}条`
-  return {
-    title,
-    subLine,
-    titleColor: theme.title,
-    subColor: theme.sub,
-    titleFontPx: titlePx,
-    subFontPx: subPx
-  }
-}
-
-module.exports = { drawLotArtWx, buildLotArtOverlay }
+module.exports = { drawLotArtWx }

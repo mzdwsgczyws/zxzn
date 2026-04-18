@@ -880,34 +880,6 @@
 
 .lot-art-canvas {
   display: block;
-  position: relative;
-  z-index: 1;
-}
-
-.lot-art-overlay {
-  position: absolute;
-  left: 0;
-  top: 0;
-  z-index: 2;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  pointer-events: none;
-}
-
-.lot-art-title-text {
-  display: block;
-  text-align: center;
-  font-weight: 700;
-  line-height: 1.2;
-}
-
-.lot-art-sub-text {
-  display: block;
-  text-align: center;
-  margin-top: 8rpx;
-  line-height: 1.2;
 }
 
 .block {

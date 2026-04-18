@@ -1,6 +1,18 @@
 const KEYS = require('../../../utils/storage-keys.js')
 const pageAnalytics = require('../../../behaviors/page-analytics.js')
 const { recordShare } = require('../../../utils/usage-analytics.js')
+const { drawPersonalityPortraitWx } = require('../../../utils/personality-portrait.js')
+
+const PORTRAIT_PX = 280
+const SHARE_PORTRAIT = { x: 302, y: 22, w: 184, h: 184 }
+const POSTER_PORTRAIT = { x: 56, y: 288, w: 300, h: 300 }
+
+function resultTypeId(result) {
+  if (!result) return 0
+  if (result.typeId != null) return result.typeId
+  if (result.id != null) return result.id
+  return 0
+}
 
 Page({
   behaviors: [pageAnalytics],
@@ -49,7 +61,10 @@ Page({
       { k: '显', v: s['显'] || 0 }
     ]
     this.setData({ hasResult: true, result, scoreList, shareImg: '' }, () => {
-      setTimeout(() => this.renderShareCard(), 200)
+      setTimeout(() => {
+        this.renderPortraitCanvas()
+        this.renderShareCard()
+      }, 200)
     })
   },
 
@@ -61,10 +76,21 @@ Page({
     wx.navigateTo({ url: '/pages/personality/quiz/quiz' })
   },
 
+  /** 结果页展示用意象肖像 */
+  renderPortraitCanvas() {
+    const result = this.data.result
+    if (!result) return
+    const tid = resultTypeId(result)
+    const ctx = wx.createCanvasContext('portraitCanvas', this)
+    drawPersonalityPortraitWx(ctx, 0, 0, PORTRAIT_PX, PORTRAIT_PX, tid)
+    ctx.draw(false)
+  },
+
   /** 分享用卡片：500×400 CSS 像素，导出 2x 更清晰 */
   renderShareCard() {
     const result = this.data.result
     if (!result) return
+    const tid = resultTypeId(result)
     const ctx = wx.createCanvasContext('shareCanvas', this)
     const W = 500
     const H = 400
@@ -80,41 +106,44 @@ Page({
     ctx.fillRect(12, 24, W - 24, 3)
     ctx.fillRect(12, H - 36, W - 24, 3)
 
+    drawPersonalityPortraitWx(ctx, SHARE_PORTRAIT.x, SHARE_PORTRAIT.y, SHARE_PORTRAIT.w, SHARE_PORTRAIT.h, tid)
+
+    const leftX = 24
     ctx.setFillStyle('#1a237e')
-    ctx.setFontSize(20)
-    ctx.fillText('道性十六型 · 自我觉察卡片', 28, 52)
+    ctx.setFontSize(18)
+    ctx.fillText('道性十六型 · 自我觉察卡片', leftX, 48)
 
-    ctx.setFontSize(26)
-    ctx.fillText('当前更接近（非固定标签）', 28, 82)
+    ctx.setFontSize(22)
+    ctx.fillText('当前更接近（非固定标签）', leftX, 78)
 
-    ctx.setFontSize(32)
+    ctx.setFontSize(28)
     const name = result.typeName || ''
-    ctx.fillText(name.length > 14 ? name.slice(0, 14) + '…' : name, 28, 128)
+    ctx.fillText(name.length > 11 ? name.slice(0, 11) + '…' : name, leftX, 118)
 
     ctx.setFillStyle('#6d4c41')
-    ctx.setFontSize(18)
-    ctx.fillText('形象取意：' + (result.figure || '—'), 28, 158)
+    ctx.setFontSize(16)
+    ctx.fillText('形象取意：' + (result.figure || '—'), leftX, 148)
 
     ctx.setFillStyle('#3e3428')
-    ctx.setFontSize(17)
-    let y = this.drawLines(ctx, result.summary || '', 28, 188, 20, 24)
+    ctx.setFontSize(15)
+    let y = this.drawLines(ctx, result.summary || '', leftX, 172, 17, 21)
 
-    y += 16
+    y += 12
     ctx.setFillStyle('#3949ab')
-    ctx.setFontSize(17)
-    ctx.fillText('四维 · 动 / 刚 / 散 / 显', 28, y)
-    y += 28
+    ctx.setFontSize(15)
+    ctx.fillText('四维 · 动 / 刚 / 散 / 显', leftX, y)
+    y += 22
     const sc = result.scores || {}
     ctx.setFillStyle('#4a4034')
-    ctx.setFontSize(16)
+    ctx.setFontSize(14)
     ;['动', '刚', '散', '显'].forEach((k) => {
-      ctx.fillText(`${k} ${sc[k] || 0}%`, 28, y)
-      y += 22
+      ctx.fillText(`${k} ${sc[k] || 0}%`, leftX, y)
+      y += 19
     })
 
     ctx.setFillStyle('#a0907c')
-    ctx.setFontSize(14)
-    ctx.fillText('道性自修 · 仅供文化参考', 28, H - 28)
+    ctx.setFontSize(13)
+    ctx.fillText('道性自修 · 仅供文化参考', leftX, H - 26)
 
     ctx.draw(false, () => {
       setTimeout(() => {
@@ -138,6 +167,7 @@ Page({
     const { result } = this.data
     if (!result) return
 
+    const tid = resultTypeId(result)
     const ctx = wx.createCanvasContext('posterCanvas', this)
     const W = 750
     const H = 1200
@@ -162,19 +192,29 @@ Page({
     ctx.setFontSize(24)
     ctx.fillText('当前更接近（非固定标签）', 56, 158)
 
-    ctx.setFontSize(40)
+    ctx.setFontSize(38)
     const name = result.typeName || ''
-    ctx.fillText(name.length > 12 ? name.slice(0, 12) + '…' : name, 56, 220)
+    ctx.fillText(name.length > 11 ? name.slice(0, 11) + '…' : name, 56, 208)
 
     ctx.setFillStyle('#6d4c41')
     ctx.setFontSize(26)
-    ctx.fillText('形象取意：' + (result.figure || ''), 56, 268)
+    ctx.fillText('形象取意：' + (result.figure || ''), 56, 252)
+
+    drawPersonalityPortraitWx(
+      ctx,
+      POSTER_PORTRAIT.x,
+      POSTER_PORTRAIT.y,
+      POSTER_PORTRAIT.w,
+      POSTER_PORTRAIT.h,
+      tid
+    )
 
     ctx.setFillStyle('#3e3428')
     ctx.setFontSize(24)
-    let y = this.drawLines(ctx, result.summary || '', 56, 308, 22, 32)
+    const summaryY = POSTER_PORTRAIT.y + POSTER_PORTRAIT.h + 36
+    let y = this.drawLines(ctx, result.summary || '', 56, summaryY, 22, 32)
 
-    y = Math.max(y + 28, 420)
+    y = Math.max(y + 28, summaryY + 120)
     ctx.setFillStyle('#3949ab')
     ctx.setFontSize(26)
     ctx.fillText('四维概览', 56, y)

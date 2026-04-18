@@ -6,6 +6,16 @@
     <text class="tip">你当前更接近以下状态（非固定标签，可随自修与境遇变化）</text>
   </view>
 
+  <view class="portrait-block">
+    <canvas
+      canvas-id="portraitCanvas"
+      class="portrait-canvas"
+      style="width: 280px; height: 280px;"
+      disable-scroll="{{true}}"
+    ></canvas>
+    <text class="portrait-note">意象肖像 · 水墨与赛博（程序绘制，原创示意）</text>
+  </view>
+
   <view class="card main-card">
     <text class="type-name">{{result.typeName}}</text>
     <text class="figure">历史形象取意：{{result.figure}}</text>

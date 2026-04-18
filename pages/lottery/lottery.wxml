@@ -60,20 +60,6 @@
           style="width: {{lotArtW}}px; height: {{lotArtH}}px;"
           disable-scroll="{{true}}"
         ></canvas>
-        <view
-          wx:if="{{lotArtOverlay}}"
-          class="lot-art-overlay"
-          style="width: {{lotArtW}}px; height: {{lotArtH}}px;"
-        >
-          <text
-            class="lot-art-title-text"
-            style="color: {{lotArtOverlay.titleColor}}; font-size: {{lotArtOverlay.titleFontPx}}px;"
-          >{{lotArtOverlay.title}}</text>
-          <text
-            class="lot-art-sub-text"
-            style="color: {{lotArtOverlay.subColor}}; font-size: {{lotArtOverlay.subFontPx}}px;"
-          >{{lotArtOverlay.subLine}}</text>
-        </view>
       </view>
       <view class="block">
         <text class="b-title">释义</text>
