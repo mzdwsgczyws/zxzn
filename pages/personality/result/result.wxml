@@ -7,13 +7,12 @@
   </view>
 
   <view class="portrait-block">
-    <canvas
-      canvas-id="portraitCanvas"
-      class="portrait-canvas"
-      style="width: 280px; height: 280px;"
-      disable-scroll="{{true}}"
-    ></canvas>
-    <text class="portrait-note">意象肖像 · 水墨与赛博（程序绘制，原创示意）</text>
+    <image
+      wx:if="{{portraitSrc}}"
+      class="portrait-img"
+      src="{{portraitSrc}}"
+      mode="aspectFill"
+    />
   </view>
 
   <view class="card main-card">

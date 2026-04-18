@@ -40,19 +40,13 @@
   border: 1rpx solid rgba(57, 73, 171, 0.12);
 }
 
-.portrait-canvas {
+.portrait-img {
   display: block;
+  width: 280px;
+  height: 280px;
   border-radius: 16rpx;
   box-shadow: 0 8rpx 24rpx rgba(26, 35, 126, 0.15);
-}
-
-.portrait-note {
-  margin-top: 12rpx;
-  font-size: 22rpx;
-  color: #9a8b7a;
-  line-height: 1.4;
-  text-align: center;
-  padding: 0 24rpx;
+  background: #e8e0d4;
 }
 
 .main-card {

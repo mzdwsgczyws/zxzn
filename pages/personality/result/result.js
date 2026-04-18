@@ -1,9 +1,7 @@
 const KEYS = require('../../../utils/storage-keys.js')
 const pageAnalytics = require('../../../behaviors/page-analytics.js')
 const { recordShare } = require('../../../utils/usage-analytics.js')
-const { drawPersonalityPortraitWx } = require('../../../utils/personality-portrait.js')
 
-const PORTRAIT_PX = 280
 const SHARE_PORTRAIT = { x: 302, y: 22, w: 184, h: 184 }
 const POSTER_PORTRAIT = { x: 56, y: 288, w: 300, h: 300 }
 
@@ -14,6 +12,13 @@ function resultTypeId(result) {
   return 0
 }
 
+/** 与 utils/personality.js 中 id 0～15 对应，资源在 images/personality-portraits/ */
+function personalityPortraitSrc(tid) {
+  const n = Number(tid)
+  const id = Number.isFinite(n) && n >= 0 && n <= 15 ? Math.floor(n) : 0
+  return `/images/personality-portraits/${id}.jpg`
+}
+
 Page({
   behaviors: [pageAnalytics],
 
@@ -21,7 +26,8 @@ Page({
     hasResult: false,
     result: null,
     scoreList: [],
-    shareImg: ''
+    shareImg: '',
+    portraitSrc: ''
   },
 
   onShow() {
@@ -50,7 +56,7 @@ Page({
   loadResult() {
     const result = wx.getStorageSync(KEYS.PERSONALITY_RESULT)
     if (!result || !result.typeName) {
-      this.setData({ hasResult: false, result: null, scoreList: [], shareImg: '' })
+      this.setData({ hasResult: false, result: null, scoreList: [], shareImg: '', portraitSrc: '' })
       return
     }
     const s = result.scores || {}
@@ -60,11 +66,9 @@ Page({
       { k: '散', v: s['散'] || 0 },
       { k: '显', v: s['显'] || 0 }
     ]
-    this.setData({ hasResult: true, result, scoreList, shareImg: '' }, () => {
-      setTimeout(() => {
-        this.renderPortraitCanvas()
-        this.renderShareCard()
-      }, 200)
+    const portraitSrc = personalityPortraitSrc(resultTypeId(result))
+    this.setData({ hasResult: true, result, scoreList, shareImg: '', portraitSrc }, () => {
+      setTimeout(() => this.renderShareCard(), 200)
     })
   },
 
@@ -76,21 +80,19 @@ Page({
     wx.navigateTo({ url: '/pages/personality/quiz/quiz' })
   },
 
-  /** 结果页展示用意象肖像 */
-  renderPortraitCanvas() {
-    const result = this.data.result
-    if (!result) return
-    const tid = resultTypeId(result)
-    const ctx = wx.createCanvasContext('portraitCanvas', this)
-    drawPersonalityPortraitWx(ctx, 0, 0, PORTRAIT_PX, PORTRAIT_PX, tid)
-    ctx.draw(false)
-  },
-
   /** 分享用卡片：500×400 CSS 像素，导出 2x 更清晰 */
   renderShareCard() {
     const result = this.data.result
     if (!result) return
-    const tid = resultTypeId(result)
+    const src = personalityPortraitSrc(resultTypeId(result))
+    wx.getImageInfo({
+      src,
+      success: (info) => this._paintShareCard(result, info.path),
+      fail: () => this._paintShareCard(result, '')
+    })
+  },
+
+  _paintShareCard(result, portraitLocalPath) {
     const ctx = wx.createCanvasContext('shareCanvas', this)
     const W = 500
     const H = 400
@@ -106,7 +108,18 @@ Page({
     ctx.fillRect(12, 24, W - 24, 3)
     ctx.fillRect(12, H - 36, W - 24, 3)
 
-    drawPersonalityPortraitWx(ctx, SHARE_PORTRAIT.x, SHARE_PORTRAIT.y, SHARE_PORTRAIT.w, SHARE_PORTRAIT.h, tid)
+    if (portraitLocalPath) {
+      ctx.drawImage(
+        portraitLocalPath,
+        SHARE_PORTRAIT.x,
+        SHARE_PORTRAIT.y,
+        SHARE_PORTRAIT.w,
+        SHARE_PORTRAIT.h
+      )
+    } else {
+      ctx.setFillStyle('#d7cfc4')
+      ctx.fillRect(SHARE_PORTRAIT.x, SHARE_PORTRAIT.y, SHARE_PORTRAIT.w, SHARE_PORTRAIT.h)
+    }
 
     const leftX = 24
     ctx.setFillStyle('#1a237e')
@@ -167,7 +180,15 @@ Page({
     const { result } = this.data
     if (!result) return
 
-    const tid = resultTypeId(result)
+    const src = personalityPortraitSrc(resultTypeId(result))
+    wx.getImageInfo({
+      src,
+      success: (info) => this._paintPoster(result, info.path),
+      fail: () => this._paintPoster(result, '')
+    })
+  },
+
+  _paintPoster(result, portraitLocalPath) {
     const ctx = wx.createCanvasContext('posterCanvas', this)
     const W = 750
     const H = 1200
@@ -200,14 +221,18 @@ Page({
     ctx.setFontSize(26)
     ctx.fillText('形象取意：' + (result.figure || ''), 56, 252)
 
-    drawPersonalityPortraitWx(
-      ctx,
-      POSTER_PORTRAIT.x,
-      POSTER_PORTRAIT.y,
-      POSTER_PORTRAIT.w,
-      POSTER_PORTRAIT.h,
-      tid
-    )
+    if (portraitLocalPath) {
+      ctx.drawImage(
+        portraitLocalPath,
+        POSTER_PORTRAIT.x,
+        POSTER_PORTRAIT.y,
+        POSTER_PORTRAIT.w,
+        POSTER_PORTRAIT.h
+      )
+    } else {
+      ctx.setFillStyle('#d7cfc4')
+      ctx.fillRect(POSTER_PORTRAIT.x, POSTER_PORTRAIT.y, POSTER_PORTRAIT.w, POSTER_PORTRAIT.h)
+    }
 
     ctx.setFillStyle('#3e3428')
     ctx.setFontSize(24)
