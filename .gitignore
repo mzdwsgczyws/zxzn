@@ -1,0 +1,28 @@
+# —— 文档（不上库）——
+*.md
+**/*.md
+
+# —— 本地批处理 / 素材脚本（非小程序运行所需）——
+/scripts/
+
+# —— 编辑器与本地配置 ——
+.cursor/
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# —— 微信开发者工具本地私有配置 ——
+project.private.config.json
+
+# —— 仅本地自测工具 ——
+utils/_test_personality.js
+
+# —— 系统与杂项 ——
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.log
+npm-debug.log*
+yarn-error.log*
+node_modules/
