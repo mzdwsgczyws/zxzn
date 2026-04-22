@@ -2,12 +2,11 @@
   "description": "道性人格 · 量化自修 · 心象箴言",
   "packOptions": {
     "ignore": [
-      "README.md",
-      "**/*.md",
-      "docs/**",
-      "scripts/**",
-      ".cursor/**",
-      "utils/_test_personality.js"
+      { "type": "suffix", "value": ".md" },
+      { "type": "folder", "value": "docs" },
+      { "type": "folder", "value": "scripts" },
+      { "type": "folder", "value": ".cursor" },
+      { "type": "file", "value": "utils/_test_personality.js" }
     ],
     "include": []
   },
