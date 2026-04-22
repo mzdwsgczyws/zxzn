@@ -19,5 +19,22 @@
   },
   "style": "v2",
   "sitemapLocation": "sitemap.json",
-  "lazyCodeLoading": "requiredComponents"
+  "lazyCodeLoading": "requiredComponents",
+  "subPackages": [
+    {
+      "root": "subpackages/portrait-assets",
+      "name": "portrait-assets",
+      "pages": ["page/placeholder/placeholder"]
+    }
+  ],
+  "preloadRule": {
+    "pages/personality/quiz/quiz": {
+      "network": "all",
+      "packages": ["portrait-assets"]
+    },
+    "pages/personality/result/result": {
+      "network": "all",
+      "packages": ["portrait-assets"]
+    }
+  }
 }

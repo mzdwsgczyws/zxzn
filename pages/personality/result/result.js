@@ -12,11 +12,11 @@ function resultTypeId(result) {
   return 0
 }
 
-/** 与 utils/personality.js 中 id 0～15 对应，资源在 images/personality-portraits/ */
+/** 与 utils/personality.js 中 id 0～15 对应；肖像在分包以控制主包体积 */
 function personalityPortraitSrc(tid) {
   const n = Number(tid)
   const id = Number.isFinite(n) && n >= 0 && n <= 15 ? Math.floor(n) : 0
-  return `/images/personality-portraits/${id}.jpg`
+  return `/subpackages/portrait-assets/images/personality-portraits/${id}.jpg`
 }
 
 Page({
