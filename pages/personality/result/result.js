@@ -19,6 +19,22 @@ function personalityPortraitSrc(tid) {
   return `/subpackages/portrait-assets/images/personality-portraits/${id}.jpg`
 }
 
+function buildQuizMetaLine(result) {
+  if (!result) return ''
+  const ne = result.neitherCount || 0
+  const early = result.earlyExit === true
+  if (early && ne > 0) {
+    return `本次提前结束；未答题目已按中性估算，并略体现求简、求结果倾向。另有 ${ne} 题「都不想选」，计分略向简静、内收调节。仅供自察。`
+  }
+  if (early) {
+    return '本次提前结束问卷：未答题目已按「中性」估算，并略体现求简、求结果倾向，仅供自察参考。'
+  }
+  if (ne > 0) {
+    return `有 ${ne} 题选择「都不想选」：在计分上略向简静、内收质心调节，与刻板标签不同。`
+  }
+  return ''
+}
+
 Page({
   behaviors: [pageAnalytics],
 
@@ -27,7 +43,8 @@ Page({
     result: null,
     scoreList: [],
     shareImg: '',
-    portraitSrc: ''
+    portraitSrc: '',
+    quizMetaLine: ''
   },
 
   onShow() {
@@ -56,7 +73,7 @@ Page({
   loadResult() {
     const result = wx.getStorageSync(KEYS.PERSONALITY_RESULT)
     if (!result || !result.typeName) {
-      this.setData({ hasResult: false, result: null, scoreList: [], shareImg: '', portraitSrc: '' })
+      this.setData({ hasResult: false, result: null, scoreList: [], shareImg: '', portraitSrc: '', quizMetaLine: '' })
       return
     }
     const s = result.scores || {}
@@ -67,7 +84,8 @@ Page({
       { k: '显', v: s['显'] || 0 }
     ]
     const portraitSrc = personalityPortraitSrc(resultTypeId(result))
-    this.setData({ hasResult: true, result, scoreList, shareImg: '', portraitSrc }, () => {
+    const quizMetaLine = buildQuizMetaLine(result)
+    this.setData({ hasResult: true, result, scoreList, shareImg: '', portraitSrc, quizMetaLine }, () => {
       setTimeout(() => this.renderShareCard(), 200)
     })
   },

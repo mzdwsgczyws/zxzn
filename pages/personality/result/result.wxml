@@ -6,6 +6,10 @@
     <text class="tip">你当前更接近以下状态（非固定标签，可随自修与境遇变化）</text>
   </view>
 
+  <view class="quiz-meta" wx:if="{{quizMetaLine}}">
+    <text class="quiz-meta-text">{{quizMetaLine}}</text>
+  </view>
+
   <view class="portrait-block">
     <image
       wx:if="{{portraitSrc}}"

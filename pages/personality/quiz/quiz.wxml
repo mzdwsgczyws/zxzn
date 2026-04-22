@@ -11,10 +11,11 @@
     <text class="q-text">{{current.text}}</text>
     <button
       wx:for="{{current.options}}"
-      wx:key="index"
-      class="opt {{selectedIdx === index ? 'opt--selected' : ''}}"
+      wx:for-index="oi"
+      wx:key="oi"
+      class="opt {{selectedIdx === oi ? 'opt--selected' : ''}} {{oi === 5 ? 'opt--neither' : ''}}"
       bindtap="choose"
-      data-idx="{{index}}"
+      data-idx="{{oi}}"
     >{{item.label}}</button>
   </view>
 
@@ -23,5 +24,9 @@
     <text class="nav-mid-hint">{{selectedIdx >= 0 ? '已选，自动进入下一题' : '请选择一项'}}</text>
   </view>
 
-  <view class="hint">提示：没有标准答案，按「通常情况」选择最贴近的即可。</view>
+  <view class="early-wrap" wx:if="{{current}}">
+    <button class="btn-early" bindtap="finishEarly">不想做后续题目，直接看结果</button>
+  </view>
+
+  <view class="hint">提示：没有标准答案，按「通常情况」选择最贴近的即可。选「都不想选」表示难以在本题两极中选边，会略向简静、内收计分；提前结束则未答题按中性估算并略带「求结果」倾向。</view>
 </view>

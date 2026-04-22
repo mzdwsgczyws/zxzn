@@ -78,6 +78,13 @@
   color: #4a148c;
 }
 
+.opt--neither {
+  background: #f5f2eb;
+  border-style: dashed;
+  font-size: 26rpx;
+  color: #6d5d4a;
+}
+
 /* 导航行 */
 .nav-row {
   display: flex;
@@ -108,6 +115,26 @@
 .nav-mid-hint {
   font-size: 22rpx;
   color: #a0907c;
+}
+
+.early-wrap {
+  padding: 8rpx 32rpx 0;
+  margin-top: 8rpx;
+}
+
+.btn-early {
+  width: 100%;
+  padding: 20rpx 24rpx;
+  font-size: 26rpx;
+  line-height: 1.45;
+  color: #5c4d3d;
+  background: #fff;
+  border: 2rpx dashed #b0a080;
+  border-radius: 16rpx;
+}
+
+.btn-early::after {
+  border: none;
 }
 
 .hint {

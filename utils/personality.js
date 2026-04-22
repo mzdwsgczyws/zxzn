@@ -1,12 +1,14 @@
 /**
  * 道性十六型：动/静、刚/柔、散/聚、显/藏
  *
- * 每题 5 个选项，按倾向程度分配权重：
+ * 每题 6 个选项，前 5 个按倾向程度分配权重：
  *   选项 1 — 强 A 端（权重 1.0 : 0.0）
  *   选项 2 — 偏 A 端（权重 0.75 : 0.25）
  *   选项 3 — 中性 / 不确定（权重 0.5 : 0.5）
  *   选项 4 — 偏 B 端（权重 0.25 : 0.75）
  *   选项 5 — 强 B 端（权重 0.0 : 1.0）
+ *   选项 6 — 都不想选：本题维度上略向「静/柔/聚/藏」收一点（0.42:0.58），反映难以在两极中选边
+ * 可提前交卷：未答题按第 3 项（0.5:0.5）估算，并叠加「要结果/略外显」的轻量偏置
  *
  * 计分后得到四维比例 [dong, gang, san, xian] ∈ [0,1]，与 16 型质心最近邻匹配。
  */
@@ -207,12 +209,12 @@ const PERSONALITY_TYPES = [
 ]
 
 /**
- * 36 题，每题 5 个选项 options[]。
+ * 36 题，每题 6 个选项 options[]（前 5 同原；第 6 为「都不想选」）。
  * 每个 option: { label: string, w: { [key]: number } }
  *   w 中 key 为 dong/jing/gang/rou/san/ju/xian/cang，值为该选项对该端的贡献权重。
  *   强 A 端 = 1.0:0.0 | 偏 A = 0.75:0.25 | 中性 = 0.5:0.5 | 偏 B = 0.25:0.75 | 强 B = 0.0:1.0
  */
-const QUESTIONS = [
+const _QUESTION_RAW = [
   // ═══════════ 动/静 (dj) 题 1–9 ═══════════
   {
     id: 1, text: '约好晨跑那天下起雨来，你多半会？', dim: 'dj',
@@ -579,6 +581,28 @@ const QUESTIONS = [
   }
 ]
 
+/**
+ * 第 6 项「都不想选」：在当题对应维度上略向 B 端（静/柔/聚/藏）收，表示回避两极表态
+ */
+function neitherOptionW(dim) {
+  if (dim === 'dj') return { dong: 0.42, jing: 0.58 }
+  if (dim === 'gj') return { gang: 0.42, rou: 0.58 }
+  if (dim === 'sj') return { san: 0.42, ju: 0.58 }
+  if (dim === 'xz') return { xian: 0.42, cang: 0.58 }
+  return { dong: 0.5, jing: 0.5 }
+}
+
+const QUESTIONS = _QUESTION_RAW.map((q) => ({
+  ...q,
+  options: [
+    ...q.options,
+    { label: '都不想选（难以判断）', w: neitherOptionW(q.dim) }
+  ]
+}))
+
+/** 提前结束测验：在原始计分上叠一点「求结果、少纠缠」的轻偏置（动/显略升） */
+const EARLY_EXIT_BIAS = { dong: 0.2, jing: 0.08, xian: 0.16, cang: 0.1 }
+
 function dist2(a, b) {
   let s = 0
   for (let i = 0; i < 4; i++) {
@@ -590,31 +614,52 @@ function dist2(a, b) {
 
 /**
  * 计分：遍历每题，根据用户所选选项的 w 权重累加到对应维度计数器。
- * answers: { [questionId]: optionIndex (0–4) }
+ * answers: { [questionId]: optionIndex (0–5) }
+ * meta: { earlyExit?: boolean } — 为 true 时未答题按第 3 项（0.5:0.5）估算，并叠加 EARLY_EXIT_BIAS
  *
  * 兼容旧版 'a'/'b'/'n' 格式：a→0, b→4, n→2
  */
-function calculatePersonality(answers) {
+function calculatePersonality(answers, meta) {
+  const earlyExit = meta && meta.earlyExit === true
   const count = { dong: 0, jing: 0, gang: 0, rou: 0, san: 0, ju: 0, xian: 0, cang: 0 }
+  let neitherCount = 0
+
   QUESTIONS.forEach((q) => {
     let v = answers[q.id]
-    if (v == null) return
-    // 兼容旧版字符串格式
+    if (v == null) {
+      if (earlyExit) v = 2
+      else return
+    }
     if (v === 'a') v = 0
     else if (v === 'b') v = 4
     else if (v === 'n') v = 2
     const idx = typeof v === 'number' ? v : parseInt(v, 10)
     if (isNaN(idx) || idx < 0 || idx >= q.options.length) return
+    if (idx === 5) neitherCount += 1
     const w = q.options[idx].w
     Object.keys(w).forEach((k) => {
       count[k] = (count[k] || 0) + w[k]
     })
   })
+
+  if (earlyExit) {
+    Object.keys(EARLY_EXIT_BIAS).forEach((k) => {
+      count[k] = (count[k] || 0) + EARLY_EXIT_BIAS[k]
+    })
+  }
+
   const dong = count.dong + count.jing > 0 ? count.dong / (count.dong + count.jing) : 0.5
   const gang = count.gang + count.rou > 0 ? count.gang / (count.gang + count.rou) : 0.5
   const san = count.san + count.ju > 0 ? count.san / (count.san + count.ju) : 0.5
   const xian = count.xian + count.cang > 0 ? count.xian / (count.xian + count.cang) : 0.5
-  const vec = [dong, gang, san, xian]
+  let vec = [dong, gang, san, xian]
+
+  // 「都不想选」较多时，向偏阴、偏收的中质心略贴近（避免与强极端型硬贴）
+  if (neitherCount > 0) {
+    const blend = Math.min(0.14, neitherCount * 0.006)
+    const target = [0.44, 0.4, 0.45, 0.38]
+    vec = vec.map((v, i) => v * (1 - blend) + target[i] * blend)
+  }
 
   let best = 0
   let bestD = Infinity
@@ -632,11 +677,13 @@ function calculatePersonality(answers) {
     typeId: type.id,
     typeName: type.name,
     vector: vec,
+    neitherCount,
+    earlyExit: !!earlyExit,
     scores: {
-      动: Math.round(dong * 100),
-      刚: Math.round(gang * 100),
-      散: Math.round(san * 100),
-      显: Math.round(xian * 100)
+      动: Math.round(vec[0] * 100),
+      刚: Math.round(vec[1] * 100),
+      散: Math.round(vec[2] * 100),
+      显: Math.round(vec[3] * 100)
     }
   }
 }

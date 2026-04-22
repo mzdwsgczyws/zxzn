@@ -29,6 +29,20 @@
   line-height: 1.6;
 }
 
+.quiz-meta {
+  margin: 0 32rpx 8rpx;
+  padding: 16rpx 20rpx;
+  background: rgba(126, 87, 194, 0.08);
+  border-radius: 12rpx;
+  border-left: 6rpx solid #7e57c2;
+}
+
+.quiz-meta-text {
+  font-size: 22rpx;
+  color: #5c4d3d;
+  line-height: 1.55;
+}
+
 .portrait-block {
   display: flex;
   flex-direction: column;
