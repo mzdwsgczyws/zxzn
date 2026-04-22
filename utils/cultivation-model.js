@@ -3,6 +3,8 @@
  * 输入：按日期升序的 records；可选 personality（道性结果）、profile（档案）、priorities（用户勾选的重点 id 列表）。
  */
 
+const { getPersonalityExtraPlans } = require('./cultivation-personality-extras.js')
+
 const WINDOW = 7
 
 function avg(records, key) {
@@ -191,7 +193,7 @@ function personalityHooks(pers) {
 }
 
 function buildCandidates(ctx) {
-  const { last, av, domPhase, streaks, persHooks, profHooks, priorities } = ctx
+  const { last, av, domPhase, streaks, persHooks, profHooks, priorities, personality } = ctx
   const priSet = new Set(priorities || [])
   const windowLabel = `近 ${last.length} 天`
 
@@ -210,6 +212,20 @@ function buildCandidates(ctx) {
   }
 
   const c = []
+
+  const pid = personality && personality.typeId != null ? personality.typeId : null
+  if (pid != null) {
+    getPersonalityExtraPlans(pid).forEach((e) => {
+      c.push({
+        id: e.id,
+        tags: e.tags,
+        score: boost(e.tags, 19),
+        title: e.title,
+        adjust: e.adjust,
+        reason: e.reason
+      })
+    })
+  }
 
   if (concernSleep(av.sleepHours) > 15) {
     const tags = ['sleep']
@@ -397,7 +413,7 @@ function buildCandidates(ctx) {
     uniq.push(item)
   })
 
-  return uniq.slice(0, 6)
+  return uniq.slice(0, 8)
 }
 
 function analyzeRecords(records, ctx = {}) {
@@ -446,6 +462,7 @@ function analyzeRecords(records, ctx = {}) {
     streaks,
     persHooks,
     profHooks,
+    personality: ctx.personality,
     priorities: ctx.priorities
   })
 

@@ -4,6 +4,7 @@
  */
 
 const { hashStr } = require('./fortune.js')
+const { collectCorpusEntries, resolveUserTone } = require('./lottery-advice-corpus.js')
 
 function mulberry32(a) {
   return function () {
@@ -67,9 +68,15 @@ function collectCandidates(ctx) {
     gender,
     pf,
     lotTitle,
+    lotId = 0,
+    wxDay = '',
+    typeId = null,
     recentState,
     rhythmType,
-    focusTags
+    focusTags,
+    personality,
+    profile,
+    userTone
   } = ctx
 
   const push = (cat, text, weight = 1) => {
@@ -233,6 +240,22 @@ function collectCandidates(ctx) {
     push('行动参考', '今日修身与做事各选一件小的去落实，不必贪多。', 1)
   }
 
+  /* —— 签象 / 日五行 / 等第 / 道性 大语料（与上下文精确匹配，高区分度）—— */
+  try {
+    collectCorpusEntries({
+      lotId,
+      wxDay,
+      tier,
+      typeId,
+      personality,
+      profile,
+      recentState,
+      userTone
+    }).forEach((item) => {
+      push(item.cat, item.text, 1)
+    })
+  } catch (e) {}
+
   /* —— 保底池 —— */
   const fallback = [
     { cat: '起居', text: '睡前 30 分钟调暗灯光，减少短视频滑动。' },
@@ -284,9 +307,12 @@ function computeLotteryAdvices(input) {
     age,
     gender,
     personality,
+    wxDay,
+    typeId,
     recentState,
     rhythmType,
-    focusTags
+    focusTags,
+    profile
   } = input
 
   const wf = weatherFlags(weather)
@@ -301,8 +327,12 @@ function computeLotteryAdvices(input) {
   const rh = rhythmType != null ? String(rhythmType) : 'na'
   const ft =
     Array.isArray(focusTags) && focusTags.length ? focusTags.slice().sort().join(',') : 'na'
+  const wday = wxDay != null && wxDay !== '' ? String(wxDay) : 'na'
+  const tId = typeId != null && !Number.isNaN(Number(typeId)) ? Number(typeId) : 'na'
+  const userTone = resolveUserTone({ personality, profile, recentState })
+  const et = profile && profile.emotionTendency != null ? String(profile.emotionTendency) : 'na'
   const seed = hashStr(
-    `${dateStr}|${lotId}|${tier}|${almanac && almanac.jieqi}|${jianchu}|${wf.code}|${age}|${genderKey}|${persKey}|${rs}|${rh}|${ft}`
+    `${dateStr}|${lotId}|${tier}|${almanac && almanac.jieqi}|${jianchu}|${wf.code}|${age}|${genderKey}|${persKey}|${rs}|${rh}|${ft}|wx${wday}|ty${tId}|ut${userTone}|et${et}`
   )
   const rnd = mulberry32(seed)
 
@@ -315,12 +345,18 @@ function computeLotteryAdvices(input) {
     gender: genderKey,
     pf,
     lotTitle,
+    lotId: lotId != null ? Number(lotId) : 0,
+    wxDay: wday === 'na' ? '' : wday,
+    typeId: tId === 'na' ? null : tId,
     recentState,
     rhythmType,
-    focusTags
+    focusTags,
+    personality,
+    profile,
+    userTone
   }
   const pool = collectCandidates(ctx)
-  const need = 7
+  const need = 8
   const picked = uniquePick(pool, rnd, need)
   const lines = picked.map((p, i) => `${i + 1}. ${p.text}`)
   return lines.length >= 5

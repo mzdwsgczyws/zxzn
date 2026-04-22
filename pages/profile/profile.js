@@ -13,6 +13,15 @@ const GENDER_LABELS = ['保密 / 跳过', '男', '女']
 const RECENT_LABELS = ['-', '偏低沉 / 易疲', '平稳', '较充沛 / 偏积极']
 const RECENT_VALUES = [null, 'low', 'mid', 'high']
 
+const EMOTION_LABELS = [
+  '自动（据近期状态与道性推测）',
+  '偏安抚（心浮气燥时）',
+  '偏鼓励（低落时）',
+  '偏同理（易怒好辩时）',
+  '仅中性签条（语气均衡）'
+]
+const EMOTION_VALUES = [null, 'soothe', 'encourage', 'empathy', 'neutral_only']
+
 const RHYTHM_LABELS = ['-', '偏早起', '偏夜猫', '作息不太规律']
 const RHYTHM_VALUES = [null, 'early', 'night', 'irregular']
 
@@ -80,6 +89,8 @@ Page({
     geocodeHint: '',
     recentLabels: RECENT_LABELS,
     recentIndex: 0,
+    emotionLabels: EMOTION_LABELS,
+    emotionIndex: 0,
     rhythmLabels: RHYTHM_LABELS,
     rhythmIndex: 0,
     styleLabels: STYLE_LABELS,
@@ -279,6 +290,7 @@ Page({
       ),
       geocodeHint,
       recentIndex: indexFromValue(RECENT_VALUES, p.recentState),
+      emotionIndex: indexFromValue(EMOTION_VALUES, p.emotionTendency),
       rhythmIndex: indexFromValue(RHYTHM_VALUES, p.rhythmType),
       styleIndex: indexFromValue(STYLE_VALUES, p.lotStylePref),
       focusTagsSelected: tags,
@@ -305,6 +317,9 @@ Page({
 
   onRecentPick(e) {
     this.setData({ recentIndex: Number(e.detail.value) || 0 })
+  },
+  onEmotionPick(e) {
+    this.setData({ emotionIndex: Number(e.detail.value) || 0 })
   },
   onRhythmPick(e) {
     this.setData({ rhythmIndex: Number(e.detail.value) || 0 })
@@ -352,12 +367,15 @@ Page({
     const payload = { ...prev, age, birthMonth, gender }
 
     const rs = RECENT_VALUES[this.data.recentIndex]
+    const em = EMOTION_VALUES[this.data.emotionIndex]
     const rh = RHYTHM_VALUES[this.data.rhythmIndex]
     const sp = STYLE_VALUES[this.data.styleIndex]
     const ft = (this.data.focusTagsSelected || []).slice()
 
     if (rs) payload.recentState = rs
     else delete payload.recentState
+    if (em != null && em !== '') payload.emotionTendency = em
+    else delete payload.emotionTendency
     if (rh) payload.rhythmType = rh
     else delete payload.rhythmType
     if (sp) payload.lotStylePref = sp

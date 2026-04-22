@@ -170,7 +170,7 @@ function finalizeDraw(page, lat, lng, weather) {
   const y = now.getFullYear()
   const mo = now.getMonth() + 1
   const d = now.getDate()
-  const { gz } = getGanZhiDaySeed(y, mo, d)
+  const { gz, wxDay } = getGanZhiDaySeed(y, mo, d)
   const almanac = getHuangdaoPackage(now, gz)
 
   const meta = buildFortuneMeta({
@@ -205,6 +205,9 @@ function finalizeDraw(page, lat, lng, weather) {
     age: profile.age,
     gender,
     personality: hasPersonality ? pers : null,
+    profile,
+    wxDay,
+    typeId: hasPersonality && pers.typeId != null ? pers.typeId : null,
     recentState: profile.recentState,
     rhythmType: profile.rhythmType,
     focusTags: profile.focusTags

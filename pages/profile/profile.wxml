@@ -11,6 +11,13 @@
       </picker>
     </view>
     <view class="field">
+      <text class="label">签文语气匹配（箴言上下文）</text>
+      <text class="loc-hint">自动：综合「近期状态」与道性四维（动/刚/散/显）推测；也可固定偏安抚、鼓励、同理，或只用中性签条。</text>
+      <picker mode="selector" range="{{emotionLabels}}" value="{{emotionIndex}}" bindchange="onEmotionPick">
+        <view class="picker-val">{{emotionLabels[emotionIndex]}}</view>
+      </picker>
+    </view>
+    <view class="field">
       <text class="label">作息倾向（箴言上下文）</text>
       <picker mode="selector" range="{{rhythmLabels}}" value="{{rhythmIndex}}" bindchange="onRhythmPick">
         <view class="picker-val">{{rhythmLabels[rhythmIndex]}}</view>
