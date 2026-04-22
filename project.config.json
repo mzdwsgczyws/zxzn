@@ -1,7 +1,14 @@
 {
   "description": "道性人格 · 量化自修 · 心象箴言",
   "packOptions": {
-    "ignore": [],
+    "ignore": [
+      "README.md",
+      "**/*.md",
+      "docs/**",
+      "scripts/**",
+      ".cursor/**",
+      "utils/_test_personality.js"
+    ],
     "include": []
   },
   "setting": {
@@ -19,7 +26,7 @@
     "autoAudits": false,
     "newFeature": false,
     "uglifyFileName": false,
-    "uploadWithSourceMap": true,
+    "uploadWithSourceMap": false,
     "useIsolateContext": true,
     "nodeModules": false,
     "enhance": true,

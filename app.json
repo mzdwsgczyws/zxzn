@@ -20,7 +20,7 @@
   "style": "v2",
   "sitemapLocation": "sitemap.json",
   "lazyCodeLoading": "requiredComponents",
-  "subPackages": [
+  "subpackages": [
     {
       "root": "subpackages/portrait-assets",
       "name": "portrait-assets",
