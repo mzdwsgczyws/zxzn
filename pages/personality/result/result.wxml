@@ -69,14 +69,14 @@
     type="2d"
     id="posterCanvas2d"
     class="hidden-canvas"
-    style="width: 750px; height: 1200px;"
+    style="width: 750px; height: {{posterCanvasH}}px;"
   ></canvas>
   <canvas
     canvas-id="posterCanvasLegacy"
     class="hidden-canvas"
-    style="width: 750px; height: 1200px;"
+    style="width: 750px; height: {{posterCanvasH}}px;"
     width="750"
-    height="1200"
+    height="{{posterCanvasH}}"
   ></canvas>
 </view>
 

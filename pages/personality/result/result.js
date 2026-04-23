@@ -3,17 +3,335 @@ const pageAnalytics = require('../../../behaviors/page-analytics.js')
 const { recordShare } = require('../../../utils/usage-analytics.js')
 
 const SHARE_PORTRAIT = { x: 302, y: 22, w: 184, h: 184 }
-const POSTER_PORTRAIT = { x: 56, y: 288, w: 300, h: 300 }
+/** 与 result.wxml 中 banner.tip 一致 */
+const BANNER_TIP =
+  '你当前更接近以下状态（非固定标签，可随自修与境遇变化）'
+const PORTRAIT_W = 280
+const PORTRAIT_H = 280
+const PORTRAIT_X = (750 - PORTRAIT_W) / 2
 /** 海报用小程序码图（与十六型图同目录，便于分包预载） */
 const MINI_CODE_SRCS = [
   '/subpackages/portrait-assets/images/personality-portraits/index.jpg',
   '/subpackages/portrait-assets/images/personality-portraits/index.png'
 ]
 const POSTER_W = 750
-const POSTER_H = 1200
-/** 二维码海报区域：右上方，分享时与签文同屏 */
-const MINI_CODE_BOX = { x: 550, y: 52, w: 168, h: 168 }
+/** 二维码：右上方，下方两行说明避免裁切 */
+const MINI_CODE_BOX = { x: 538, y: 40, w: 172, h: 172 }
 const POSTER_FONT = 'system-ui, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif'
+
+function lineRows(str, cpl) {
+  const s = String(str || '').replace(/\n/g, '')
+  if (!s) return 0
+  return Math.max(1, Math.ceil(s.length / cpl))
+}
+
+function applyTextStyle(ctx, is2d, color, fontPx) {
+  if (is2d) {
+    ctx.fillStyle = color
+    ctx.font = `${fontPx}px ${POSTER_FONT}`
+  } else {
+    ctx.setFillStyle(color)
+    ctx.setFontSize(fontPx)
+  }
+}
+
+/**
+ * 与页面长文换行尽量一致，返回最终 y
+ */
+function drawWrappedLines(ctx, is2d, str, x, y, cpl, lineHeight, color, fontPx) {
+  const s = String(str || '').replace(/\n/g, '')
+  if (!s) return y
+  applyTextStyle(ctx, is2d, color, fontPx)
+  let py = y
+  for (let i = 0; i < s.length; i += cpl) {
+    ctx.fillText(s.slice(i, i + cpl), x, py)
+    py += lineHeight
+  }
+  return py
+}
+
+function computePosterHeight(result, metaLine) {
+  let y = 100
+  y += lineRows(BANNER_TIP, 22) * 28 + 16
+  if (metaLine) y += lineRows(metaLine, 22) * 24 + 12
+  y = Math.max(y, 280)
+  y += PORTRAIT_H + 20
+  y += lineRows(String(result.typeName || ''), 16) * 48 + 12
+  y += lineRows('历史形象取意：' + (result.figure || ''), 24) * 32 + 16
+  y += lineRows(result.summary || '', 24) * 32 + 24
+  y += 4 * 36 + 24
+  y += 32 + 12
+  ;(result.traits || []).forEach((t) => {
+    y += lineRows('· ' + t, 24) * 30 + 6
+  })
+  y += 20
+  y += 32 + 12
+  ;(result.risks || []).forEach((t) => {
+    y += lineRows('· ' + t, 24) * 30 + 6
+  })
+  y += 20
+  y += 32 + 12
+  ;(result.advice || []).forEach((t) => {
+    y += lineRows('· ' + t, 24) * 30 + 6
+  })
+  y += 20
+  y += 32 + 12
+  y += lineRows(result.detail || '', 24) * 32 + 40
+  return Math.max(1200, y + 200)
+}
+
+/**
+ * 与 result 页 wxml 顺序一致：banner → meta → 肖像 → 主卡片全文；右上小程序码
+ */
+function paintResultPoster(
+  ctx,
+  {
+    is2d,
+    H,
+    result,
+    metaLine,
+    imgPortrait,
+    imgCode,
+    indexPath,
+    portraitPath
+  }
+) {
+  const W = POSTER_W
+
+  if (is2d) {
+    ctx.fillStyle = '#0d1642'
+    ctx.fillRect(0, 0, W, H)
+    ctx.fillStyle = '#f5f0e8'
+    ctx.fillRect(32, 32, W - 64, H - 64)
+    ctx.fillStyle = '#1a237e'
+    ctx.fillRect(32, 32, W - 64, 20)
+    ctx.fillRect(32, H - 52, W - 64, 20)
+    ctx.fillStyle = '#c9a227'
+    ctx.fillRect(56, 72, W - 112, 4)
+  } else {
+    ctx.setFillStyle('#0d1642')
+    ctx.fillRect(0, 0, W, H)
+    ctx.setFillStyle('#f5f0e8')
+    ctx.fillRect(32, 32, W - 64, H - 64)
+    ctx.setFillStyle('#1a237e')
+    ctx.fillRect(32, 32, W - 64, 20)
+    ctx.fillRect(32, H - 52, W - 64, 20)
+    ctx.setFillStyle('#c9a227')
+    ctx.fillRect(56, 72, W - 112, 4)
+  }
+
+  if (indexPath) {
+    const b = MINI_CODE_BOX
+    if (is2d) {
+      ctx.fillStyle = '#ffffff'
+      ctx.fillRect(b.x - 6, b.y - 6, b.w + 12, b.h + 12)
+      ctx.strokeStyle = '#c9a227'
+      ctx.lineWidth = 2
+      ctx.strokeRect(b.x - 6, b.y - 6, b.w + 12, b.h + 12)
+      if (imgCode) {
+        ctx.drawImage(imgCode, b.x, b.y, b.w, b.h)
+      } else {
+        ctx.fillStyle = '#ede8df'
+        ctx.fillRect(b.x, b.y, b.w, b.h)
+        applyTextStyle(ctx, true, '#7d6a58', 16)
+        ctx.fillText('小程序码未加载', b.x + 12, b.y + 92)
+      }
+    } else {
+      ctx.setFillStyle('#ffffff')
+      ctx.fillRect(b.x - 6, b.y - 6, b.w + 12, b.h + 12)
+      ctx.setStrokeStyle('#c9a227')
+      ctx.setLineWidth(2)
+      ctx.strokeRect(b.x - 6, b.y - 6, b.w + 12, b.h + 12)
+      try {
+        ctx.drawImage(indexPath, b.x, b.y, b.w, b.h)
+      } catch (e) {
+        console.warn('index draw', e)
+        ctx.setFillStyle('#ede8df')
+        ctx.fillRect(b.x, b.y, b.w, b.h)
+        applyTextStyle(ctx, false, '#7d6a58', 16)
+        ctx.fillText('小程序码未加载', b.x + 12, b.y + 92)
+      }
+    }
+    let ty = b.y + b.h + 22
+    if (is2d) {
+      applyTextStyle(ctx, true, '#5c4d3d', 19)
+    } else {
+      applyTextStyle(ctx, false, '#5c4d3d', 19)
+    }
+    ctx.fillText('微信扫一扫', b.x, ty)
+    ctx.fillText('使用本小程序', b.x, ty + 26)
+  }
+
+  let y = 100
+  y = drawWrappedLines(
+    ctx,
+    is2d,
+    BANNER_TIP,
+    56,
+    y,
+    22,
+    28,
+    '#5c4d3d',
+    20
+  )
+  y += 16
+  if (metaLine) {
+    y = drawWrappedLines(
+      ctx,
+      is2d,
+      metaLine,
+      56,
+      y,
+      22,
+      24,
+      '#5c4d3d',
+      20
+    )
+    y += 12
+  }
+  y = Math.max(y, 280)
+
+  if (is2d) {
+    if (imgPortrait) {
+      ctx.drawImage(imgPortrait, PORTRAIT_X, y, PORTRAIT_W, PORTRAIT_H)
+    } else {
+      ctx.fillStyle = '#d7cfc4'
+      ctx.fillRect(PORTRAIT_X, y, PORTRAIT_W, PORTRAIT_H)
+    }
+  } else if (portraitPath) {
+    try {
+      ctx.drawImage(portraitPath, PORTRAIT_X, y, PORTRAIT_W, PORTRAIT_H)
+    } catch (e) {
+      ctx.setFillStyle('#d7cfc4')
+      ctx.fillRect(PORTRAIT_X, y, PORTRAIT_W, PORTRAIT_H)
+    }
+  } else {
+    ctx.setFillStyle('#d7cfc4')
+    ctx.fillRect(PORTRAIT_X, y, PORTRAIT_W, PORTRAIT_H)
+  }
+  y += PORTRAIT_H + 20
+
+  y = drawWrappedLines(
+    ctx,
+    is2d,
+    result.typeName || '',
+    56,
+    y,
+    16,
+    48,
+    '#1a237e',
+    38
+  )
+  y += 12
+  y = drawWrappedLines(
+    ctx,
+    is2d,
+    '历史形象取意：' + (result.figure || ''),
+    56,
+    y,
+    24,
+    32,
+    '#8d6e63',
+    26
+  )
+  y += 16
+  y = drawWrappedLines(
+    ctx,
+    is2d,
+    result.summary || '',
+    56,
+    y,
+    24,
+    32,
+    '#3e3428',
+    24
+  )
+  y += 24
+  const sc = result.scores || {}
+  const scoreFont = 24
+  const scoreC = is2d ? (px) => applyTextStyle(ctx, true, '#4a4034', px) : (px) => applyTextStyle(ctx, false, '#4a4034', px)
+  scoreC(scoreFont)
+  ;['动', '刚', '散', '显'].forEach((k) => {
+    ctx.fillText(`${k}  ${sc[k] || 0}%`, 56, y)
+    y += 36
+  })
+  y += 16
+
+  applyTextStyle(ctx, is2d, '#3949ab', 28)
+  ctx.fillText('核心特征', 56, y)
+  y += 40
+  ;(result.traits || []).forEach((t) => {
+    y = drawWrappedLines(
+      ctx,
+      is2d,
+      '· ' + t,
+      56,
+      y,
+      24,
+      30,
+      '#4a4034',
+      26
+    )
+    y += 8
+  })
+  y += 20
+
+  applyTextStyle(ctx, is2d, '#3949ab', 28)
+  ctx.fillText('风险点', 56, y)
+  y += 40
+  ;(result.risks || []).forEach((t) => {
+    y = drawWrappedLines(
+      ctx,
+      is2d,
+      '· ' + t,
+      56,
+      y,
+      24,
+      30,
+      '#4a4034',
+      26
+    )
+    y += 8
+  })
+  y += 20
+
+  applyTextStyle(ctx, is2d, '#3949ab', 28)
+  ctx.fillText('自修建议', 56, y)
+  y += 40
+  ;(result.advice || []).forEach((t) => {
+    y = drawWrappedLines(
+      ctx,
+      is2d,
+      '· ' + t,
+      56,
+      y,
+      24,
+      30,
+      '#4a4034',
+      26
+    )
+    y += 8
+  })
+  y += 20
+
+  applyTextStyle(ctx, is2d, '#3949ab', 28)
+  ctx.fillText('详细说明', 56, y)
+  y += 40
+  y = drawWrappedLines(
+    ctx,
+    is2d,
+    result.detail || '',
+    56,
+    y,
+    24,
+    32,
+    '#5c4d3d',
+    26
+  )
+  y += 32
+  applyTextStyle(ctx, is2d, '#a0907c', 20)
+  ctx.fillText('量化自修正念 · 仅供文化参考', 56, H - 56)
+}
 
 function getImageInfoPath(src) {
   return new Promise((resolve) => {
@@ -169,7 +487,8 @@ Page({
     scoreList: [],
     shareImg: '',
     portraitSrc: '',
-    quizMetaLine: ''
+    quizMetaLine: '',
+    posterCanvasH: 2400
   },
 
   onShow() {
@@ -328,7 +647,7 @@ Page({
     })
   },
 
-  _getPosterCanvas2d() {
+  _getPosterCanvas2d(posterH) {
     return new Promise((resolve, reject) => {
       const query = wx.createSelectorQuery().in(this)
       query
@@ -352,8 +671,9 @@ Page({
           }
           const sys = wx.getSystemInfoSync ? wx.getSystemInfoSync() : {}
           const dpr = Math.min(sys.pixelRatio || 2, 3)
+          const H = posterH
           canvas.width = Math.floor(POSTER_W * dpr)
-          canvas.height = Math.floor(POSTER_H * dpr)
+          canvas.height = Math.floor(H * dpr)
           ctx.scale(dpr, dpr)
           ctx.textBaseline = 'alphabetic'
           resolve({ canvas, ctx, dpr })
@@ -368,11 +688,16 @@ Page({
     try {
       await loadPortraitSubpackage()
       const tid = resultTypeId(result)
+      const metaLine = buildQuizMetaLine(result)
+      const H = computePosterHeight(result, metaLine)
+      await new Promise((resolve) => {
+        this.setData({ posterCanvasH: H }, () => resolve())
+      })
       const [portraitRes, indexRes] = await Promise.all([
         firstImagePathAndSrc(personalityPortraitCandidates(tid)),
         firstImagePathAndSrc(MINI_CODE_SRCS)
       ])
-      const { canvas, ctx } = await this._getPosterCanvas2d()
+      const { canvas, ctx } = await this._getPosterCanvas2d(H)
       const [imgPortrait, imgCode] = await Promise.all([
         loadImage2dRobust(canvas, portraitRes.path, portraitRes.packSrc),
         loadImage2dRobust(canvas, indexRes.path, indexRes.packSrc)
@@ -380,13 +705,24 @@ Page({
       const needLegacy =
         (portraitRes.path && !imgPortrait) || (indexRes.path && !imgCode)
       if (needLegacy) {
-        await this._exportPosterLegacy(result, portraitRes.path, indexRes.path)
+        await this._exportPosterLegacy(
+          result,
+          portraitRes.path,
+          indexRes.path,
+          H,
+          metaLine
+        )
         return
       }
-      this._paintPoster2dContent(ctx, result, {
+      paintResultPoster(ctx, {
+        is2d: true,
+        H,
+        result,
+        metaLine,
         imgPortrait,
         imgCode,
-        indexPath: indexRes.path
+        indexPath: indexRes.path,
+        portraitPath: ''
       })
       try {
         await new Promise((resolve, reject) => {
@@ -413,7 +749,13 @@ Page({
       } catch (e) {
         if (portraitRes.path || indexRes.path) {
           console.warn('2d toTemp 失败，改旧版 canvas', e)
-          await this._exportPosterLegacy(result, portraitRes.path, indexRes.path)
+          await this._exportPosterLegacy(
+            result,
+            portraitRes.path,
+            indexRes.path,
+            H,
+            metaLine
+          )
         } else {
           throw e
         }
@@ -426,10 +768,20 @@ Page({
   /**
    * 真机部分环境下 2D createImage 无法解码分包图，但旧版 drawImage(本地路径字符串) 可用
    */
-  _exportPosterLegacy(result, portraitPath, indexPath) {
+  _exportPosterLegacy(result, portraitPath, indexPath, H, metaLine) {
     const ctx = wx.createCanvasContext('posterCanvasLegacy', this)
     return new Promise((resolve, reject) => {
-      this._paintPosterLegacyContent(ctx, result, portraitPath, indexPath, () => {
+      paintResultPoster(ctx, {
+        is2d: false,
+        H,
+        result,
+        metaLine: metaLine || buildQuizMetaLine(result),
+        imgPortrait: null,
+        imgCode: null,
+        indexPath,
+        portraitPath
+      })
+      ctx.draw(false, () => {
         setTimeout(() => {
           const sys = wx.getSystemInfoSync ? wx.getSystemInfoSync() : {}
           const dpr = Math.min(sys.pixelRatio || 2, 3)
@@ -439,9 +791,9 @@ Page({
               x: 0,
               y: 0,
               width: POSTER_W,
-              height: POSTER_H,
+              height: H,
               destWidth: Math.floor(POSTER_W * dpr),
-              destHeight: Math.floor(POSTER_H * dpr),
+              destHeight: Math.floor(H * dpr),
               fileType: 'png',
               quality: 1,
               success: (r) => {
@@ -458,232 +810,6 @@ Page({
         }, 220)
       })
     })
-  },
-
-  _paintPosterLegacyContent(ctx, result, portraitPath, indexPath, done) {
-    const W = POSTER_W
-    const H = POSTER_H
-
-    ctx.setFillStyle('#0d1642')
-    ctx.fillRect(0, 0, W, H)
-
-    ctx.setFillStyle('#f5f0e8')
-    ctx.fillRect(32, 32, W - 64, H - 64)
-
-    ctx.setFillStyle('#1a237e')
-    ctx.fillRect(32, 32, W - 64, 20)
-    ctx.fillRect(32, H - 52, W - 64, 20)
-
-    ctx.setFillStyle('#c9a227')
-    ctx.fillRect(56, 72, W - 112, 4)
-
-    if (indexPath) {
-      const b = MINI_CODE_BOX
-      ctx.setFillStyle('#ffffff')
-      ctx.fillRect(b.x - 6, b.y - 6, b.w + 12, b.h + 12)
-      ctx.setStrokeStyle('#c9a227')
-      ctx.setLineWidth(2)
-      ctx.strokeRect(b.x - 6, b.y - 6, b.w + 12, b.h + 12)
-      try {
-        ctx.drawImage(indexPath, b.x, b.y, b.w, b.h)
-      } catch (e) {
-        console.warn('legacy drawImage index', e)
-      }
-      ctx.setFillStyle('#5c4d3d')
-      ctx.setFontSize(19)
-      ctx.fillText('微信扫一扫，使用本小程序', b.x, b.y + b.h + 30)
-    }
-
-    ctx.setFillStyle('#1a237e')
-    ctx.setFontSize(32)
-    ctx.fillText('道性十六型 · 结果海报', 56, 118)
-
-    ctx.setFontSize(24)
-    ctx.fillText('当前更接近（非固定标签）', 56, 158)
-
-    ctx.setFontSize(38)
-    const name = result.typeName || ''
-    ctx.fillText(name.length > 11 ? name.slice(0, 11) + '…' : name, 56, 208)
-
-    ctx.setFillStyle('#6d4c41')
-    ctx.setFontSize(26)
-    ctx.fillText('形象取意：' + (result.figure || ''), 56, 252)
-
-    if (portraitPath) {
-      try {
-        ctx.drawImage(
-          portraitPath,
-          POSTER_PORTRAIT.x,
-          POSTER_PORTRAIT.y,
-          POSTER_PORTRAIT.w,
-          POSTER_PORTRAIT.h
-        )
-      } catch (e) {
-        console.warn('legacy drawImage portrait', e)
-        ctx.setFillStyle('#d7cfc4')
-        ctx.fillRect(
-          POSTER_PORTRAIT.x,
-          POSTER_PORTRAIT.y,
-          POSTER_PORTRAIT.w,
-          POSTER_PORTRAIT.h
-        )
-      }
-    } else {
-      ctx.setFillStyle('#d7cfc4')
-      ctx.fillRect(POSTER_PORTRAIT.x, POSTER_PORTRAIT.y, POSTER_PORTRAIT.w, POSTER_PORTRAIT.h)
-    }
-
-    ctx.setFillStyle('#3e3428')
-    ctx.setFontSize(24)
-    const summaryY = POSTER_PORTRAIT.y + POSTER_PORTRAIT.h + 36
-    let y = this.drawLines(ctx, result.summary || '', 56, summaryY, 22, 32)
-
-    y = Math.max(y + 28, summaryY + 120)
-    ctx.setFillStyle('#3949ab')
-    ctx.setFontSize(26)
-    ctx.fillText('四维概览', 56, y)
-    y += 40
-    const scores = result.scores || {}
-    ctx.setFillStyle('#4a4034')
-    ctx.setFontSize(24)
-    ;['动', '刚', '散', '显'].forEach((k) => {
-      ctx.fillText(`${k} ${scores[k] || 0}%`, 56, y)
-      y += 36
-    })
-
-    y += 24
-    ctx.setFillStyle('#3949ab')
-    ctx.setFontSize(26)
-    ctx.fillText('自修建议（摘录）', 56, y)
-    y += 40
-    ctx.setFillStyle('#4a4034')
-    ctx.setFontSize(22)
-    const adv = (result.advice || []).slice(0, 5)
-    adv.forEach((line) => {
-      y = this.drawLines(ctx, '· ' + line, 56, y, 26, 28) + 8
-    })
-
-    ctx.setFillStyle('#a0907c')
-    ctx.setFontSize(20)
-    ctx.fillText('量化自修正念 · 仅供文化参考', 56, H - 56)
-
-    ctx.draw(false, done)
-  },
-
-  _paintPoster2dContent(
-    ctx,
-    result,
-    { imgPortrait, imgCode, indexPath }
-  ) {
-    const W = POSTER_W
-    const H = POSTER_H
-    const f = (px) => `${px}px ${POSTER_FONT}`
-
-    ctx.fillStyle = '#0d1642'
-    ctx.fillRect(0, 0, W, H)
-
-    ctx.fillStyle = '#f5f0e8'
-    ctx.fillRect(32, 32, W - 64, H - 64)
-
-    ctx.fillStyle = '#1a237e'
-    ctx.fillRect(32, 32, W - 64, 20)
-    ctx.fillRect(32, H - 52, W - 64, 20)
-
-    ctx.fillStyle = '#c9a227'
-    ctx.fillRect(56, 72, W - 112, 4)
-
-    if (indexPath) {
-      const b = MINI_CODE_BOX
-      ctx.fillStyle = '#ffffff'
-      ctx.fillRect(b.x - 6, b.y - 6, b.w + 12, b.h + 12)
-      ctx.strokeStyle = '#c9a227'
-      ctx.lineWidth = 2
-      ctx.strokeRect(b.x - 6, b.y - 6, b.w + 12, b.h + 12)
-      if (imgCode) {
-        ctx.drawImage(imgCode, b.x, b.y, b.w, b.h)
-      } else {
-        ctx.fillStyle = '#ede8df'
-        ctx.fillRect(b.x, b.y, b.w, b.h)
-        ctx.fillStyle = '#7d6a58'
-        ctx.font = f(16)
-        ctx.fillText('小程序码未加载', b.x + 12, b.y + 92)
-      }
-      ctx.fillStyle = '#5c4d3d'
-      ctx.font = f(19)
-      ctx.fillText('微信扫一扫，使用本小程序', b.x, b.y + b.h + 30)
-    }
-
-    ctx.fillStyle = '#1a237e'
-    ctx.font = f(32)
-    ctx.fillText('道性十六型 · 结果海报', 56, 118)
-
-    ctx.font = f(24)
-    ctx.fillText('当前更接近（非固定标签）', 56, 158)
-
-    ctx.font = f(38)
-    const name = result.typeName || ''
-    ctx.fillText(name.length > 11 ? name.slice(0, 11) + '…' : name, 56, 208)
-
-    ctx.fillStyle = '#6d4c41'
-    ctx.font = f(26)
-    ctx.fillText('形象取意：' + (result.figure || ''), 56, 252)
-
-    if (imgPortrait) {
-      ctx.drawImage(
-        imgPortrait,
-        POSTER_PORTRAIT.x,
-        POSTER_PORTRAIT.y,
-        POSTER_PORTRAIT.w,
-        POSTER_PORTRAIT.h
-      )
-    } else {
-      ctx.fillStyle = '#d7cfc4'
-      ctx.fillRect(POSTER_PORTRAIT.x, POSTER_PORTRAIT.y, POSTER_PORTRAIT.w, POSTER_PORTRAIT.h)
-    }
-
-    ctx.fillStyle = '#3e3428'
-    ctx.font = f(24)
-    const summaryY = POSTER_PORTRAIT.y + POSTER_PORTRAIT.h + 36
-    let y = this.drawLines2d(ctx, result.summary || '', 56, summaryY, 22, 32)
-
-    y = Math.max(y + 28, summaryY + 120)
-    ctx.fillStyle = '#3949ab'
-    ctx.font = f(26)
-    ctx.fillText('四维概览', 56, y)
-    y += 40
-    const scores = result.scores || {}
-    ctx.fillStyle = '#4a4034'
-    ctx.font = f(24)
-    ;['动', '刚', '散', '显'].forEach((k) => {
-      ctx.fillText(`${k} ${scores[k] || 0}%`, 56, y)
-      y += 36
-    })
-
-    y += 24
-    ctx.fillStyle = '#3949ab'
-    ctx.font = f(26)
-    ctx.fillText('自修建议（摘录）', 56, y)
-    y += 40
-    ctx.fillStyle = '#4a4034'
-    ctx.font = f(22)
-    const adv = (result.advice || []).slice(0, 5)
-    adv.forEach((line) => {
-      y = this.drawLines2d(ctx, '· ' + line, 56, y, 26, 28) + 8
-    })
-
-    ctx.fillStyle = '#a0907c'
-    ctx.font = f(20)
-    ctx.fillText('量化自修正念 · 仅供文化参考', 56, H - 56)
-  },
-
-  drawLines2d(ctx, text, x, startY, maxCharsPerLine, lineHeight) {
-    const s = String(text).replace(/\n/g, '')
-    let y = startY
-    for (let i = 0; i < s.length; i += maxCharsPerLine) {
-      ctx.fillText(s.slice(i, i + maxCharsPerLine), x, y)
-      y += lineHeight
-    }
-    return y
   },
 
   drawLines(ctx, text, x, startY, maxCharsPerLine, lineHeight) {
