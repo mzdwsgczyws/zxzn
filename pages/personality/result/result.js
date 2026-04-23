@@ -24,13 +24,13 @@ function buildQuizMetaLine(result) {
   const ne = result.neitherCount || 0
   const early = result.earlyExit === true
   if (early && ne > 0) {
-    return `本次提前结束；未答题目已按中性估算，并略体现求简、求结果倾向。另有 ${ne} 题「都不想选」，计分略向简静、内收调节。仅供自察。`
+    return `本次为提前完成，另有 ${ne} 题选用了「都难选」。结果仅供自察参考。`
   }
   if (early) {
-    return '本次提前结束问卷：未答题目已按「中性」估算，并略体现求简、求结果倾向，仅供自察参考。'
+    return '本次为提前完成，未做题目已纳入系统处理。结果仅供自察参考。'
   }
   if (ne > 0) {
-    return `有 ${ne} 题选择「都不想选」：在计分上略向简静、内收质心调节，与刻板标签不同。`
+    return `有 ${ne} 题选用了「都难选」。结果仅供自察参考。`
   }
   return ''
 }

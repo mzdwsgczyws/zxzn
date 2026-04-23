@@ -62,14 +62,14 @@ Page({
     this.setQuestion(currentIndex - 1)
   },
 
-  /** 未答部分按中性估算，并叠提前交卷偏置 */
+  /** 未作答题由 calculatePersonality 与提前交卷元数据统一处理 */
   finishEarly() {
     const { answers } = this.data
     const n = Object.keys(answers).length
     const tip =
       n === 0
-        ? '你尚未选择任何一题。未答题将按各维「无信息」估算，并略体现希望尽快看到结果的倾向。确定继续？'
-        : `已答 ${n} 题。未答题目将按各维「无信息」估算，并略体现「提前结束、求简求结果」的倾向。确定直接看结果？`
+        ? '你尚未选择任何一题。未作答部分将由系统自动补全后给出结果。确定继续？'
+        : `已答 ${n} 题。未作答部分将由系统自动补全。确定直接看结果？`
     wx.showModal({
       title: '提前看结果',
       content: tip,

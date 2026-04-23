@@ -568,7 +568,7 @@ const QUESTIONS = _QUESTION_RAW.map((q) => ({
   ...q,
   options: [
     ...q.options,
-    { label: '都难选·本维略向静/柔/聚/藏计弱分（少用以利区分）', w: neitherOptionW(q.dim) }
+    { label: '都难选', w: neitherOptionW(q.dim) }
   ]
 }))
 
