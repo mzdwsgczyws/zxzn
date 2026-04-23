@@ -16,6 +16,9 @@ const { computeLotteryAdvices } = require('./lottery-advice.js')
 const { drawLotArtWx } = require('./lot-art.js')
 const { applyLotStylePref } = require('./lot-display.js')
 
+/** 每次生成当日签 +1，用于作废延迟 setData 与跨页清缓存 */
+let gLotDrawVer = 0
+
 function todayStr() {
   const d = new Date()
   return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`
@@ -86,14 +89,19 @@ function restoreToday(page, options) {
     stopAccel(page)
     return
   }
-  page.setData({
-    phase: whenEmpty,
-    shaking: false,
-    shakeHint: '摇动手机数次…',
-    lot: null,
-    revealed: false,
-    adviceList: []
-  })
+  page.setData(
+    {
+      phase: whenEmpty,
+      shaking: false,
+      shakeHint: '摇动手机数次…',
+      lot: null,
+      revealed: false,
+      adviceList: []
+    },
+    () => {
+      clearLotCanvas(page)
+    }
+  )
   page.shakeAccum = 0
   page.lastShake = 0
   stopAccel(page)
@@ -213,12 +221,14 @@ function finalizeDraw(page, lat, lng, weather) {
     focusTags: profile.focusTags
   })
 
+  const drawVer = ++gLotDrawVer
   const payload = {
     dateStr: meta.dateStr,
     lotId: meta.lotId,
     revealed: false,
     adviceList,
-    lotStylePref: stylePref
+    lotStylePref: stylePref,
+    _drawVer: drawVer
   }
   wx.setStorageSync(KEYS.LOTTERY_TODAY, payload)
   appendLotteryDraw({
@@ -231,6 +241,9 @@ function finalizeDraw(page, lat, lng, weather) {
   recordBiz('lot_draw', String(meta.lotId))
 
   setTimeout(() => {
+    const cache = wx.getStorageSync(KEYS.LOTTERY_TODAY) || {}
+    if (!cache.lotId || cache._drawVer !== drawVer) return
+    if (cache.lotId !== meta.lotId || cache.dateStr !== meta.dateStr) return
     page.setData({
       phase: 'result',
       shaking: false,
@@ -275,10 +288,23 @@ function renderLotArt(page, retry) {
   })
 }
 
+/** 清空签图画布，避免重进页或重抽后旧像素残留 */
+function clearLotCanvas(page) {
+  const w = page.data.lotArtW
+  const h = page.data.lotArtH
+  if (w < 2 || h < 2) return
+  try {
+    const ctx = wx.createCanvasContext(getCanvasId(page), page)
+    ctx.clearRect(0, 0, w, h)
+    ctx.draw(false)
+  } catch (e) {}
+}
+
 function paintLotToCanvas(page, w, h, lot) {
   if (!lot || w < 2 || h < 2) return
   try {
     const ctx = wx.createCanvasContext(getCanvasId(page), page)
+    ctx.clearRect(0, 0, w, h)
     drawLotArtWx(ctx, w, h, {
       id: lot.id,
       title: lot.title,
@@ -300,6 +326,7 @@ function simShake(page) {
 
 function clearTodayAndReset(page, whenEmpty) {
   wx.removeStorageSync(KEYS.LOTTERY_TODAY)
+  clearLotCanvas(page)
   restoreToday(page, { whenEmpty: whenEmpty || 'idle' })
 }
 
@@ -322,6 +349,7 @@ module.exports = {
   reveal,
   renderLotArt,
   paintLotToCanvas,
+  clearLotCanvas,
   simShake,
   clearTodayAndReset,
   onLotteryLoad,
