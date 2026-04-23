@@ -58,8 +58,19 @@
     <button class="btn-ghost" bindtap="retest">重新测验</button>
   </view>
 
-  <canvas canvas-id="shareCanvas" class="hidden-canvas" style="width: 500px; height: 400px;"></canvas>
-  <canvas canvas-id="posterCanvas" class="hidden-canvas" style="width: 750px; height: 1200px;"></canvas>
+  <canvas
+    canvas-id="shareCanvas"
+    class="hidden-canvas"
+    style="width: 500px; height: 400px;"
+    width="500"
+    height="400"
+  ></canvas>
+  <canvas
+    type="2d"
+    id="posterCanvas2d"
+    class="hidden-canvas"
+    style="width: 750px; height: 1200px;"
+  ></canvas>
 </view>
 
 <view class="empty page" wx:else>

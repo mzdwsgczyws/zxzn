@@ -5,11 +5,50 @@ const { recordShare } = require('../../../utils/usage-analytics.js')
 const SHARE_PORTRAIT = { x: 302, y: 22, w: 184, h: 184 }
 const POSTER_PORTRAIT = { x: 56, y: 288, w: 300, h: 300 }
 /** 海报用小程序码图（与十六型图同目录，便于分包预载） */
-const MINI_CODE_SRC = '/subpackages/portrait-assets/images/personality-portraits/index.jpg'
+const MINI_CODE_SRCS = [
+  '/subpackages/portrait-assets/images/personality-portraits/index.jpg',
+  '/subpackages/portrait-assets/images/personality-portraits/index.png'
+]
 const POSTER_W = 750
 const POSTER_H = 1200
 /** 二维码海报区域：右上方，分享时与签文同屏 */
 const MINI_CODE_BOX = { x: 550, y: 52, w: 168, h: 168 }
+const POSTER_FONT = 'system-ui, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif'
+
+function getImageInfoPath(src) {
+  return new Promise((resolve) => {
+    wx.getImageInfo({
+      src,
+      success: (i) => resolve(i && i.path ? i.path : ''),
+      fail: () => resolve('')
+    })
+  })
+}
+
+async function firstImagePathIn(sources) {
+  for (let i = 0; i < sources.length; i++) {
+    const p = await getImageInfoPath(sources[i])
+    if (p) return p
+  }
+  return ''
+}
+
+function loadCanvas2dImage(canvas, path) {
+  return new Promise((resolve) => {
+    if (!path || !canvas) {
+      resolve(null)
+      return
+    }
+    if (typeof canvas.createImage !== 'function') {
+      resolve(null)
+      return
+    }
+    const img = canvas.createImage()
+    img.onload = () => resolve(img)
+    img.onerror = () => resolve(null)
+    img.src = path
+  })
+}
 
 function resultTypeId(result) {
   if (!result) return 0
@@ -203,147 +242,202 @@ Page({
   savePoster() {
     const { result } = this.data
     if (!result) return
-
-    const tid = resultTypeId(result)
-    const portraitSrc = personalityPortraitSrc(tid)
-    Promise.all([
-      new Promise((resolve) => {
-        wx.getImageInfo({
-          src: portraitSrc,
-          success: (info) => resolve(info.path),
-          fail: () => resolve('')
-        })
-      }),
-      new Promise((resolve) => {
-        wx.getImageInfo({
-          src: MINI_CODE_SRC,
-          success: (info) => resolve(info.path),
-          fail: () => resolve('')
-        })
-      })
-    ]).then(([portraitPath, indexPath]) => {
-      this._paintPoster(result, portraitPath, indexPath)
+    this._exportPoster2d().catch((e) => {
+      console.warn('export poster', e)
+      wx.showToast({ title: '生成图片失败，请重试', icon: 'none' })
     })
   },
 
-  _paintPoster(result, portraitLocalPath, indexLocalPath) {
-    const ctx = wx.createCanvasContext('posterCanvas', this)
+  _getPosterCanvas2d() {
+    return new Promise((resolve, reject) => {
+      const query = wx.createSelectorQuery().in(this)
+      query
+        .select('#posterCanvas2d')
+        .fields({ node: true, size: true })
+        .exec((res) => {
+          const r = res && res[0]
+          if (!r || !r.node) {
+            reject(new Error('no canvas'))
+            return
+          }
+          const canvas = r.node
+          if (!canvas.getContext) {
+            reject(new Error('no getContext'))
+            return
+          }
+          const ctx = canvas.getContext('2d')
+          if (!ctx) {
+            reject(new Error('no 2d context'))
+            return
+          }
+          const sys = wx.getSystemInfoSync ? wx.getSystemInfoSync() : {}
+          const dpr = Math.min(sys.pixelRatio || 2, 3)
+          canvas.width = Math.floor(POSTER_W * dpr)
+          canvas.height = Math.floor(POSTER_H * dpr)
+          ctx.scale(dpr, dpr)
+          ctx.textBaseline = 'alphabetic'
+          resolve({ canvas, ctx, dpr })
+        })
+    })
+  },
+
+  async _exportPoster2d() {
+    const { result } = this.data
+    if (!result) return
+    wx.showLoading({ title: '生成中', mask: true })
+    try {
+      const tid = resultTypeId(result)
+      const portraitSrc = personalityPortraitSrc(tid)
+      const [portraitPath, indexPath] = await Promise.all([
+        getImageInfoPath(portraitSrc),
+        firstImagePathIn(MINI_CODE_SRCS)
+      ])
+      const { canvas, ctx } = await this._getPosterCanvas2d()
+      const [imgPortrait, imgCode] = await Promise.all([
+        loadCanvas2dImage(canvas, portraitPath),
+        loadCanvas2dImage(canvas, indexPath)
+      ])
+      this._paintPoster2dContent(ctx, result, { imgPortrait, imgCode, indexPath })
+      await new Promise((resolve, reject) => {
+        setTimeout(() => {
+          wx.canvasToTempFilePath(
+            {
+              type: '2d',
+              canvas,
+              fileType: 'png',
+              quality: 1,
+              success: (r) => {
+                this.saveFile(r.tempFilePath)
+                resolve()
+              },
+              fail: (e) => {
+                console.warn('canvasToTempFilePath 2d', e)
+                reject(e)
+              }
+            },
+            this
+          )
+        }, 100)
+      })
+    } finally {
+      wx.hideLoading()
+    }
+  },
+
+  _paintPoster2dContent(
+    ctx,
+    result,
+    { imgPortrait, imgCode, indexPath }
+  ) {
     const W = POSTER_W
     const H = POSTER_H
+    const f = (px) => `${px}px ${POSTER_FONT}`
 
-    ctx.setFillStyle('#0d1642')
+    ctx.fillStyle = '#0d1642'
     ctx.fillRect(0, 0, W, H)
 
-    ctx.setFillStyle('#f5f0e8')
+    ctx.fillStyle = '#f5f0e8'
     ctx.fillRect(32, 32, W - 64, H - 64)
 
-    ctx.setFillStyle('#1a237e')
+    ctx.fillStyle = '#1a237e'
     ctx.fillRect(32, 32, W - 64, 20)
     ctx.fillRect(32, H - 52, W - 64, 20)
 
-    ctx.setFillStyle('#c9a227')
+    ctx.fillStyle = '#c9a227'
     ctx.fillRect(56, 72, W - 112, 4)
 
-    if (indexLocalPath) {
+    if (indexPath) {
       const b = MINI_CODE_BOX
-      ctx.setFillStyle('#ffffff')
+      ctx.fillStyle = '#ffffff'
       ctx.fillRect(b.x - 6, b.y - 6, b.w + 12, b.h + 12)
-      ctx.setStrokeStyle('#c9a227')
-      ctx.setLineWidth(2)
+      ctx.strokeStyle = '#c9a227'
+      ctx.lineWidth = 2
       ctx.strokeRect(b.x - 6, b.y - 6, b.w + 12, b.h + 12)
-      ctx.drawImage(indexLocalPath, b.x, b.y, b.w, b.h)
-      ctx.setFillStyle('#5c4d3d')
-      ctx.setFontSize(19)
+      if (imgCode) {
+        ctx.drawImage(imgCode, b.x, b.y, b.w, b.h)
+      } else {
+        ctx.fillStyle = '#ede8df'
+        ctx.fillRect(b.x, b.y, b.w, b.h)
+        ctx.fillStyle = '#7d6a58'
+        ctx.font = f(16)
+        ctx.fillText('小程序码未加载', b.x + 12, b.y + 92)
+      }
+      ctx.fillStyle = '#5c4d3d'
+      ctx.font = f(19)
       ctx.fillText('微信扫一扫，使用本小程序', b.x, b.y + b.h + 30)
     }
 
-    ctx.setFillStyle('#1a237e')
-    ctx.setFontSize(32)
+    ctx.fillStyle = '#1a237e'
+    ctx.font = f(32)
     ctx.fillText('道性十六型 · 结果海报', 56, 118)
 
-    ctx.setFontSize(24)
+    ctx.font = f(24)
     ctx.fillText('当前更接近（非固定标签）', 56, 158)
 
-    ctx.setFontSize(38)
+    ctx.font = f(38)
     const name = result.typeName || ''
     ctx.fillText(name.length > 11 ? name.slice(0, 11) + '…' : name, 56, 208)
 
-    ctx.setFillStyle('#6d4c41')
-    ctx.setFontSize(26)
+    ctx.fillStyle = '#6d4c41'
+    ctx.font = f(26)
     ctx.fillText('形象取意：' + (result.figure || ''), 56, 252)
 
-    if (portraitLocalPath) {
+    if (imgPortrait) {
       ctx.drawImage(
-        portraitLocalPath,
+        imgPortrait,
         POSTER_PORTRAIT.x,
         POSTER_PORTRAIT.y,
         POSTER_PORTRAIT.w,
         POSTER_PORTRAIT.h
       )
     } else {
-      ctx.setFillStyle('#d7cfc4')
+      ctx.fillStyle = '#d7cfc4'
       ctx.fillRect(POSTER_PORTRAIT.x, POSTER_PORTRAIT.y, POSTER_PORTRAIT.w, POSTER_PORTRAIT.h)
     }
 
-    ctx.setFillStyle('#3e3428')
-    ctx.setFontSize(24)
+    ctx.fillStyle = '#3e3428'
+    ctx.font = f(24)
     const summaryY = POSTER_PORTRAIT.y + POSTER_PORTRAIT.h + 36
-    let y = this.drawLines(ctx, result.summary || '', 56, summaryY, 22, 32)
+    let y = this.drawLines2d(ctx, result.summary || '', 56, summaryY, 22, 32)
 
     y = Math.max(y + 28, summaryY + 120)
-    ctx.setFillStyle('#3949ab')
-    ctx.setFontSize(26)
+    ctx.fillStyle = '#3949ab'
+    ctx.font = f(26)
     ctx.fillText('四维概览', 56, y)
     y += 40
     const scores = result.scores || {}
-    ctx.setFillStyle('#4a4034')
-    ctx.setFontSize(24)
+    ctx.fillStyle = '#4a4034'
+    ctx.font = f(24)
     ;['动', '刚', '散', '显'].forEach((k) => {
       ctx.fillText(`${k} ${scores[k] || 0}%`, 56, y)
       y += 36
     })
 
     y += 24
-    ctx.setFillStyle('#3949ab')
-    ctx.setFontSize(26)
+    ctx.fillStyle = '#3949ab'
+    ctx.font = f(26)
     ctx.fillText('自修建议（摘录）', 56, y)
     y += 40
-    ctx.setFillStyle('#4a4034')
-    ctx.setFontSize(22)
+    ctx.fillStyle = '#4a4034'
+    ctx.font = f(22)
     const adv = (result.advice || []).slice(0, 5)
     adv.forEach((line) => {
-      y = this.drawLines(ctx, '· ' + line, 56, y, 26, 28) + 8
+      y = this.drawLines2d(ctx, '· ' + line, 56, y, 26, 28) + 8
     })
 
-    ctx.setFillStyle('#a0907c')
-    ctx.setFontSize(20)
+    ctx.fillStyle = '#a0907c'
+    ctx.font = f(20)
     ctx.fillText('量化自修正念 · 仅供文化参考', 56, H - 56)
+  },
 
-    ctx.draw(false, () => {
-      setTimeout(() => {
-        const sys = wx.getSystemInfoSync ? wx.getSystemInfoSync() : {}
-        const dpr = Math.min(sys.pixelRatio || 2, 3)
-        wx.canvasToTempFilePath(
-          {
-            canvasId: 'posterCanvas',
-            x: 0,
-            y: 0,
-            width: W,
-            height: H,
-            destWidth: Math.floor(W * dpr),
-            destHeight: Math.floor(H * dpr),
-            fileType: 'png',
-            quality: 1,
-            success: (res) => this.saveFile(res.tempFilePath),
-            fail: (e) => {
-              console.warn('canvasToTempFilePath poster', e)
-              wx.showToast({ title: '生成图片失败', icon: 'none' })
-            }
-          },
-          this
-        )
-      }, 180)
-    })
+  drawLines2d(ctx, text, x, startY, maxCharsPerLine, lineHeight) {
+    const s = String(text).replace(/\n/g, '')
+    let y = startY
+    for (let i = 0; i < s.length; i += maxCharsPerLine) {
+      ctx.fillText(s.slice(i, i + maxCharsPerLine), x, y)
+      y += lineHeight
+    }
+    return y
   },
 
   drawLines(ctx, text, x, startY, maxCharsPerLine, lineHeight) {
