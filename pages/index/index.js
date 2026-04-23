@@ -4,6 +4,7 @@ const { isLotteryProfileComplete } = require('../../utils/profile-lottery.js')
 const { getFirstUnlockListSorted, computeAchievements } = require('../../utils/lottery-history.js')
 const pageAnalytics = require('../../behaviors/page-analytics.js')
 const { recordShare } = require('../../utils/usage-analytics.js')
+const checkin = require('../../utils/checkin.js')
 
 Page({
   behaviors: [pageAnalytics],
@@ -18,7 +19,10 @@ Page({
     hallLotN: 0,
     hallAchUnlocked: 0,
     hallAchTotal: 0,
-    theoryBannerEligible: false
+    theoryBannerEligible: false,
+    checkinStreak: 0,
+    checkinTotalDays: 0,
+    checkinCheckedToday: false
   }),
 
   onLoad() {
@@ -61,6 +65,30 @@ Page({
     core.restoreToday(this, { whenEmpty: 'idle' })
     this.refreshHallStrip()
     this.refreshTheoryBannerFlag()
+    this.refreshCheckIn()
+  },
+
+  refreshCheckIn() {
+    const s = checkin.getCheckInSummary()
+    this.setData({
+      checkinStreak: s.streak,
+      checkinTotalDays: s.totalDays,
+      checkinCheckedToday: s.checkedToday
+    })
+  },
+
+  tapCheckIn() {
+    const r = checkin.recordCheckIn()
+    this.refreshCheckIn()
+    if (r.already) {
+      wx.showToast({ title: '今日已打卡', icon: 'none' })
+      return
+    }
+    if (r.milestone) {
+      wx.showToast({ title: `「${r.milestone}」`, icon: 'none' })
+    } else {
+      wx.showToast({ title: `已连续 ${r.streak} 天`, icon: 'none' })
+    }
   },
 
   refreshTheoryBannerFlag() {

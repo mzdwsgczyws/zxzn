@@ -21,6 +21,22 @@
         </view>
       </view>
 
+      <view class="checkin-strip" wx:if="{{phase === 'idle' || phase === 'result'}}">
+        <view class="checkin-left">
+          <text class="checkin-streak">已连续 {{checkinStreak}} 天</text>
+          <text class="checkin-sub">累计 {{checkinTotalDays}} 天 · {{checkinCheckedToday ? '今日已记' : '点右侧完成今日一记'}}</text>
+        </view>
+        <button
+          class="checkin-btn"
+          size="mini"
+          bindtap="tapCheckIn"
+          disabled="{{checkinCheckedToday}}"
+          hover-class="checkin-btn-hover"
+        >
+          {{checkinCheckedToday ? '已打卡' : '今日打卡'}}
+        </button>
+      </view>
+
       <!-- 未抽取：居中入口 -->
       <view class="lot-panel lot-idle" wx:if="{{phase === 'idle'}}">
         <view class="idle-warm-wrap">

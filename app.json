@@ -18,6 +18,11 @@
     "backgroundTextStyle": "dark"
   },
   "style": "v2",
+  "permission": {
+    "scope.writePhotosAlbum": {
+      "desc": "用于将道性测验海报保存到您的相册"
+    }
+  },
   "sitemapLocation": "sitemap.json",
   "lazyCodeLoading": "requiredComponents",
   "subpackages": [

@@ -184,6 +184,66 @@
   padding: 8rpx 12rpx;
 }
 
+.checkin-strip {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0 24rpx 16rpx;
+  padding: 18rpx 22rpx;
+  border-radius: 16rpx;
+  background: rgba(57, 73, 171, 0.07);
+  border: 1rpx solid rgba(57, 73, 171, 0.2);
+  box-sizing: border-box;
+}
+
+.checkin-left {
+  flex: 1;
+  min-width: 0;
+  padding-right: 16rpx;
+}
+
+.checkin-streak {
+  display: block;
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #1a237e;
+}
+
+.checkin-sub {
+  display: block;
+  margin-top: 8rpx;
+  font-size: 22rpx;
+  color: #6d5d4a;
+  line-height: 1.45;
+}
+
+.checkin-btn {
+  flex-shrink: 0;
+  margin: 0;
+  padding: 0 28rpx;
+  height: 56rpx;
+  line-height: 56rpx;
+  font-size: 24rpx;
+  background: linear-gradient(180deg, #3949ab 0%, #283593 100%);
+  color: #f5f0e8;
+  border-radius: 28rpx;
+  border: none;
+}
+
+.checkin-btn::after {
+  border: none;
+}
+
+.checkin-btn-hover {
+  opacity: 0.92;
+}
+
+.checkin-btn[disabled] {
+  background: #b0b8d4;
+  color: #f0f0f0;
+}
+
 /* —— 摇动舞台：竹筒 —— */
 .lot-stage--bamboo {
   position: relative;

@@ -4,6 +4,12 @@ const { recordShare } = require('../../../utils/usage-analytics.js')
 
 const SHARE_PORTRAIT = { x: 302, y: 22, w: 184, h: 184 }
 const POSTER_PORTRAIT = { x: 56, y: 288, w: 300, h: 300 }
+/** 海报用小程序码图（与十六型图同目录，便于分包预载） */
+const MINI_CODE_SRC = '/subpackages/portrait-assets/images/personality-portraits/index.jpg'
+const POSTER_W = 750
+const POSTER_H = 1200
+/** 二维码海报区域：右上方，分享时与签文同屏 */
+const MINI_CODE_BOX = { x: 550, y: 52, w: 168, h: 168 }
 
 function resultTypeId(result) {
   if (!result) return 0
@@ -198,18 +204,32 @@ Page({
     const { result } = this.data
     if (!result) return
 
-    const src = personalityPortraitSrc(resultTypeId(result))
-    wx.getImageInfo({
-      src,
-      success: (info) => this._paintPoster(result, info.path),
-      fail: () => this._paintPoster(result, '')
+    const tid = resultTypeId(result)
+    const portraitSrc = personalityPortraitSrc(tid)
+    Promise.all([
+      new Promise((resolve) => {
+        wx.getImageInfo({
+          src: portraitSrc,
+          success: (info) => resolve(info.path),
+          fail: () => resolve('')
+        })
+      }),
+      new Promise((resolve) => {
+        wx.getImageInfo({
+          src: MINI_CODE_SRC,
+          success: (info) => resolve(info.path),
+          fail: () => resolve('')
+        })
+      })
+    ]).then(([portraitPath, indexPath]) => {
+      this._paintPoster(result, portraitPath, indexPath)
     })
   },
 
-  _paintPoster(result, portraitLocalPath) {
+  _paintPoster(result, portraitLocalPath, indexLocalPath) {
     const ctx = wx.createCanvasContext('posterCanvas', this)
-    const W = 750
-    const H = 1200
+    const W = POSTER_W
+    const H = POSTER_H
 
     ctx.setFillStyle('#0d1642')
     ctx.fillRect(0, 0, W, H)
@@ -223,6 +243,19 @@ Page({
 
     ctx.setFillStyle('#c9a227')
     ctx.fillRect(56, 72, W - 112, 4)
+
+    if (indexLocalPath) {
+      const b = MINI_CODE_BOX
+      ctx.setFillStyle('#ffffff')
+      ctx.fillRect(b.x - 6, b.y - 6, b.w + 12, b.h + 12)
+      ctx.setStrokeStyle('#c9a227')
+      ctx.setLineWidth(2)
+      ctx.strokeRect(b.x - 6, b.y - 6, b.w + 12, b.h + 12)
+      ctx.drawImage(indexLocalPath, b.x, b.y, b.w, b.h)
+      ctx.setFillStyle('#5c4d3d')
+      ctx.setFontSize(19)
+      ctx.fillText('微信扫一扫，使用本小程序', b.x, b.y + b.h + 30)
+    }
 
     ctx.setFillStyle('#1a237e')
     ctx.setFontSize(32)
@@ -288,15 +321,28 @@ Page({
 
     ctx.draw(false, () => {
       setTimeout(() => {
+        const sys = wx.getSystemInfoSync ? wx.getSystemInfoSync() : {}
+        const dpr = Math.min(sys.pixelRatio || 2, 3)
         wx.canvasToTempFilePath(
           {
             canvasId: 'posterCanvas',
+            x: 0,
+            y: 0,
+            width: W,
+            height: H,
+            destWidth: Math.floor(W * dpr),
+            destHeight: Math.floor(H * dpr),
+            fileType: 'png',
+            quality: 1,
             success: (res) => this.saveFile(res.tempFilePath),
-            fail: () => wx.showToast({ title: '生成图片失败', icon: 'none' })
+            fail: (e) => {
+              console.warn('canvasToTempFilePath poster', e)
+              wx.showToast({ title: '生成图片失败', icon: 'none' })
+            }
           },
           this
         )
-      }, 120)
+      }, 180)
     })
   },
 
@@ -311,20 +357,63 @@ Page({
   },
 
   saveFile(path) {
-    wx.saveImageToPhotosAlbum({
-      filePath: path,
-      success: () => wx.showToast({ title: '已保存到相册' }),
-      fail: (err) => {
-        const denied = err.errMsg && err.errMsg.indexOf('auth deny') >= 0
-        wx.showModal({
-          title: denied ? '需要相册权限' : '保存失败',
-          content: denied ? '请在设置中开启「保存到相册」后重试。' : '可稍后重试或截图本页。',
-          confirmText: denied ? '去设置' : '知道了',
-          success: (r) => {
-            if (denied && r.confirm) wx.openSetting({})
+    const runSave = () => {
+      wx.saveImageToPhotosAlbum({
+        filePath: path,
+        success: () => wx.showToast({ title: '已保存到相册' }),
+        fail: (err) => {
+          const msg = (err && err.errMsg) || ''
+          const denied = /auth deny|denied|permission|authorize|拒绝/i.test(msg)
+          wx.showModal({
+            title: denied ? '需要相册权限' : '保存失败',
+            content: denied
+              ? '请在设置中开启「保存到相册」后重试。'
+              : '可稍后重试或截图本页。',
+            confirmText: denied ? '去设置' : '知道了',
+            success: (r) => {
+              if (denied && r.confirm) wx.openSetting({})
+            }
+          })
+        }
+      })
+    }
+
+    wx.getSetting({
+      success: (res) => {
+        const w = res.authSetting['scope.writePhotosAlbum']
+        if (w === true) {
+          runSave()
+          return
+        }
+        if (w === false) {
+          wx.showModal({
+            title: '需要相册权限',
+            content: '保存高清海报需开启「保存到相册」，请在设置中打开。',
+            confirmText: '去设置',
+            cancelText: '取消',
+            success: (r) => {
+              if (r.confirm) wx.openSetting({})
+            }
+          })
+          return
+        }
+        wx.authorize({
+          scope: 'scope.writePhotosAlbum',
+          success: () => runSave(),
+          fail: () => {
+            wx.showModal({
+              title: '需要相册权限',
+              content: '请允许保存到相册，以便保存海报。',
+              confirmText: '去设置',
+              cancelText: '取消',
+              success: (r) => {
+                if (r.confirm) wx.openSetting({})
+              }
+            })
           }
         })
-      }
+      },
+      fail: () => runSave()
     })
   }
 })

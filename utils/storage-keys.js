@@ -20,5 +20,7 @@ module.exports = {
   /** 本地使用统计（短键 JSON），见 utils/usage-analytics.js */
   USAGE_STATS: 'usageStats_v1',
   /** 首页「量化×修道」提示条是否已关闭或已点阅（读过后不再自动弹出） */
-  THEORY_INTRO_BANNER_DISMISSED: 'theoryIntroBannerDismissed_v1'
+  THEORY_INTRO_BANNER_DISMISSED: 'theoryIntroBannerDismissed_v1',
+  /** 每日打卡：连续天数、累计天数、最后打卡日本地字符串，见 utils/checkin.js */
+  CHECKIN_STATE: 'checkinState_v1'
 }
