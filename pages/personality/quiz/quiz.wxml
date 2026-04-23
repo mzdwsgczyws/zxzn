@@ -13,7 +13,7 @@
       wx:for="{{current.options}}"
       wx:for-index="oi"
       wx:key="oi"
-      class="opt {{selectedIdx === oi ? 'opt--selected' : ''}} {{oi === 5 ? 'opt--neither' : ''}}"
+      class="opt {{selectedIdx === oi ? 'opt--selected' : ''}} {{oi === 4 ? 'opt--neither' : ''}}"
       bindtap="choose"
       data-idx="{{oi}}"
     >{{item.label}}</button>
@@ -28,5 +28,5 @@
     <button class="btn-early" bindtap="finishEarly">不想做后续题目，直接看结果</button>
   </view>
 
-  <view class="hint">提示：没有标准答案，按「通常情况」选择最贴近的即可。选「都不想选」表示难以在本题两极中选边，会略向简静、内收计分；提前结束则未答题按中性估算并略带「求结果」倾向。</view>
+  <view class="hint">提示：没有对错。请尽量按「第一反应」选，避免在三四档间犹豫成「老好人」式答案——四档都可能是你的常态，只体现习惯差。末项仅用于实在无法判断，会略向简静、内收计弱分；少用更利于区分。提前结束则未答题按无信息估算并略带「求结果」倾向。</view>
 </view>
