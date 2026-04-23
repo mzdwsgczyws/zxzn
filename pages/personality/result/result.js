@@ -409,7 +409,7 @@ Page({
               this
             )
           }, 100)
-        )
+        })
       } catch (e) {
         if (portraitRes.path || indexRes.path) {
           console.warn('2d toTemp 失败，改旧版 canvas', e)
