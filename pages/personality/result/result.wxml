@@ -71,6 +71,13 @@
     class="hidden-canvas"
     style="width: 750px; height: 1200px;"
   ></canvas>
+  <canvas
+    canvas-id="posterCanvasLegacy"
+    class="hidden-canvas"
+    style="width: 750px; height: 1200px;"
+    width="750"
+    height="1200"
+  ></canvas>
 </view>
 
 <view class="empty page" wx:else>
