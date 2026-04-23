@@ -13,7 +13,7 @@
       wx:for="{{current.options}}"
       wx:for-index="oi"
       wx:key="oi"
-      class="opt {{selectedIdx === oi ? 'opt--selected' : ''}} {{oi === 4 ? 'opt--neither' : ''}}"
+      class="opt {{selectedIdx === oi ? 'opt--selected' : ''}} {{oi === 2 ? 'opt--neither' : ''}}"
       bindtap="choose"
       data-idx="{{oi}}"
     >{{item.label}}</button>
@@ -28,5 +28,5 @@
     <button class="btn-early" bindtap="finishEarly">不想做后续题目，直接看结果</button>
   </view>
 
-  <view class="hint">提示：没有对错，尽量按第一反应选；四档都是常见行为方式。只有实在在两极间选不出来时，再用最后一项。未完成全部题目时也可提前看结果。</view>
+  <view class="hint">提示：没有对错，尽量按第一反应选。每题两栏都是常见、可接受的做法，只问哪边更像你。只有实在选不出时，再用最后一项。未完成全部题目时也可提前看结果。</view>
 </view>
