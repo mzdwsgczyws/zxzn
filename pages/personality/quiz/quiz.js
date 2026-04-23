@@ -3,6 +3,20 @@ const KEYS = require('../../../utils/storage-keys.js')
 const pageAnalytics = require('../../../behaviors/page-analytics.js')
 const { recordBiz } = require('../../../utils/usage-analytics.js')
 
+function loadPortraitSubpackage() {
+  return new Promise((resolve) => {
+    if (typeof wx.loadSubpackage !== 'function') {
+      resolve()
+      return
+    }
+    wx.loadSubpackage({
+      name: 'portrait-assets',
+      success: () => resolve(),
+      fail: () => resolve()
+    })
+  })
+}
+
 Page({
   behaviors: [pageAnalytics],
   data: {
@@ -15,6 +29,7 @@ Page({
   },
 
   onLoad() {
+    loadPortraitSubpackage()
     this.setQuestion(0)
   },
 

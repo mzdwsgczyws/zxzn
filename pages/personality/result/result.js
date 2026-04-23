@@ -491,6 +491,10 @@ Page({
     posterCanvasH: 2400
   },
 
+  onLoad() {
+    loadPortraitSubpackage()
+  },
+
   onShow() {
     this.loadResult()
   },
@@ -527,11 +531,20 @@ Page({
       { k: '散', v: s['散'] || 0 },
       { k: '显', v: s['显'] || 0 }
     ]
-    const portraitSrc = personalityPortraitSrc(resultTypeId(result))
+    const tid = resultTypeId(result)
+    const portraitSrc = personalityPortraitSrc(tid)
     const quizMetaLine = buildQuizMetaLine(result)
-    this.setData({ hasResult: true, result, scoreList, shareImg: '', portraitSrc, quizMetaLine }, () => {
-      setTimeout(() => this.renderShareCard(), 200)
-    })
+    /** 分包内 jpg 首次可能未就绪，先展示文案，分包拉完再赋 portraitSrc，避免首进白图 */
+    this.setData(
+      { hasResult: true, result, scoreList, shareImg: '', portraitSrc: '', quizMetaLine },
+      () => {
+        loadPortraitSubpackage().then(() => {
+          this.setData({ portraitSrc }, () => {
+            setTimeout(() => this.renderShareCard(), 200)
+          })
+        })
+      }
+    )
   },
 
   startQuiz() {
