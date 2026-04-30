@@ -15,7 +15,55 @@ const { fetchWeather } = require('./weather.js')
 const { computeLotteryAdvices } = require('./lottery-advice.js')
 const { drawLotArtWx } = require('./lot-art.js')
 const { applyLotStylePref } = require('./lot-display.js')
-const { buildLotteryThinkingView } = require('./lottery-thinking.js')
+const { buildLotteryThinkingBrief } = require('./lottery-thinking.js')
+
+/** 思考模式类目逐项显现间隔（毫秒） */
+const THINKING_REVEAL_INITIAL_MS = 220
+const THINKING_REVEAL_STEP_MS = 340
+const THINKING_REVEAL_FOOTNOTE_MS = 380
+
+function clearThinkingReveal(page) {
+  if (!page) return
+  if (page._thinkingRevealTimer != null) {
+    clearTimeout(page._thinkingRevealTimer)
+    page._thinkingRevealTimer = null
+  }
+}
+
+function startThinkingReveal(page) {
+  clearThinkingReveal(page)
+  const cats = page.data.thinkingCategories || []
+  const total = cats.length
+  if (total === 0) {
+    page.setData({ thinkingFootnoteVisible: true })
+    return
+  }
+  const tick = (step) => {
+    if (!page || page.data.phase !== 'thinking') return
+    page.setData({ thinkingVisibleCount: step })
+    if (step >= total) {
+      page._thinkingRevealTimer = setTimeout(() => {
+        if (!page || page.data.phase !== 'thinking') return
+        page.setData({ thinkingFootnoteVisible: true })
+        page._thinkingRevealTimer = null
+      }, THINKING_REVEAL_FOOTNOTE_MS)
+      return
+    }
+    page._thinkingRevealTimer = setTimeout(() => tick(step + 1), THINKING_REVEAL_STEP_MS)
+  }
+  page._thinkingRevealTimer = setTimeout(() => tick(1), THINKING_REVEAL_INITIAL_MS)
+}
+
+/** 跳过逐项动画，直接展示全部类目与脚注 */
+function skipThinkingReveal(page) {
+  if (!page || page.data.phase !== 'thinking') return
+  clearThinkingReveal(page)
+  const total = (page.data.thinkingCategories || []).length
+  page.setData({
+    thinkingVisibleCount: total,
+    thinkingFootnoteVisible: true
+  })
+}
 
 /** 每次生成当日签 +1，用于作废延迟 setData 与跨页清缓存 */
 let gLotDrawVer = 0
@@ -55,8 +103,10 @@ function lotteryDataDefaults() {
     revealed: false,
     tierColor: '#1565c0',
     adviceList: [],
-    thinkingRows: [],
+    thinkingCategories: [],
     thinkingFootnote: '',
+    thinkingVisibleCount: 0,
+    thinkingFootnoteVisible: false,
     lotArtW: w,
     lotArtH: h
   }
@@ -67,6 +117,7 @@ function lotteryDataDefaults() {
  * @param {{ whenEmpty?: 'idle' | 'shake' }} options
  */
 function restoreToday(page, options) {
+  clearThinkingReveal(page)
   const whenEmpty = options && options.whenEmpty === 'idle' ? 'idle' : 'shake'
   const t = todayStr()
   const cache = wx.getStorageSync(KEYS.LOTTERY_TODAY)
@@ -80,8 +131,10 @@ function restoreToday(page, options) {
         revealed: !!cache.revealed,
         tierColor: TIER_COLORS[lot.tier] || '#1565c0',
         adviceList: cache.adviceList || [],
-        thinkingRows: [],
-        thinkingFootnote: ''
+        thinkingCategories: [],
+        thinkingFootnote: '',
+        thinkingVisibleCount: 0,
+        thinkingFootnoteVisible: false
       },
       () => {
         if (cache.revealed) {
@@ -102,8 +155,10 @@ function restoreToday(page, options) {
       lot: null,
       revealed: false,
       adviceList: [],
-      thinkingRows: [],
-      thinkingFootnote: ''
+      thinkingCategories: [],
+      thinkingFootnote: '',
+      thinkingVisibleCount: 0,
+      thinkingFootnoteVisible: false
     },
     () => {
       clearLotCanvas(page)
@@ -247,28 +302,34 @@ function finalizeDraw(page, lat, lng, weather) {
   })
   recordBiz('lot_draw', String(meta.lotId))
 
-  const thinking = buildLotteryThinkingView(meta, profile, hasPersonality, pers, lat, lng)
+  const thinking = buildLotteryThinkingBrief()
 
   setTimeout(() => {
     const cache = wx.getStorageSync(KEYS.LOTTERY_TODAY) || {}
     if (!cache.lotId || cache._drawVer !== drawVer) return
     if (cache.lotId !== meta.lotId || cache.dateStr !== meta.dateStr) return
-    page.setData({
-      phase: 'thinking',
-      shaking: false,
-      thinkingRows: thinking.rows,
-      thinkingFootnote: thinking.footnote,
-      lot,
-      revealed: false,
-      tierColor: TIER_COLORS[lot.tier] || '#1565c0',
-      adviceList
-    })
+    page.setData(
+      {
+        phase: 'thinking',
+        shaking: false,
+        thinkingCategories: thinking.categories,
+        thinkingFootnote: thinking.footnote,
+        thinkingVisibleCount: 0,
+        thinkingFootnoteVisible: false,
+        lot,
+        revealed: false,
+        tierColor: TIER_COLORS[lot.tier] || '#1565c0',
+        adviceList
+      },
+      () => startThinkingReveal(page)
+    )
   }, 900)
 }
 
 /** 思考模式结束后进入箴言揭晓卡片（lot 已在数据中，仍保持 revealed=false） */
 function confirmThinkingToResult(page) {
   if (!page || page.data.phase !== 'thinking') return
+  clearThinkingReveal(page)
   page.setData({ phase: 'result' })
 }
 
@@ -364,6 +425,8 @@ module.exports = {
   drawLot,
   finalizeDraw,
   confirmThinkingToResult,
+  skipThinkingReveal,
+  clearThinkingReveal,
   reveal,
   renderLotArt,
   paintLotToCanvas,

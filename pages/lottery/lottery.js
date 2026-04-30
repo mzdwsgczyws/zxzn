@@ -49,10 +49,12 @@ Page({
 
   onHide() {
     core.stopAccel(this)
+    core.clearThinkingReveal(this)
   },
 
   onUnload() {
     core.stopAccel(this)
+    core.clearThinkingReveal(this)
   },
 
   onShareAppMessage() {
@@ -87,5 +89,9 @@ Page({
 
   tapConfirmThinking() {
     core.confirmThinkingToResult(this)
+  },
+
+  tapSkipThinkingReveal() {
+    core.skipThinkingReveal(this)
   }
 })

@@ -37,14 +37,24 @@
   <view class="card thinking-card-page" wx:if="{{phase === 'thinking'}}">
     <text class="thinking-kicker">运算脉络</text>
     <text class="thinking-title">今日箴言并非随手抽取</text>
-    <text class="thinking-sub">下列字段按固定规则汇合为当日指纹，映射六十四卦之一；同一自然日、同一档案与环境上下文下结果稳定。</text>
-    <view class="thinking-rows-wrap">
-      <view class="thinking-row" wx:for="{{thinkingRows}}" wx:for-item="row" wx:key="label">
-        <text class="thinking-label">{{row.label}}</text>
-        <text class="thinking-value">{{row.value}}</text>
+    <text class="thinking-sub">下列数据门类正逐项汇入当日运算（不显细节取值）。</text>
+    <view class="thinking-cat-list">
+      <view
+        wx:for="{{thinkingCategories}}"
+        wx:for-index="idx"
+        wx:key="*this"
+        class="thinking-cat-row {{thinkingVisibleCount > idx ? 'thinking-cat-row--in' : ''}}"
+      >
+        <text class="thinking-cat-mark">◇</text>
+        <text class="thinking-cat-text">{{item}}</text>
       </view>
     </view>
-    <text class="thinking-foot">{{thinkingFootnote}}</text>
+    <text class="thinking-foot {{thinkingFootnoteVisible ? 'thinking-foot--in' : ''}}">{{thinkingFootnote}}</text>
+    <text
+      class="thinking-skip"
+      wx:if="{{thinkingCategories.length > thinkingVisibleCount || !thinkingFootnoteVisible}}"
+      bindtap="tapSkipThinkingReveal"
+    >跳过显现</text>
     <button class="btn-primary thinking-btn-page" bindtap="tapConfirmThinking">已阅 · 查看箴言</button>
   </view>
 
