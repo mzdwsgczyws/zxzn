@@ -695,21 +695,13 @@
   border: 1rpx solid var(--dao-border-gold);
 }
 
-.thinking-kicker {
+.thinking-hint {
   display: block;
-  font-size: 22rpx;
-  letter-spacing: 10rpx;
-  color: var(--dao-gold-muted);
-  margin-bottom: 12rpx;
-}
-
-.thinking-title {
-  display: block;
-  font-size: 32rpx;
-  font-weight: 600;
-  color: var(--dao-purple-deep);
+  font-size: 24rpx;
+  line-height: 1.62;
+  font-weight: 500;
+  color: var(--dao-ink-muted);
   margin-bottom: 14rpx;
-  letter-spacing: 2rpx;
 }
 
 .thinking-sub {

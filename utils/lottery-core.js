@@ -16,6 +16,7 @@ const { computeLotteryAdvices } = require('./lottery-advice.js')
 const { drawLotArtWx } = require('./lot-art.js')
 const { applyLotStylePref } = require('./lot-display.js')
 const { buildLotteryThinkingBrief } = require('./lottery-thinking.js')
+const sensory = require('./lottery-shake-sensory.js')
 
 /** 思考模式类目逐项显现间隔（毫秒，整体偏慢便于阅读） */
 const THINKING_REVEAL_INITIAL_MS = 480
@@ -208,6 +209,7 @@ function startAccel(page) {
     if (g > 1.65 && now - page.lastShake > 120) {
       page.lastShake = now
       page.shakeAccum += 1
+      sensory.feedbackShakeImpulse()
       page.setData({
         shaking: true,
         shakeHint: `感应中… ${Math.min(page.shakeAccum, SHAKE_COUNT_NEED)}/${SHAKE_COUNT_NEED}`
@@ -237,6 +239,7 @@ function readProfileLatLng() {
 }
 
 function drawLot(page) {
+  sensory.feedbackDrawCommitted()
   page.setData({ phase: 'anim', shaking: true, shakeHint: '内容生成中，请稍候…' })
   const { lat, lng } = readProfileLatLng()
   if (lat != null && lng != null) {
@@ -415,9 +418,12 @@ function paintLotToCanvas(page, w, h, lot) {
 
 function simShake(page) {
   if (page.data.phase !== 'shake') return
-  page.shakeAccum = SHAKE_COUNT_NEED
   stopAccel(page)
-  drawLot(page)
+  sensory.feedbackSimulatedNineTicks(() => {
+    if (!page || page.data.phase !== 'shake') return
+    page.shakeAccum = SHAKE_COUNT_NEED
+    drawLot(page)
+  })
 }
 
 function clearTodayAndReset(page, whenEmpty) {
@@ -452,5 +458,6 @@ module.exports = {
   simShake,
   clearTodayAndReset,
   onLotteryLoad,
-  getCanvasId
+  getCanvasId,
+  teardownShakeSensory: sensory.teardown
 }

@@ -85,9 +85,8 @@
 
       <!-- 运算思考：展示纳入种子的上下文后再进入箴言卡片 -->
       <view class="lot-panel lot-thinking" wx:if="{{phase === 'thinking'}}">
-        <text class="thinking-kicker">运算脉络</text>
-        <text class="thinking-title">今日箴言并非随手抽取</text>
-        <text class="thinking-sub">下列数据门类正逐项汇入当日运算（不显细节取值）。完成后将自动进入箴言卡片。</text>
+        <text class="thinking-hint">正在根据以下信息，参照周易八卦与紫微斗数意象演算中…</text>
+        <text class="thinking-sub">下列为当日纳入运算的数据门类（不显细节）。完成后将自动进入箴言卡片。</text>
         <view class="thinking-cat-list">
           <view
             wx:for="{{thinkingCategories}}"

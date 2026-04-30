@@ -453,19 +453,12 @@
   margin: 0 24rpx 28rpx;
 }
 
-.thinking-card-page .thinking-kicker {
+.thinking-card-page .thinking-hint {
   display: block;
-  font-size: 22rpx;
-  letter-spacing: 10rpx;
-  color: var(--dao-gold-muted);
-  margin-bottom: 12rpx;
-}
-
-.thinking-card-page .thinking-title {
-  display: block;
-  font-size: 32rpx;
-  font-weight: 600;
-  color: var(--dao-purple-deep);
+  font-size: 24rpx;
+  line-height: 1.62;
+  font-weight: 500;
+  color: var(--dao-ink-muted);
   margin-bottom: 14rpx;
 }
 

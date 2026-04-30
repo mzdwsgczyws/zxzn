@@ -13,7 +13,7 @@ const THINKING_CATEGORIES = [
 ]
 
 const THINKING_FOOTNOTE =
-  '上述门类按固定规则汇合为当日指纹并映射卦序；同日、同档案与同环境下稳定对应，非无序抽签。仅供文化自察参考。'
+  '周易八卦与紫微斗数为传统文化意象参照，非宿命断言；仅供文化自察与行动参考。'
 
 /** @returns {{ categories: string[], footnote: string }} */
 function buildLotteryThinkingBrief() {

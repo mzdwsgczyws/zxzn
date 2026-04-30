@@ -55,6 +55,7 @@ Page({
   onUnload() {
     core.stopAccel(this)
     core.clearThinkingReveal(this)
+    core.teardownShakeSensory()
   },
 
   onShareAppMessage() {
