@@ -66,6 +66,22 @@ function dayRepTierMap(draws) {
   return rep
 }
 
+/** 每个自然日只保留当日最后一次抽取（同日多次只计一日），按日期升序 */
+function dailyRepresentativeDraws(draws) {
+  const byDay = {}
+  draws.forEach((d) => {
+    const day = d.dateStr
+    if (!day) return
+    if (!byDay[day]) byDay[day] = []
+    byDay[day].push(d)
+  })
+  const days = Object.keys(byDay).sort((a, b) => parseDayTime(a) - parseDayTime(b))
+  return days.map((dateStr) => {
+    const arr = byDay[dateStr].slice().sort((a, b) => b.ts - a.ts)
+    return arr[0]
+  })
+}
+
 function maxCalendarTierRun(rep, pred) {
   const days = Object.keys(rep).sort((a, b) => parseDayTime(a) - parseDayTime(b))
   let best = 0
@@ -110,61 +126,62 @@ function maxDrawDayStreak(draws) {
   return best
 }
 
-function maxDrawStreak(drawsSorted, pred) {
-  let cur = 0
-  let best = 0
-  drawsSorted.forEach((d) => {
-    if (pred(d.tier)) {
-      cur++
-      best = Math.max(best, cur)
-    } else {
-      cur = 0
-    }
-  })
-  return best
-}
-
 function buildAchievementState(draws) {
   const sorted = [...draws].sort((a, b) => a.ts - b.ts)
+  const dailyLast = dailyRepresentativeDraws(draws)
+  const drawDayCount = dailyLast.length
+
   const firstByLot = {}
   sorted.forEach((d) => {
     const id = d.lotId | 0
     if (firstByLot[id] === undefined) firstByLot[id] = d.ts
   })
+
   const tiersSeen = {}
   sorted.forEach((d) => {
     tiersSeen[d.tier] = true
   })
-  const lotCounts = {}
+
+  /** 同一条目在多少个「不同自然日」出现过（同日多次只计一日） */
+  const lotDaySets = {}
   sorted.forEach((d) => {
     const id = d.lotId | 0
-    lotCounts[id] = (lotCounts[id] || 0) + 1
+    const day = d.dateStr
+    if (!day) return
+    if (!lotDaySets[id]) lotDaySets[id] = new Set()
+    lotDaySets[id].add(day)
   })
+  const lotDayCountList = Object.keys(lotDaySets).map((k) => lotDaySets[k].size)
+  const maxSameLot = lotDayCountList.length ? Math.max(...lotDayCountList) : 0
+
   const rep = dayRepTierMap(sorted)
   const upperLotIds = getLotIdsByTier('上上')
   const lowerLotIds = getLotIdsByTier('下下')
   const hasAllShangshangLots = upperLotIds.every((id) => firstByLot[id] !== undefined)
   const hasAllXiaxiaLots = lowerLotIds.every((id) => firstByLot[id] !== undefined)
   const uniqueLots = Object.keys(firstByLot).length
-  const maxSameLot = Math.max(0, ...Object.values(lotCounts))
+
+  const calendarUpperRun = maxCalendarTierRun(rep, isUpperTier)
+  const calendarLowerRun = maxCalendarTierRun(rep, isLowerTier)
 
   return {
     draws: sorted,
-    drawCount: sorted.length,
+    /** 有抽签的自然日数（同日多次只计一日） */
+    drawCount: drawDayCount,
     firstByLot,
     tiersSeen,
-    lotCounts,
     rep,
     hasAllShangshangLots,
     hasAllXiaxiaLots,
     uniqueLots,
     maxSameLot,
-    calendarUpperRun: maxCalendarTierRun(rep, isUpperTier),
-    calendarLowerRun: maxCalendarTierRun(rep, isLowerTier),
+    calendarUpperRun,
+    calendarLowerRun,
     drawDayStreak: maxDrawDayStreak(sorted),
-    drawUpperStreak: maxDrawStreak(sorted, isUpperTier),
-    drawLowerStreak: maxDrawStreak(sorted, isLowerTier),
-    allMiddleLong: sorted.length >= 8 && sorted.every((d) => d.tier === '中')
+    /** 与日历连续上等第一致：按自然日末抽等第 */
+    drawUpperStreak: calendarUpperRun,
+    drawLowerStreak: calendarLowerRun,
+    allMiddleLong: dailyLast.length >= 8 && dailyLast.every((d) => d.tier === '中')
   }
 }
 
@@ -172,29 +189,29 @@ const ACHIEVEMENT_DEFS = [
   {
     id: 'first_draw',
     name: '初启心象',
-    subtitle: '第一次成功生成一条心象箴言',
+    subtitle: '第一次在自然日留下抽签记录',
     accent: 'gold',
     test: (s) => s.drawCount >= 1,
-    comment: '第一次收录完成！展馆里多了一条时间戳——以后每次生成都会留在这里。',
+    comment: '第一次收录完成！展馆里多了一条时间戳——以后每个「抽签日」都会留在这里。',
     commentLocked: '去首页轻触开始并完成一次摇动，成就就从这里亮起。'
   },
   {
     id: 'draws_10',
     name: '十次心象',
-    subtitle: '累计生成满 10 次',
+    subtitle: '累计满 10 个有抽签的自然日（同日多次只计一日）',
     accent: 'violet',
     test: (s) => s.drawCount >= 10,
-    comment: '十次下来，你对这些句子应该已经有点「脸熟」了——习惯记录本身就是收获。',
-    commentLocked: '再多生成几次，累计到十次就能解锁。'
+    comment: '十个不同的日子都有记录——节奏比同一天里反复摇更重要。',
+    commentLocked: '跨越多日抽签，累计十个「抽签日」即可解锁（同一天只算一次）。'
   },
   {
     id: 'draws_30',
     name: '三十昼夜',
-    subtitle: '累计生成满 30 次',
+    subtitle: '累计满 30 个有抽签的自然日（同日多次只计一日）',
     accent: 'violet',
     test: (s) => s.drawCount >= 30,
-    comment: '三十次坚持打卡，像在做一本私人情绪手账——节奏比单次结果更重要。',
-    commentLocked: '细水长流，次数到了自然解锁。'
+    comment: '三十个抽签日坚持下来，像在做一本按日历翻页的私人手账。',
+    commentLocked: '细水长流，累计三十个「抽签日」即可（同一天只算一次）。'
   },
   {
     id: 'first_shangshang',
@@ -237,20 +254,20 @@ const ACHIEVEMENT_DEFS = [
   {
     id: 'streak_draw_upper3',
     name: '连中三元',
-    subtitle: '连续三次生成均为上或上上',
+    subtitle: '连续三个日历日的末次抽签均为上或上上',
     accent: 'gold',
     test: (s) => s.drawUpperStreak >= 3,
-    comment: '三连高位！趁热把一件小事收尾，但别一口气开太多新坑。',
-    commentLocked: '连续三次生成都落在「上」或「上上」档即可解锁。'
+    comment: '三个连续「抽签日」末抽都在高位——趁热把一件小事收尾，别一口气开太多新坑。',
+    commentLocked: '连续三个日历日、每日以最后一次抽签为准，均为「上」或「上上」档即可解锁。'
   },
   {
     id: 'streak_draw_lower3',
     name: '逆风三连',
-    subtitle: '连续三次生成均为下或下下',
+    subtitle: '连续三个日历日的末次抽签均为下或下下',
     accent: 'slate',
     test: (s) => s.drawLowerStreak >= 3,
-    comment: '三连低位……出门晒晒太阳、走十分钟，比盯着屏幕反复想更管用。',
-    commentLocked: '（但愿用不上）连续三次落在低位档时出现。'
+    comment: '三个连续「抽签日」末抽都在低位……出门晒晒太阳、走十分钟，比盯着屏幕反复想更管用。',
+    commentLocked: '（但愿用不上）连续三个日历日末抽均为「下」或「下下」档时出现。'
   },
   {
     id: 'collect_all_shangshang',
@@ -296,20 +313,20 @@ const ACHIEVEMENT_DEFS = [
   {
     id: 'repeat_lot',
     name: '故象重来',
-    subtitle: '同一条目至少生成过两次',
+    subtitle: '同一条目在不少于两个自然日出现过（同日多次只计一日）',
     accent: 'amber',
     test: (s) => s.maxSameLot >= 2,
-    comment: '又抽到同一条？也许是提醒你别忘了上次读到时的那点心意。',
-    commentLocked: '同一条目再次出现时会解锁。'
+    comment: '在不同日子里又遇见同一条——也许是提醒你别忘了上次读到时的那点心意。',
+    commentLocked: '同一条目在另外一个日历日再出现时解锁（同一天内重复摇动不计入）。'
   },
   {
     id: 'triple_same_lot',
     name: '三见故知',
-    subtitle: '同一条目至少生成过三次',
+    subtitle: '同一条目在不少于三个自然日出现过',
     accent: 'amber',
     test: (s) => s.maxSameLot >= 3,
-    comment: '同一条连着三次露面——像便签贴在冰箱上：这件事，该认真看一眼了。',
-    commentLocked: '同一条目第三次出现时会解锁，留意反复出现的标题。'
+    comment: '三个不同的抽签日都遇见它——像便签贴在冰箱上：这件事，该认真看一眼了。',
+    commentLocked: '同一条目在第三个独立的日历日再出现时解锁。'
   },
   {
     id: 'week_draw_streak',
@@ -332,11 +349,11 @@ const ACHIEVEMENT_DEFS = [
   {
     id: 'middle_master',
     name: '中庸达人',
-    subtitle: '累计至少 8 次生成，且全部为「中」',
+    subtitle: '不少于 8 个抽签日，且每日末次抽签均为「中」',
     accent: 'blue',
     test: (s) => s.allMiddleLong,
-    comment: '八连「中」！稳得像节拍器——偶尔也可以故意「跑调」一下换换心情。',
-    commentLocked: '连续很多次都落在「中」档——佛系玩家专属彩蛋。'
+    comment: '八个「抽签日」末抽都在「中」档！稳得像节拍器——偶尔也可以故意「跑调」一下换换心情。',
+    commentLocked: '累计八个及以上自然日，且每日以最后一次抽签为准均为「中」档——佛系玩家专属彩蛋。'
   }
 ]
 
