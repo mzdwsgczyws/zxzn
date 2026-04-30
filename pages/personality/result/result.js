@@ -373,6 +373,27 @@ function loadPortraitSubpackage() {
   })
 }
 
+/**
+ * 人物图展示：冷启动时仅用分包 URL 易失败；优先多次 getImageInfo 取本地 path。
+ * 仍保留 URL + ?v=代数 作兜底，并由 loadResult 的 _portraitShowGen 防止多次 onShow 交错覆盖。
+ */
+function portraitSrcForImagePage(page, tid, myGen) {
+  const plain = personalityPortraitSrc(tid)
+  const candidates = personalityPortraitCandidates(tid)
+  const sleepsMs = [0, 90, 170, 260, 360]
+
+  return loadPortraitSubpackage().then(async () => {
+    for (let i = 0; i < sleepsMs.length; i++) {
+      if (myGen !== page._portraitShowGen) return ''
+      if (sleepsMs[i] > 0) await new Promise((r) => setTimeout(r, sleepsMs[i]))
+      const { path } = await firstImagePathAndSrc(candidates)
+      if (path) return path
+    }
+    if (myGen !== page._portraitShowGen) return ''
+    return `${plain}?v=${myGen}`
+  })
+}
+
 function createImageCompat(canvas) {
   if (canvas && typeof canvas.createImage === 'function') return canvas.createImage()
   if (typeof wx.createImage === 'function') return wx.createImage()
@@ -535,25 +556,16 @@ Page({
     const tid = resultTypeId(result)
     const quizMetaLine = buildQuizMetaLine(result)
     const myGen = (this._portraitShowGen = (this._portraitShowGen || 0) + 1)
-    /**
-     * 页面展示不用 getImageInfo 的本地 path：临时路径再次进入可能失效，且多次 onShow 异步易互相覆盖。
-     * 分包就绪后用分包内 URL + ?v=代数 强制 image 重载；仅用代数守卫接纳最后一次 loadResult。
-     */
     this.setData(
       { hasResult: true, result, scoreList, shareImg: '', portraitSrc: '', quizMetaLine },
       () => {
-        loadPortraitSubpackage().then(() => {
+        portraitSrcForImagePage(this, tid, myGen).then((portraitSrc) => {
           if (myGen !== this._portraitShowGen) return
           if (!this.data.hasResult || !this.data.result || resultTypeId(this.data.result) !== tid) return
-          const pack = personalityPortraitSrc(tid)
-          const portraitSrc = `${pack}?v=${myGen}`
-          setTimeout(() => {
-            if (myGen !== this._portraitShowGen) return
-            if (!this.data.hasResult || !this.data.result || resultTypeId(this.data.result) !== tid) return
-            this.setData({ portraitSrc }, () => {
-              setTimeout(() => this.renderShareCard(), 200)
-            })
-          }, 48)
+          const src = portraitSrc || personalityPortraitSrc(tid)
+          this.setData({ portraitSrc: src }, () => {
+            setTimeout(() => this.renderShareCard(), 200)
+          })
         })
       }
     )
