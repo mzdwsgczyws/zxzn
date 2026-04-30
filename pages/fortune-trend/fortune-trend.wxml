@@ -1,5 +1,6 @@
 <view class="page">
-  <scroll-view scroll-y="{{true}}" class="scroll" enhanced="{{true}}">
+  <!-- iOS：同上，走势 canvas 避免放在 enhanced scroll-view 内 -->
+  <scroll-view scroll-y="{{true}}" class="scroll">
     <view class="card intro">
       <text class="intro-p">按自然日展示抽签记录（同日多次取最后一次）。月历中有底色标记的为当日有签；长按该日可看诗文与释义。下方走势图为示意 K 线，仅供阅览趣味。</text>
     </view>

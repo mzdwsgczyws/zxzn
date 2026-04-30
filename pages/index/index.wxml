@@ -6,9 +6,9 @@
   </view>
 
   <view class="main-column" style="padding-top: {{navTotalPx}}px;">
+    <!-- iOS：enhanced scroll-view 会与原生 canvas-id 合成错位，签图勿与此同开 -->
     <scroll-view
       scroll-y="{{true}}"
-      enhanced="{{true}}"
       show-scrollbar="{{true}}"
       class="lot-scroll"
       style="height: {{mainScrollH}}px;"
