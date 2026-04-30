@@ -497,12 +497,12 @@
   transform: translateY(18rpx);
   overflow: hidden;
   transition:
-    max-height 0.48s ease,
-    opacity 0.42s ease,
-    transform 0.42s ease,
-    margin-bottom 0.36s ease,
-    padding-top 0.36s ease,
-    padding-bottom 0.36s ease;
+    max-height 0.62s ease,
+    opacity 0.58s ease,
+    transform 0.56s ease,
+    margin-bottom 0.48s ease,
+    padding-top 0.48s ease,
+    padding-bottom 0.48s ease;
 }
 
 .thinking-card-page .thinking-cat-row--in {
@@ -539,7 +539,7 @@
   max-height: 0;
   opacity: 0;
   overflow: hidden;
-  transition: max-height 0.5s ease, opacity 0.45s ease, margin-bottom 0.35s ease;
+  transition: max-height 0.62s ease, opacity 0.56s ease, margin-bottom 0.42s ease;
 }
 
 .thinking-card-page .thinking-foot--in {
@@ -555,12 +555,7 @@
   color: var(--dao-purple-mid);
   text-decoration: underline;
   text-decoration-color: rgba(212, 175, 55, 0.35);
-  margin-bottom: 20rpx;
-}
-
-.thinking-btn-page {
-  width: 100%;
-  margin-top: 8rpx;
+  margin-bottom: 12rpx;
 }
 
 .result-card {

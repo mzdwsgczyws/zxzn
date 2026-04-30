@@ -165,10 +165,6 @@ Page({
     core.reveal(this)
   },
 
-  tapConfirmThinking() {
-    core.confirmThinkingToResult(this)
-  },
-
   tapSkipThinkingReveal() {
     core.skipThinkingReveal(this)
   },

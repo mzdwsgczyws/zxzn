@@ -17,10 +17,13 @@ const { drawLotArtWx } = require('./lot-art.js')
 const { applyLotStylePref } = require('./lot-display.js')
 const { buildLotteryThinkingBrief } = require('./lottery-thinking.js')
 
-/** 思考模式类目逐项显现间隔（毫秒） */
-const THINKING_REVEAL_INITIAL_MS = 220
-const THINKING_REVEAL_STEP_MS = 340
-const THINKING_REVEAL_FOOTNOTE_MS = 380
+/** 思考模式类目逐项显现间隔（毫秒，整体偏慢便于阅读） */
+const THINKING_REVEAL_INITIAL_MS = 480
+const THINKING_REVEAL_STEP_MS = 720
+/** 最后一项类目出现后，延迟再展示脚注 */
+const THINKING_REVEAL_FOOTNOTE_MS = 640
+/** 脚注出现后自动进入箴言卡片（留出脚注动画与扫读时间） */
+const THINKING_AUTO_ADVANCE_MS = 1200
 
 function clearThinkingReveal(page) {
   if (!page) return
@@ -28,6 +31,24 @@ function clearThinkingReveal(page) {
     clearTimeout(page._thinkingRevealTimer)
     page._thinkingRevealTimer = null
   }
+  if (page._thinkingAdvanceTimer != null) {
+    clearTimeout(page._thinkingAdvanceTimer)
+    page._thinkingAdvanceTimer = null
+  }
+}
+
+/** 展示完毕后自动切入 phase result */
+function scheduleThinkingAdvance(page) {
+  if (!page || page.data.phase !== 'thinking') return
+  if (page._thinkingAdvanceTimer != null) {
+    clearTimeout(page._thinkingAdvanceTimer)
+    page._thinkingAdvanceTimer = null
+  }
+  page._thinkingAdvanceTimer = setTimeout(() => {
+    page._thinkingAdvanceTimer = null
+    if (!page || page.data.phase !== 'thinking') return
+    confirmThinkingToResult(page)
+  }, THINKING_AUTO_ADVANCE_MS)
 }
 
 function startThinkingReveal(page) {
@@ -35,7 +56,7 @@ function startThinkingReveal(page) {
   const cats = page.data.thinkingCategories || []
   const total = cats.length
   if (total === 0) {
-    page.setData({ thinkingFootnoteVisible: true })
+    page.setData({ thinkingFootnoteVisible: true }, () => scheduleThinkingAdvance(page))
     return
   }
   const tick = (step) => {
@@ -46,6 +67,7 @@ function startThinkingReveal(page) {
         if (!page || page.data.phase !== 'thinking') return
         page.setData({ thinkingFootnoteVisible: true })
         page._thinkingRevealTimer = null
+        scheduleThinkingAdvance(page)
       }, THINKING_REVEAL_FOOTNOTE_MS)
       return
     }
@@ -54,15 +76,11 @@ function startThinkingReveal(page) {
   page._thinkingRevealTimer = setTimeout(() => tick(1), THINKING_REVEAL_INITIAL_MS)
 }
 
-/** 跳过逐项动画，直接展示全部类目与脚注 */
+/** 跳过逐项动画，直接进入箴言卡片 */
 function skipThinkingReveal(page) {
   if (!page || page.data.phase !== 'thinking') return
   clearThinkingReveal(page)
-  const total = (page.data.thinkingCategories || []).length
-  page.setData({
-    thinkingVisibleCount: total,
-    thinkingFootnoteVisible: true
-  })
+  confirmThinkingToResult(page)
 }
 
 /** 每次生成当日签 +1，用于作废延迟 setData 与跨页清缓存 */

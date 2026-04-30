@@ -87,7 +87,7 @@
       <view class="lot-panel lot-thinking" wx:if="{{phase === 'thinking'}}">
         <text class="thinking-kicker">运算脉络</text>
         <text class="thinking-title">今日箴言并非随手抽取</text>
-        <text class="thinking-sub">下列数据门类正逐项汇入当日运算（不显细节取值）。</text>
+        <text class="thinking-sub">下列数据门类正逐项汇入当日运算（不显细节取值）。完成后将自动进入箴言卡片。</text>
         <view class="thinking-cat-list">
           <view
             wx:for="{{thinkingCategories}}"
@@ -105,7 +105,6 @@
           wx:if="{{thinkingCategories.length > thinkingVisibleCount || !thinkingFootnoteVisible}}"
           bindtap="tapSkipThinkingReveal"
         >跳过显现</text>
-        <button class="thinking-btn" bindtap="tapConfirmThinking">已阅 · 查看箴言</button>
       </view>
 
       <!-- 已生成 -->

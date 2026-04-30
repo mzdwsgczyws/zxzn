@@ -740,12 +740,12 @@
   transform: translateY(18rpx);
   overflow: hidden;
   transition:
-    max-height 0.48s ease,
-    opacity 0.42s ease,
-    transform 0.42s ease,
-    margin-bottom 0.36s ease,
-    padding-top 0.36s ease,
-    padding-bottom 0.36s ease;
+    max-height 0.62s ease,
+    opacity 0.58s ease,
+    transform 0.56s ease,
+    margin-bottom 0.48s ease,
+    padding-top 0.48s ease,
+    padding-bottom 0.48s ease;
 }
 
 .thinking-cat-row--in {
@@ -782,7 +782,7 @@
   max-height: 0;
   opacity: 0;
   overflow: hidden;
-  transition: max-height 0.5s ease, opacity 0.45s ease, margin-bottom 0.35s ease;
+  transition: max-height 0.62s ease, opacity 0.56s ease, margin-bottom 0.42s ease;
 }
 
 .thinking-foot--in {
@@ -798,24 +798,7 @@
   color: var(--dao-purple-mid);
   text-decoration: underline;
   text-decoration-color: rgba(212, 175, 55, 0.35);
-  margin-bottom: 22rpx;
-}
-
-.thinking-btn {
-  width: 100%;
-  padding: 28rpx 24rpx;
-  line-height: 1.45;
-  font-size: 30rpx;
-  font-weight: 600;
-  color: #2a1f15;
-  background: linear-gradient(180deg, #f0dfa0 0%, #c9a227 48%, #a67c1f 100%);
-  border: 3rpx solid rgba(90, 60, 30, 0.35);
-  border-radius: 999rpx;
-  box-shadow: 0 10rpx 28rpx rgba(166, 124, 31, 0.28);
-}
-
-.thinking-btn::after {
-  border: none;
+  margin-bottom: 8rpx;
 }
 
 /* —— 结果 —— */
