@@ -22,8 +22,8 @@ const EMOTION_LABELS = [
 ]
 const EMOTION_VALUES = [null, 'soothe', 'encourage', 'empathy', 'neutral_only']
 
-const RHYTHM_LABELS = ['-', '偏早起', '偏夜猫', '作息不太规律']
-const RHYTHM_VALUES = [null, 'early', 'night', 'irregular']
+const RHYTHM_LABELS = ['-', '作息规律', '晚睡早起', '偏早起', '偏夜猫', '作息不太规律']
+const RHYTHM_VALUES = [null, 'regular', 'late_early', 'early', 'night', 'irregular']
 
 const STYLE_LABELS = ['-', '简练', '详尽', '略偏文言感', '白话分行（易读）']
 const STYLE_VALUES = [null, 'brief', 'rich', 'classical', 'plain']

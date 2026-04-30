@@ -170,6 +170,9 @@ function profileHooks(profile) {
   const hooks = []
   if (!profile || typeof profile !== 'object') return hooks
   if (profile.recentState === 'low') hooks.push({ tag: 'energy', note: '档案里近况偏低沉/易疲' })
+  if (profile.rhythmType === 'regular') hooks.push({ tag: 'sleep', note: '档案里作息自评较规律' })
+  if (profile.rhythmType === 'late_early') hooks.push({ tag: 'sleep', note: '档案里晚睡早起，留意睡眠债叠加' })
+  if (profile.rhythmType === 'early') hooks.push({ tag: 'sleep', note: '档案里偏早起节律' })
   if (profile.rhythmType === 'irregular') hooks.push({ tag: 'sleep', note: '档案里作息自评不太规律' })
   if (profile.rhythmType === 'night') hooks.push({ tag: 'sleep', note: '档案里偏夜猫节律' })
   const ft = profile.focusTags

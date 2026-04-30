@@ -203,6 +203,12 @@ function collectCandidates(ctx) {
     push('日常', '保持节奏即可，不必强行加码或强行放松。', 1)
   }
 
+  if (rhythmType === 'regular') {
+    push('起居', '节律相对稳定时，把最需要专注的一件事卡在固定时段完成即可。', 1)
+  }
+  if (rhythmType === 'late_early') {
+    push('起居', '晚睡还要早起时更忌空腹浓茶咖啡叠加班；午间短憩补一刀也好过硬扛。', 2)
+  }
   if (rhythmType === 'night') {
     push('起居', '晚间少刷短视频，睡前一小时光线调暗、少争论。', 2)
   }

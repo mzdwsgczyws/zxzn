@@ -128,6 +128,7 @@ function inferUserTone(ctx) {
   if (gang && xian) return 'empathy'
   if (dong && san) return 'soothe'
   if (recentState === 'high' && (dong || san)) return 'soothe'
+  if (profile && profile.rhythmType === 'late_early' && recentState !== 'high') return 'soothe'
   if (
     profile &&
     profile.rhythmType === 'irregular' &&

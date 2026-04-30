@@ -1,40 +1,58 @@
 <view class="page">
   <scroll-view scroll-y="{{true}}" class="scroll" enhanced="{{true}}">
     <view class="card intro">
-      <text class="intro-p">以下为「按自然日」汇总的抽签记录：同一日多次抽取取最后一次。下方 K 线仅按等第映射为涨跌形态示意，仅供阅读趣味，并非证券走势。</text>
+      <text class="intro-p">按自然日展示抽签记录（同日多次取最后一次）。月历中有底色标记的为当日有签；长按该日可看诗文与释义。下方走势图为示意 K 线，仅供阅览趣味。</text>
     </view>
 
     <view class="chart-card card">
-      <text class="chart-title">运势走势（示意 K 线）</text>
+      <text class="chart-title">运势走势（示意）</text>
       <canvas
         canvas-id="fortuneCandleCanvas"
         class="candle-canvas"
         style="width: {{chartW}}px; height: {{chartH}}px;"
         disable-scroll="{{true}}"
       ></canvas>
-      <view class="legend">
-        <text class="legend-line">上上→大阳线 · 上→阳线 · 中→十字星 · 下→阴线 · 下下→大阴线（配色按常见行情习惯示意）</text>
-      </view>
     </view>
 
-    <view class="card">
-      <text class="section-h">按日签文</text>
-      <text class="section-tip">长按一行展开当日卦条与释义</text>
-      <view class="empty-box" wx:if="{{empty}}">
-        <text class="empty-t">暂无记录</text>
+    <view class="card calendar-card">
+      <text class="section-h">月历</text>
+      <text class="section-tip">选择年月 · 长按有签之日查看释义</text>
+
+      <view class="cal-toolbar">
+        <picker mode="selector" range="{{yearLabels}}" value="{{yearPickIdx}}" bindchange="onYearPick">
+          <view class="cal-picker">{{yearLabels[yearPickIdx]}}</view>
+        </picker>
+        <picker mode="selector" range="{{monthLabels}}" value="{{monthPickIdx}}" bindchange="onMonthPick">
+          <view class="cal-picker">{{monthLabels[monthPickIdx]}}</view>
+        </picker>
       </view>
-      <block wx:for="{{rows}}" wx:key="dateStr">
-        <view
-          class="day-row"
-          hover-class="day-row-hover"
-          bindlongpress="onRowLongPress"
-          data-idx="{{index}}"
-        >
-          <view class="day-left">
-            <text class="day-date">{{item.dateStr}}</text>
-            <text class="day-title">{{item.title}}</text>
+
+      <view class="empty-box" wx:if="{{empty}}">
+        <text class="empty-t">暂无抽签记录</text>
+      </view>
+
+      <block wx:if="{{!empty}}">
+        <view class="cal-weekdays">
+          <text class="cal-wd" wx:for="{{weekDayTitles}}" wx:key="*this">{{item}}</text>
+        </view>
+        <view class="cal-grid">
+          <view
+            wx:for="{{calCells}}"
+            wx:key="cellKey"
+            class="cal-cell cal-cell--{{item.type}} {{item.hasSign ? 'cal-cell--hit' : ''}} {{item.isWeekend ? 'cal-cell--wk' : ''}}"
+          >
+            <block wx:if="{{item.type === 'pad'}}"></block>
+            <view
+              wx:else
+              class="cal-day-inner"
+              bindlongpress="onCalLongPress"
+              data-datestr="{{item.dateStr}}"
+            >
+              <text class="cal-day-num">{{item.day}}</text>
+              <view wx:if="{{item.hasSign}}" class="cal-tier-dot" style="background-color: {{item.tierColor}};"></view>
+              <text wx:if="{{item.hasSign}}" class="cal-mini-tier">{{item.tierLabel}}</text>
+            </view>
           </view>
-          <text class="day-tier" style="color: {{item.tierColor}};">{{item.tierLabel}}</text>
         </view>
       </block>
     </view>

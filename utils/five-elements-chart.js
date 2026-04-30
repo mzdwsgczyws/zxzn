@@ -179,6 +179,29 @@ function computeFiveElements(recordsAsc, profile, personality) {
     shui += 6 + 4 * norm(drain, 2, 5)
   }
 
+  /** 档案作息：轻量偏移意象分（非诊断） */
+  if (profile && profile.rhythmType === 'regular') {
+    tu += 5
+    shui += 3
+  }
+  if (profile && profile.rhythmType === 'late_early') {
+    shui += 8
+    huo += 5
+    jin += 4
+  }
+  if (profile && profile.rhythmType === 'early') {
+    mu += 4
+    tu += 2
+  }
+  if (profile && profile.rhythmType === 'night') {
+    huo += 6
+    shui += 4
+  }
+  if (profile && profile.rhythmType === 'irregular') {
+    tu += 4
+    huo += 4
+  }
+
   if (personality && personality.scores) {
     const s = personality.scores
     if (typeof s.刚 === 'number') jin += (s.刚 - 50) * 0.06

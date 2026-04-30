@@ -3,7 +3,7 @@
  */
 
 const VALID_RECENT = ['low', 'mid', 'high']
-const VALID_RHYTHM = ['early', 'night', 'irregular']
+const VALID_RHYTHM = ['regular', 'late_early', 'early', 'night', 'irregular']
 const VALID_STYLE = ['brief', 'rich', 'classical', 'plain']
 const VALID_FOCUS = new Set(['work', 'relation', 'health', 'study', 'finance', 'family', 'rest'])
 
