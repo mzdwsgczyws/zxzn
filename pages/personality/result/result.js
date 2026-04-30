@@ -373,23 +373,6 @@ function loadPortraitSubpackage() {
   })
 }
 
-/**
- * 分包刚就绪时，直接用 /subpackages/... 作为 image src 在部分真机上首帧不渲染；
- * 通过 getImageInfo 拿到本地 path 再绑定，与海报导出逻辑一致。
- */
-async function portraitDisplaySrcForTypeId(tid) {
-  const fallbackPackSrc = personalityPortraitSrc(tid)
-  const candidates = personalityPortraitCandidates(tid)
-  await loadPortraitSubpackage()
-  const delays = [40, 80, 120, 160, 200]
-  for (let i = 0; i < delays.length; i++) {
-    const { path } = await firstImagePathAndSrc(candidates)
-    if (path) return path
-    await new Promise((r) => setTimeout(r, delays[i]))
-  }
-  return fallbackPackSrc
-}
-
 function createImageCompat(canvas) {
   if (canvas && typeof canvas.createImage === 'function') return canvas.createImage()
   if (typeof wx.createImage === 'function') return wx.createImage()
@@ -538,6 +521,7 @@ Page({
   loadResult() {
     const result = wx.getStorageSync(KEYS.PERSONALITY_RESULT)
     if (!result || !result.typeName) {
+      this._portraitShowGen = (this._portraitShowGen || 0) + 1
       this.setData({ hasResult: false, result: null, scoreList: [], shareImg: '', portraitSrc: '', quizMetaLine: '' })
       return
     }
@@ -550,15 +534,26 @@ Page({
     ]
     const tid = resultTypeId(result)
     const quizMetaLine = buildQuizMetaLine(result)
-    /** 先展示文案；肖像路径经 getImageInfo 本地化后再绑定，避免首进分包就绪后仍白图 */
+    const myGen = (this._portraitShowGen = (this._portraitShowGen || 0) + 1)
+    /**
+     * 页面展示不用 getImageInfo 的本地 path：临时路径再次进入可能失效，且多次 onShow 异步易互相覆盖。
+     * 分包就绪后用分包内 URL + ?v=代数 强制 image 重载；仅用代数守卫接纳最后一次 loadResult。
+     */
     this.setData(
       { hasResult: true, result, scoreList, shareImg: '', portraitSrc: '', quizMetaLine },
       () => {
-        portraitDisplaySrcForTypeId(tid).then((portraitSrc) => {
+        loadPortraitSubpackage().then(() => {
+          if (myGen !== this._portraitShowGen) return
           if (!this.data.hasResult || !this.data.result || resultTypeId(this.data.result) !== tid) return
-          this.setData({ portraitSrc }, () => {
-            setTimeout(() => this.renderShareCard(), 200)
-          })
+          const pack = personalityPortraitSrc(tid)
+          const portraitSrc = `${pack}?v=${myGen}`
+          setTimeout(() => {
+            if (myGen !== this._portraitShowGen) return
+            if (!this.data.hasResult || !this.data.result || resultTypeId(this.data.result) !== tid) return
+            this.setData({ portraitSrc }, () => {
+              setTimeout(() => this.renderShareCard(), 200)
+            })
+          }, 48)
         })
       }
     )
@@ -570,6 +565,17 @@ Page({
 
   retest() {
     wx.navigateTo({ url: '/pages/personality/quiz/quiz' })
+  },
+
+  /** query 形式在极少数环境下加载失败时，退回无参数分包路径 */
+  onPortraitImgError() {
+    const r = this.data.result
+    const src = this.data.portraitSrc
+    if (!r || !src) return
+    const plain = personalityPortraitSrc(resultTypeId(r))
+    const base = src.split('?')[0]
+    if (base !== plain || src === plain) return
+    this.setData({ portraitSrc: plain })
   },
 
   /** 分享用卡片：500×400 CSS 像素，导出 2x 更清晰 */

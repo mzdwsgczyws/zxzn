@@ -16,6 +16,7 @@
       class="portrait-img"
       src="{{portraitSrc}}"
       mode="aspectFill"
+      binderror="onPortraitImgError"
     />
   </view>
 
