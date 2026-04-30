@@ -373,27 +373,6 @@ function loadPortraitSubpackage() {
   })
 }
 
-/**
- * 人物图展示：冷启动时仅用分包 URL 易失败；优先多次 getImageInfo 取本地 path。
- * 仍保留 URL + ?v=代数 作兜底，并由 loadResult 的 _portraitShowGen 防止多次 onShow 交错覆盖。
- */
-function portraitSrcForImagePage(page, tid, myGen) {
-  const plain = personalityPortraitSrc(tid)
-  const candidates = personalityPortraitCandidates(tid)
-  const sleepsMs = [0, 90, 170, 260, 360]
-
-  return loadPortraitSubpackage().then(async () => {
-    for (let i = 0; i < sleepsMs.length; i++) {
-      if (myGen !== page._portraitShowGen) return ''
-      if (sleepsMs[i] > 0) await new Promise((r) => setTimeout(r, sleepsMs[i]))
-      const { path } = await firstImagePathAndSrc(candidates)
-      if (path) return path
-    }
-    if (myGen !== page._portraitShowGen) return ''
-    return `${plain}?v=${myGen}`
-  })
-}
-
 function createImageCompat(canvas) {
   if (canvas && typeof canvas.createImage === 'function') return canvas.createImage()
   if (typeof wx.createImage === 'function') return wx.createImage()
@@ -507,7 +486,7 @@ Page({
     result: null,
     scoreList: [],
     shareImg: '',
-    portraitSrc: '',
+    portraitImgBind: null,
     quizMetaLine: '',
     posterCanvasH: 2400
   },
@@ -543,7 +522,14 @@ Page({
     const result = wx.getStorageSync(KEYS.PERSONALITY_RESULT)
     if (!result || !result.typeName) {
       this._portraitShowGen = (this._portraitShowGen || 0) + 1
-      this.setData({ hasResult: false, result: null, scoreList: [], shareImg: '', portraitSrc: '', quizMetaLine: '' })
+      this.setData({
+        hasResult: false,
+        result: null,
+        scoreList: [],
+        shareImg: '',
+        portraitImgBind: null,
+        quizMetaLine: ''
+      })
       return
     }
     const s = result.scores || {}
@@ -556,16 +542,33 @@ Page({
     const tid = resultTypeId(result)
     const quizMetaLine = buildQuizMetaLine(result)
     const myGen = (this._portraitShowGen = (this._portraitShowGen || 0) + 1)
+    /**
+     * <image> 不要用 getImageInfo 的 path（部分基础库下可被 canvas 用、组件不能用）。
+     * 仅用分包内静态路径；延迟挂载避免分包刚回调立刻解码失败；_portraitShowGen 挡交错 onShow。
+     */
     this.setData(
-      { hasResult: true, result, scoreList, shareImg: '', portraitSrc: '', quizMetaLine },
+      {
+        hasResult: true,
+        result,
+        scoreList,
+        shareImg: '',
+        portraitImgBind: null,
+        quizMetaLine
+      },
       () => {
-        portraitSrcForImagePage(this, tid, myGen).then((portraitSrc) => {
+        loadPortraitSubpackage().then(() => {
           if (myGen !== this._portraitShowGen) return
           if (!this.data.hasResult || !this.data.result || resultTypeId(this.data.result) !== tid) return
-          const src = portraitSrc || personalityPortraitSrc(tid)
-          this.setData({ portraitSrc: src }, () => {
-            setTimeout(() => this.renderShareCard(), 200)
-          })
+          const plain = personalityPortraitSrc(tid)
+          const delayMs = 220
+          setTimeout(() => {
+            if (myGen !== this._portraitShowGen) return
+            if (!this.data.hasResult || !this.data.result || resultTypeId(this.data.result) !== tid) return
+            this.setData(
+              { portraitImgBind: { key: String(myGen), src: plain } },
+              () => setTimeout(() => this.renderShareCard(), 200)
+            )
+          }, delayMs)
         })
       }
     )
@@ -579,15 +582,28 @@ Page({
     wx.navigateTo({ url: '/pages/personality/quiz/quiz' })
   },
 
-  /** query 形式在极少数环境下加载失败时，退回无参数分包路径 */
+  /** jpg 失败时换 png；仍失败则重新拉分包后再挂一次 jpg */
   onPortraitImgError() {
+    const b = this.data.portraitImgBind
     const r = this.data.result
-    const src = this.data.portraitSrc
-    if (!r || !src) return
-    const plain = personalityPortraitSrc(resultTypeId(r))
-    const base = src.split('?')[0]
-    if (base !== plain || src === plain) return
-    this.setData({ portraitSrc: plain })
+    if (!b || !r || !b.src) return
+    const tid = resultTypeId(r)
+    const gen = this._portraitShowGen
+    const [jpg, png] = personalityPortraitCandidates(tid)
+
+    if (b.src === jpg) {
+      this.setData({ portraitImgBind: { key: `${gen}_png`, src: png } })
+      return
+    }
+    if (b.src === png) {
+      loadPortraitSubpackage().then(() => {
+        setTimeout(() => {
+          if (gen !== this._portraitShowGen) return
+          if (!this.data.result || resultTypeId(this.data.result) !== tid) return
+          this.setData({ portraitImgBind: { key: `${gen}_r`, src: jpg } })
+        }, 280)
+      })
+    }
   },
 
   /** 分享用卡片：500×400 CSS 像素，导出 2x 更清晰 */

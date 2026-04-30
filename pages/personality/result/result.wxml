@@ -11,13 +11,14 @@
   </view>
 
   <view class="portrait-block">
-    <image
-      wx:if="{{portraitSrc}}"
-      class="portrait-img"
-      src="{{portraitSrc}}"
-      mode="aspectFill"
-      binderror="onPortraitImgError"
-    />
+    <block wx:if="{{portraitImgBind}}">
+      <image
+        class="portrait-img"
+        src="{{portraitImgBind.src}}"
+        mode="aspectFill"
+        binderror="onPortraitImgError"
+      />
+    </block>
   </view>
 
   <view class="card main-card">
