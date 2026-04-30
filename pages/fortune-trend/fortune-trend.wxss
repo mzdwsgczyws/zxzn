@@ -1,0 +1,214 @@
+.page {
+  min-height: 100vh;
+  background: var(--dao-bg-page);
+  box-sizing: border-box;
+}
+
+.scroll {
+  height: 100vh;
+  box-sizing: border-box;
+}
+
+.card {
+  margin: 24rpx;
+  padding: 28rpx 24rpx;
+  background: var(--dao-bg-card);
+  border-radius: 20rpx;
+  border: 1rpx solid var(--dao-border-gold);
+  box-shadow: 0 8rpx 28rpx var(--dao-shadow-purple);
+  box-sizing: border-box;
+}
+
+.intro-p {
+  font-size: 24rpx;
+  line-height: 1.62;
+  color: var(--dao-ink-muted);
+}
+
+.chart-title {
+  display: block;
+  font-size: 28rpx;
+  font-weight: 600;
+  color: var(--dao-purple-deep);
+  margin-bottom: 16rpx;
+}
+
+.candle-canvas {
+  display: block;
+  width: 100%;
+  margin: 0 auto;
+  border-radius: 12rpx;
+  background: #faf7f0;
+}
+
+.legend {
+  margin-top: 16rpx;
+}
+
+.legend-line {
+  font-size: 20rpx;
+  line-height: 1.55;
+  color: var(--dao-ink-caption);
+}
+
+.section-h {
+  display: block;
+  font-size: 30rpx;
+  font-weight: 600;
+  color: var(--dao-purple-mid);
+  margin-bottom: 8rpx;
+}
+
+.section-tip {
+  display: block;
+  font-size: 22rpx;
+  color: var(--dao-ink-faint);
+  margin-bottom: 20rpx;
+}
+
+.empty-box {
+  padding: 48rpx 0;
+  text-align: center;
+}
+
+.empty-t {
+  font-size: 26rpx;
+  color: var(--dao-ink-muted);
+}
+
+.day-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: 22rpx 16rpx;
+  margin: 0 -8rpx;
+  border-radius: 14rpx;
+  border-bottom: 1rpx solid rgba(109, 93, 74, 0.12);
+}
+
+.day-row-hover {
+  background: rgba(212, 175, 55, 0.08);
+}
+
+.day-left {
+  flex: 1;
+  min-width: 0;
+  padding-right: 16rpx;
+}
+
+.day-date {
+  display: block;
+  font-size: 22rpx;
+  color: var(--dao-ink-faint);
+  margin-bottom: 6rpx;
+}
+
+.day-title {
+  display: block;
+  font-size: 26rpx;
+  font-weight: 500;
+  color: var(--dao-ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.day-tier {
+  flex-shrink: 0;
+  font-size: 28rpx;
+  font-weight: 700;
+}
+
+.fine-print {
+  display: block;
+  text-align: center;
+  font-size: 20rpx;
+  color: var(--dao-ink-caption);
+  padding: 16rpx 32rpx 32rpx;
+}
+
+.scroll-pad {
+  height: 48rpx;
+}
+
+.detail-mask {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 2000;
+  background: rgba(26, 35, 126, 0.38);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.detail-sheet {
+  width: 100%;
+  max-height: 78vh;
+  background: var(--dao-bg-card);
+  border-radius: 24rpx 24rpx 0 0;
+  padding: 28rpx 24rpx calc(24rpx + env(safe-area-inset-bottom));
+  box-sizing: border-box;
+  border-top: 2rpx solid rgba(212, 175, 55, 0.35);
+}
+
+.detail-head {
+  margin-bottom: 16rpx;
+}
+
+.detail-date {
+  display: block;
+  font-size: 24rpx;
+  color: var(--dao-ink-muted);
+  margin-bottom: 8rpx;
+}
+
+.detail-tier {
+  display: block;
+  font-size: 28rpx;
+  font-weight: 600;
+  margin-bottom: 6rpx;
+}
+
+.detail-name {
+  display: block;
+  font-size: 24rpx;
+  color: var(--dao-ink-body);
+}
+
+.detail-body {
+  max-height: 42vh;
+  margin-bottom: 20rpx;
+}
+
+.detail-poem {
+  display: block;
+  font-size: 26rpx;
+  line-height: 1.65;
+  color: var(--dao-ink);
+  margin-bottom: 20rpx;
+  white-space: pre-wrap;
+}
+
+.detail-label {
+  display: block;
+  font-size: 24rpx;
+  font-weight: 600;
+  color: var(--dao-purple-mid);
+  margin-bottom: 8rpx;
+}
+
+.detail-interpret {
+  display: block;
+  font-size: 26rpx;
+  line-height: 1.62;
+  color: var(--dao-ink-body);
+  white-space: pre-wrap;
+}
+
+.detail-close {
+  width: 100%;
+}

@@ -151,9 +151,16 @@
       </view>
     </scroll-view>
 
-    <view class="hall-strip" style="height: {{hallStripH}}px; bottom: {{bottomBarH}}px;">
+    <view class="hall-strip hall-strip--triple" style="height: {{hallStripH}}px; bottom: {{bottomBarH}}px;">
       <view class="hall-fade"></view>
       <view class="hall-btns">
+        <view class="hall-col" hover-class="hall-col-hover" bindtap="goFortuneTrend">
+          <view class="hall-circle hall-c0">
+            <text class="hall-circle-icon">势</text>
+            <text class="hall-circle-t">运势趋势</text>
+          </view>
+          <text class="hall-meta">{{hallTrendDays}}天</text>
+        </view>
         <view class="hall-col" hover-class="hall-col-hover" bindtap="goLotHall">
           <view class="hall-circle hall-c1">
             <text class="hall-circle-icon">箴</text>
@@ -169,7 +176,7 @@
           <text class="hall-meta">{{hallAchUnlocked}}/{{hallAchTotal}}</text>
         </view>
       </view>
-      <text class="hall-whisper">首次收录入库 · 成就长按趣评</text>
+      <text class="hall-whisper">运势走势示意 · 长按可看释义 · 展馆首次收录</text>
     </view>
 
     <view class="bottom-dock" style="height: {{bottomBarH}}px;">

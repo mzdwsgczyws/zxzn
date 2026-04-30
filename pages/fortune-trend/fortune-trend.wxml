@@ -1,0 +1,61 @@
+<view class="page">
+  <scroll-view scroll-y="{{true}}" class="scroll" enhanced="{{true}}">
+    <view class="card intro">
+      <text class="intro-p">以下为「按自然日」汇总的抽签记录：同一日多次抽取取最后一次。下方 K 线仅按等第映射为涨跌形态示意，仅供阅读趣味，并非证券走势。</text>
+    </view>
+
+    <view class="chart-card card">
+      <text class="chart-title">运势走势（示意 K 线）</text>
+      <canvas
+        canvas-id="fortuneCandleCanvas"
+        class="candle-canvas"
+        style="width: {{chartW}}px; height: {{chartH}}px;"
+        disable-scroll="{{true}}"
+      ></canvas>
+      <view class="legend">
+        <text class="legend-line">上上→大阳线 · 上→阳线 · 中→十字星 · 下→阴线 · 下下→大阴线（配色按常见行情习惯示意）</text>
+      </view>
+    </view>
+
+    <view class="card">
+      <text class="section-h">按日签文</text>
+      <text class="section-tip">长按一行展开当日卦条与释义</text>
+      <view class="empty-box" wx:if="{{empty}}">
+        <text class="empty-t">暂无记录</text>
+      </view>
+      <block wx:for="{{rows}}" wx:key="dateStr">
+        <view
+          class="day-row"
+          hover-class="day-row-hover"
+          bindlongpress="onRowLongPress"
+          data-idx="{{index}}"
+        >
+          <view class="day-left">
+            <text class="day-date">{{item.dateStr}}</text>
+            <text class="day-title">{{item.title}}</text>
+          </view>
+          <text class="day-tier" style="color: {{item.tierColor}};">{{item.tierLabel}}</text>
+        </view>
+      </block>
+    </view>
+
+    <text class="fine-print">仅供文化自察与行动参考。</text>
+    <view class="scroll-pad"></view>
+  </scroll-view>
+
+  <view class="detail-mask" wx:if="{{detailVisible}}" catchtap="closeDetail">
+    <view class="detail-sheet" catchtap="noop">
+      <view class="detail-head">
+        <text class="detail-date">{{detail.dateStr}}</text>
+        <text class="detail-tier" style="color: {{detail.tierColor}};">{{detail.tierLabel}} · {{detail.title}}</text>
+        <text class="detail-name">{{detail.name}}</text>
+      </view>
+      <scroll-view scroll-y="{{true}}" class="detail-body">
+        <text class="detail-poem">{{detail.poem}}</text>
+        <text class="detail-label">释义</text>
+        <text class="detail-interpret">{{detail.interpret}}</text>
+      </scroll-view>
+      <button class="detail-close btn-primary" bindtap="closeDetail">关闭</button>
+    </view>
+  </view>
+</view>

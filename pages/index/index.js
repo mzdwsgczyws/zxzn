@@ -1,7 +1,7 @@
 const KEYS = require('../../utils/storage-keys.js')
 const core = require('../../utils/lottery-core.js')
 const { isLotteryProfileComplete } = require('../../utils/profile-lottery.js')
-const { getFirstUnlockListSorted, computeAchievements } = require('../../utils/lottery-history.js')
+const { getFirstUnlockListSorted, computeAchievements, getDailyTrendSeries } = require('../../utils/lottery-history.js')
 const pageAnalytics = require('../../behaviors/page-analytics.js')
 const { recordShare } = require('../../utils/usage-analytics.js')
 const checkin = require('../../utils/checkin.js')
@@ -19,6 +19,7 @@ Page({
     hallLotN: 0,
     hallAchUnlocked: 0,
     hallAchTotal: 0,
+    hallTrendDays: 0,
     theoryBannerEligible: false,
     checkinStreak: 0,
     checkinTotalDays: 0,
@@ -35,7 +36,7 @@ Page({
     const navTotal = sb + navContentPx
     // 底栏（主页 + 三入口）：在约 1/7 屏高基础上再缩小 1/3（≈2/21 屏）；主区留给心象箴言滚动
     const bottomPx = Math.max(68, Math.floor((win.windowHeight / 7) * (2 / 3)))
-    const hallStripPx = Math.max(72, Math.floor(132 * rpx2px))
+    const hallStripPx = Math.max(78, Math.floor(148 * rpx2px))
     const mainH = Math.max(200, win.windowHeight - navTotal - bottomPx - hallStripPx)
     this.setData({
       statusBarH: sb,
@@ -53,10 +54,15 @@ Page({
     try {
       const n = getFirstUnlockListSorted().length
       const { unlockedCount, total } = computeAchievements()
+      let trendDays = 0
+      try {
+        trendDays = getDailyTrendSeries().length
+      } catch (e2) {}
       this.setData({
         hallLotN: n,
         hallAchUnlocked: unlockedCount,
-        hallAchTotal: total
+        hallAchTotal: total,
+        hallTrendDays: trendDays
       })
     } catch (e) {}
   },
@@ -198,6 +204,10 @@ Page({
 
   goProfile() {
     wx.navigateTo({ url: '/pages/profile/profile' })
+  },
+
+  goFortuneTrend() {
+    wx.navigateTo({ url: '/pages/fortune-trend/fortune-trend' })
   },
 
   goLotHall() {

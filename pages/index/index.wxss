@@ -1123,6 +1123,40 @@
   pointer-events: auto;
 }
 
+.hall-strip--triple .hall-btns {
+  gap: 26rpx;
+}
+
+.hall-strip--triple .hall-circle {
+  width: 106rpx;
+  height: 106rpx;
+}
+
+.hall-strip--triple .hall-circle-icon {
+  font-size: 30rpx;
+}
+
+.hall-strip--triple .hall-circle-t {
+  font-size: 18rpx;
+}
+
+.hall-strip--triple .hall-meta {
+  font-size: 20rpx;
+}
+
+.hall-c0 {
+  background: linear-gradient(155deg, #9fa8da 0%, #5c6bc0 45%, #3949ab 100%);
+  border-color: rgba(232, 212, 168, 0.55);
+}
+
+.hall-c0 .hall-circle-icon {
+  color: rgba(255, 252, 245, 0.96);
+}
+
+.hall-c0 .hall-circle-t {
+  color: #e8eaf6;
+}
+
 .hall-col {
   display: flex;
   flex-direction: column;

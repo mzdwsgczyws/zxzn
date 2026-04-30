@@ -99,6 +99,10 @@ Page({
     focusTagsSelected: []
   },
 
+  goFortuneTrend() {
+    wx.navigateTo({ url: '/pages/fortune-trend/fortune-trend' })
+  },
+
   goLotHall() {
     wx.navigateTo({ url: '/pages/lot-hall/lot-hall' })
   },

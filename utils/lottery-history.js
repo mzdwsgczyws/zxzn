@@ -383,10 +383,36 @@ function computeAchievements() {
   return { list, unlockedCount, total: list.length }
 }
 
+function getDailyTrendSeries() {
+  const raw = loadHistoryRaw()
+  const draws = [...raw.draws].sort((a, b) => a.ts - b.ts)
+  if (!draws.length) return []
+  const byDay = {}
+  draws.forEach((d) => {
+    const day = d.dateStr
+    if (!day) return
+    if (!byDay[day]) byDay[day] = []
+    byDay[day].push(d)
+  })
+  const days = Object.keys(byDay).sort((a, b) => parseDayTime(a) - parseDayTime(b))
+  return days.map((dateStr) => {
+    const arr = byDay[dateStr].slice().sort((a, b) => b.ts - a.ts)
+    const last = arr[0]
+    return {
+      dateStr,
+      ts: last.ts,
+      lotId: last.lotId | 0,
+      tier: String(last.tier || '中'),
+      title: String(last.title || '')
+    }
+  })
+}
+
 module.exports = {
   loadHistoryRaw,
   appendLotteryDraw,
   getFirstUnlockListSorted,
   formatDateTime,
-  computeAchievements
+  computeAchievements,
+  getDailyTrendSeries
 }

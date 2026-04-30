@@ -1,6 +1,7 @@
 {
   "pages": [
     "pages/index/index",
+    "pages/fortune-trend/fortune-trend",
     "pages/lot-hall/lot-hall",
     "pages/achieve-hall/achieve-hall",
     "pages/personality/quiz/quiz",
