@@ -373,6 +373,23 @@ function loadPortraitSubpackage() {
   })
 }
 
+/**
+ * 分包刚就绪时，直接用 /subpackages/... 作为 image src 在部分真机上首帧不渲染；
+ * 通过 getImageInfo 拿到本地 path 再绑定，与海报导出逻辑一致。
+ */
+async function portraitDisplaySrcForTypeId(tid) {
+  const fallbackPackSrc = personalityPortraitSrc(tid)
+  const candidates = personalityPortraitCandidates(tid)
+  await loadPortraitSubpackage()
+  const delays = [40, 80, 120, 160, 200]
+  for (let i = 0; i < delays.length; i++) {
+    const { path } = await firstImagePathAndSrc(candidates)
+    if (path) return path
+    await new Promise((r) => setTimeout(r, delays[i]))
+  }
+  return fallbackPackSrc
+}
+
 function createImageCompat(canvas) {
   if (canvas && typeof canvas.createImage === 'function') return canvas.createImage()
   if (typeof wx.createImage === 'function') return wx.createImage()
@@ -532,13 +549,13 @@ Page({
       { k: '显', v: s['显'] || 0 }
     ]
     const tid = resultTypeId(result)
-    const portraitSrc = personalityPortraitSrc(tid)
     const quizMetaLine = buildQuizMetaLine(result)
-    /** 分包内 jpg 首次可能未就绪，先展示文案，分包拉完再赋 portraitSrc，避免首进白图 */
+    /** 先展示文案；肖像路径经 getImageInfo 本地化后再绑定，避免首进分包就绪后仍白图 */
     this.setData(
       { hasResult: true, result, scoreList, shareImg: '', portraitSrc: '', quizMetaLine },
       () => {
-        loadPortraitSubpackage().then(() => {
+        portraitDisplaySrcForTypeId(tid).then((portraitSrc) => {
+          if (!this.data.hasResult || !this.data.result || resultTypeId(this.data.result) !== tid) return
           this.setData({ portraitSrc }, () => {
             setTimeout(() => this.renderShareCard(), 200)
           })
