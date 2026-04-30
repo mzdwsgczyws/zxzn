@@ -21,7 +21,7 @@
         </view>
       </view>
 
-      <view class="checkin-strip" wx:if="{{phase === 'idle' || phase === 'result'}}">
+      <view class="checkin-strip" wx:if="{{phase === 'idle' || phase === 'result' || phase === 'thinking'}}">
         <view class="checkin-left">
           <text class="checkin-streak">已连续 {{checkinStreak}} 天</text>
           <text class="checkin-sub">累计 {{checkinTotalDays}} 天 · {{checkinCheckedToday ? '今日已记' : '点右侧完成今日一记'}}</text>
@@ -81,6 +81,21 @@
         </view>
         <text class="shake-tip">{{shakeHint}}</text>
         <text class="sim-tip" wx:if="{{phase === 'shake'}}" bindtap="simShake">模拟器无感应？点此完成生成</text>
+      </view>
+
+      <!-- 运算思考：展示纳入种子的上下文后再进入箴言卡片 -->
+      <view class="lot-panel lot-thinking" wx:if="{{phase === 'thinking'}}">
+        <text class="thinking-kicker">运算脉络</text>
+        <text class="thinking-title">今日箴言并非随手抽取</text>
+        <text class="thinking-sub">下列字段按固定规则汇合为当日指纹，映射六十四卦之一；同一自然日、同一档案与环境上下文下结果稳定。</text>
+        <view class="thinking-card">
+          <view class="thinking-row" wx:for="{{thinkingRows}}" wx:for-item="row" wx:key="label">
+            <text class="thinking-label">{{row.label}}</text>
+            <text class="thinking-value">{{row.value}}</text>
+          </view>
+        </view>
+        <text class="thinking-foot">{{thinkingFootnote}}</text>
+        <button class="thinking-btn" bindtap="tapConfirmThinking">已阅 · 查看箴言</button>
       </view>
 
       <!-- 已生成 -->

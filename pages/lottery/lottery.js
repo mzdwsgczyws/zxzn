@@ -83,5 +83,9 @@ Page({
 
   simShake() {
     core.simShake(this)
+  },
+
+  tapConfirmThinking() {
+    core.confirmThinkingToResult(this)
   }
 })

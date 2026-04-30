@@ -15,6 +15,7 @@ const { fetchWeather } = require('./weather.js')
 const { computeLotteryAdvices } = require('./lottery-advice.js')
 const { drawLotArtWx } = require('./lot-art.js')
 const { applyLotStylePref } = require('./lot-display.js')
+const { buildLotteryThinkingView } = require('./lottery-thinking.js')
 
 /** 每次生成当日签 +1，用于作废延迟 setData 与跨页清缓存 */
 let gLotDrawVer = 0
@@ -54,6 +55,8 @@ function lotteryDataDefaults() {
     revealed: false,
     tierColor: '#1565c0',
     adviceList: [],
+    thinkingRows: [],
+    thinkingFootnote: '',
     lotArtW: w,
     lotArtH: h
   }
@@ -76,7 +79,9 @@ function restoreToday(page, options) {
         lot,
         revealed: !!cache.revealed,
         tierColor: TIER_COLORS[lot.tier] || '#1565c0',
-        adviceList: cache.adviceList || []
+        adviceList: cache.adviceList || [],
+        thinkingRows: [],
+        thinkingFootnote: ''
       },
       () => {
         if (cache.revealed) {
@@ -96,7 +101,9 @@ function restoreToday(page, options) {
       shakeHint: '摇动手机数次…',
       lot: null,
       revealed: false,
-      adviceList: []
+      adviceList: [],
+      thinkingRows: [],
+      thinkingFootnote: ''
     },
     () => {
       clearLotCanvas(page)
@@ -240,19 +247,29 @@ function finalizeDraw(page, lat, lng, weather) {
   })
   recordBiz('lot_draw', String(meta.lotId))
 
+  const thinking = buildLotteryThinkingView(meta, profile, hasPersonality, pers, lat, lng)
+
   setTimeout(() => {
     const cache = wx.getStorageSync(KEYS.LOTTERY_TODAY) || {}
     if (!cache.lotId || cache._drawVer !== drawVer) return
     if (cache.lotId !== meta.lotId || cache.dateStr !== meta.dateStr) return
     page.setData({
-      phase: 'result',
+      phase: 'thinking',
       shaking: false,
+      thinkingRows: thinking.rows,
+      thinkingFootnote: thinking.footnote,
       lot,
       revealed: false,
       tierColor: TIER_COLORS[lot.tier] || '#1565c0',
       adviceList
     })
   }, 900)
+}
+
+/** 思考模式结束后进入箴言揭晓卡片（lot 已在数据中，仍保持 revealed=false） */
+function confirmThinkingToResult(page) {
+  if (!page || page.data.phase !== 'thinking') return
+  page.setData({ phase: 'result' })
 }
 
 function reveal(page) {
@@ -346,6 +363,7 @@ module.exports = {
   stopAccel,
   drawLot,
   finalizeDraw,
+  confirmThinkingToResult,
   reveal,
   renderLotArt,
   paintLotToCanvas,

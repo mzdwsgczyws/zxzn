@@ -163,6 +163,10 @@ Page({
     core.reveal(this)
   },
 
+  tapConfirmThinking() {
+    core.confirmThinkingToResult(this)
+  },
+
   simShake() {
     core.simShake(this)
   },

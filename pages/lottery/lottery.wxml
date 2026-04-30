@@ -34,6 +34,20 @@
     <text class="sim-tip" wx:if="{{phase === 'shake'}}" bindtap="simShake">模拟器无感应？点此模拟摇动</text>
   </view>
 
+  <view class="card thinking-card-page" wx:if="{{phase === 'thinking'}}">
+    <text class="thinking-kicker">运算脉络</text>
+    <text class="thinking-title">今日箴言并非随手抽取</text>
+    <text class="thinking-sub">下列字段按固定规则汇合为当日指纹，映射六十四卦之一；同一自然日、同一档案与环境上下文下结果稳定。</text>
+    <view class="thinking-rows-wrap">
+      <view class="thinking-row" wx:for="{{thinkingRows}}" wx:for-item="row" wx:key="label">
+        <text class="thinking-label">{{row.label}}</text>
+        <text class="thinking-value">{{row.value}}</text>
+      </view>
+    </view>
+    <text class="thinking-foot">{{thinkingFootnote}}</text>
+    <button class="btn-primary thinking-btn-page" bindtap="tapConfirmThinking">已阅 · 查看箴言</button>
+  </view>
+
   <view class="card result-card" wx:if="{{phase === 'result'}}">
     <text class="tier" style="color: {{tierColor}};">{{lot.tierLabel}}</text>
     <text class="lot-name" wx:if="{{revealed}}">{{lot.name}}</text>
