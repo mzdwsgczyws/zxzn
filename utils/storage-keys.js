@@ -16,6 +16,8 @@ module.exports = {
   LOTTERY_TODAY: 'lotteryToday_v2',
   /** 每次成功抽取后追加一条，供展馆与成就统计 */
   LOTTERY_HISTORY: 'lotteryHistory_v1',
+  /** 上一轮心象建议纯文本列表，用于降低与下次抽签重复感（仅存本机） */
+  LOTTERY_ADVICE_RECENT: 'lotteryAdviceRecent_v1',
   USER_PROFILE: 'userProfile_v2',
   /** 本地使用统计（短键 JSON），见 utils/usage-analytics.js */
   USAGE_STATS: 'usageStats_v1',

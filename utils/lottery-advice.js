@@ -278,7 +278,24 @@ function collectCandidates(ctx) {
   return out
 }
 
-function uniquePick(list, rnd, need) {
+function normalizeAvoidTexts(avoidAdviceTexts) {
+  if (!avoidAdviceTexts) return new Set()
+  if (avoidAdviceTexts instanceof Set) return avoidAdviceTexts
+  const arr = Array.isArray(avoidAdviceTexts) ? avoidAdviceTexts : []
+  const s = new Set()
+  arr.forEach((x) => {
+    const t = String(x || '').trim()
+    if (t) s.add(t)
+  })
+  return s
+}
+
+/**
+ * 贪心选取：优先不与上一条同 cat、优先避开上一轮抽签出现过的正文；
+ * 候选不足时逐级放宽，保证尽量凑满 need。
+ */
+function uniquePick(list, rnd, need, avoidAdviceTexts) {
+  const avoid = normalizeAvoidTexts(avoidAdviceTexts)
   const seen = new Set()
   const res = []
   const shuffled = list.slice()
@@ -288,13 +305,26 @@ function uniquePick(list, rnd, need) {
     shuffled[i] = shuffled[j]
     shuffled[j] = t
   }
-  for (let k = 0; k < shuffled.length && res.length < need; k++) {
-    const item = shuffled[k]
-    const key = item.text
-    if (!seen.has(key)) {
-      seen.add(key)
-      res.push(item)
+
+  while (res.length < need) {
+    const lastCat = res.length ? res[res.length - 1].cat : null
+    const candidates = shuffled.filter((it) => !seen.has(it.text))
+    if (!candidates.length) break
+
+    const tierA = candidates.filter((it) => (!lastCat || it.cat !== lastCat) && !avoid.has(it.text))
+    const tierB = candidates.filter((it) => !lastCat || it.cat !== lastCat)
+    const tierC = candidates.filter((it) => !avoid.has(it.text))
+    const pools = [tierA, tierB, tierC, candidates]
+    let pool = null
+    for (let p = 0; p < pools.length; p++) {
+      if (pools[p].length) {
+        pool = pools[p]
+        break
+      }
     }
+    const pick = pool[Math.floor(rnd() * pool.length)]
+    seen.add(pick.text)
+    res.push(pick)
   }
   return res
 }
@@ -318,7 +348,8 @@ function computeLotteryAdvices(input) {
     recentState,
     rhythmType,
     focusTags,
-    profile
+    profile,
+    avoidAdviceTexts
   } = input
 
   const wf = weatherFlags(weather)
@@ -363,7 +394,7 @@ function computeLotteryAdvices(input) {
   }
   const pool = collectCandidates(ctx)
   const need = 8
-  const picked = uniquePick(pool, rnd, need)
+  const picked = uniquePick(pool, rnd, need, avoidAdviceTexts)
   const lines = picked.map((p, i) => `${i + 1}. ${p.text}`)
   return lines.length >= 5
     ? lines

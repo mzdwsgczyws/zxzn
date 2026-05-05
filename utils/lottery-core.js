@@ -18,6 +18,13 @@ const { applyLotStylePref } = require('./lot-display.js')
 const { buildLotteryThinkingBrief } = require('./lottery-thinking.js')
 const sensory = require('./lottery-shake-sensory.js')
 
+/** 与 lottery-advice 编号列表对应，去掉前序号便于跨次去重 */
+function stripAdvicePlainLine(line) {
+  return String(line || '')
+    .replace(/^\s*\d+\.\s*/, '')
+    .trim()
+}
+
 /** 思考模式类目逐项显现间隔（毫秒，整体偏慢便于阅读） */
 const THINKING_REVEAL_INITIAL_MS = 480
 const THINKING_REVEAL_STEP_MS = 720
@@ -286,6 +293,13 @@ function finalizeDraw(page, lat, lng, weather) {
   const rawLot = getLotById(meta.lotId)
   const stylePref = profile.lotStylePref || 'rich'
   const lot = applyLotStylePref(rawLot, stylePref)
+
+  let avoidAdviceTexts = []
+  try {
+    const prev = wx.getStorageSync(KEYS.LOTTERY_ADVICE_RECENT) || {}
+    avoidAdviceTexts = Array.isArray(prev.texts) ? prev.texts : []
+  } catch (e) {}
+
   const adviceList = computeLotteryAdvices({
     dateStr: meta.dateStr,
     lotId: meta.lotId,
@@ -301,8 +315,14 @@ function finalizeDraw(page, lat, lng, weather) {
     typeId: hasPersonality && pers.typeId != null ? pers.typeId : null,
     recentState: profile.recentState,
     rhythmType: profile.rhythmType,
-    focusTags: profile.focusTags
+    focusTags: profile.focusTags,
+    avoidAdviceTexts
   })
+
+  try {
+    const texts = adviceList.map(stripAdvicePlainLine).filter(Boolean)
+    wx.setStorageSync(KEYS.LOTTERY_ADVICE_RECENT, { texts, ts: now.getTime() })
+  } catch (e) {}
 
   const drawVer = ++gLotDrawVer
   const payload = {
