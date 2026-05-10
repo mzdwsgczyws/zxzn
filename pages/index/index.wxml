@@ -85,7 +85,7 @@
 
       <!-- 运算思考：展示纳入种子的上下文后再进入箴言卡片 -->
       <view class="lot-panel lot-thinking" wx:if="{{phase === 'thinking'}}">
-        <text class="thinking-hint">正在根据以下信息，参照周易八卦与紫微斗数意象演算中…</text>
+        <text class="thinking-hint">正在结合您已填写的档案与当日情境，整理纳入本轮箴言上下文的若干门类…</text>
         <text class="thinking-sub">下列为当日纳入运算的数据门类（不显细节）。完成后将自动进入箴言卡片。</text>
         <view class="thinking-cat-list">
           <view
@@ -156,8 +156,8 @@
       <view class="hall-btns">
         <view class="hall-col" hover-class="hall-col-hover" bindtap="goFortuneTrend">
           <view class="hall-circle hall-c0">
-            <text class="hall-circle-icon">势</text>
-            <text class="hall-circle-t">运势趋势</text>
+            <text class="hall-circle-icon">历</text>
+            <text class="hall-circle-t">心象日历</text>
           </view>
           <text class="hall-meta">{{hallTrendDays}}天</text>
         </view>
@@ -176,7 +176,7 @@
           <text class="hall-meta">{{hallAchUnlocked}}/{{hallAchTotal}}</text>
         </view>
       </view>
-      <text class="hall-whisper">运势走势示意 · 长按可看释义 · 展馆首次收录</text>
+      <text class="hall-whisper">按日记录示意 · 长按可看诗文与释义 · 展馆首次收录</text>
     </view>
 
     <view class="bottom-dock" style="height: {{bottomBarH}}px;">

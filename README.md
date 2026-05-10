@@ -1,6 +1,6 @@
 # 量化自修正念 · 微信小程序
 
-面向「自我观察与文化参考」的工具型小程序：**今日心象箴言**（含配图与建议）、**道性十六型**情景测验、**量化自修记录**与轻量分析、**个人档案**（箴言上下文）；首页提供 **运势走势**（按日示意 K 线）、**心象展馆**（每卦首次收录时间）与 **成就展馆**（心象成就与长按趣评）。数据默认**仅存本机**（`wx.setStorage`），未接自有后端业务库。
+面向「自我观察与文化参考」的工具型小程序：**今日心象箴言**（含配图与建议）、**道性十六型**情景测验、**量化自修记录**与轻量分析、**个人档案**（箴言上下文）；首页提供 **心象日历**（按日抽签记录的月历与层级示意图，仅供自察）、**心象展馆**（每卦首次收录时间）与 **成就展馆**（心象成就与长按趣评）。数据默认**仅存本机**（`wx.setStorage`），未接自有后端业务库。
 
 > **重要声明**：所有箴言与人格描述与建议均**仅供文化学习与自我观察**，不构成医疗、心理咨询或命运断言；持续情绪与睡眠困扰请寻求专业帮助。
 
@@ -12,7 +12,7 @@
 | **自察分型** | 道性测验 → 十六型结果与自修提示；可重做，以最后一次为准。 |
 | **量化记录** | 自修页填睡眠、情绪、恢复/耗竭、五行相关代理项等 → 保存；**五行雷达图** + 分轴卡片；**刷新分析**得带理由的排序建议（综合道性/档案/自选重点，非诊断）。 |
 | **档案与上下文** | 个人档案补齐箴言上下文项后，抽取时少打扰、建议与释义更贴情境。 |
-| **展馆与走势** | **运势走势**：按自然日末抽汇总的示意 K 线 + 月历；**心象展馆**：「首获」图鉴；**成就展馆**：趣味解锁条件（按日历日统计抽签），长按看评语。 |
+| **展馆与日历** | **心象日历**：按自然日展示抽签记录（末次）+ 层级示意图（历史可视化，非前瞻推断）；**心象展馆**：「首获」图鉴；**成就展馆**：趣味解锁条件（按日历日统计抽签），长按看评语。 |
 | **每日打卡** | 首页在「心象」idle/result 时展示连续/累计打卡与「今日打卡」；数据仅存本机，见 `utils/checkin.js` 与 `docs/check-in-system-brief.md`。 |
 
 ### 近期补充与修复（与代码同步 · 2026-05）
@@ -22,11 +22,11 @@
   - **连续档（连中三元 / 逆风三连等）**：按**自然日**，每日取**最后一次**抽签等第参与连续判定。
   - **同签重复成就**：按同一 `lotId` 出现在**不同日期**的天数计。
   - 成就文案见 **`ACHIEVEMENT_DEFS`**；计算入口 **`buildAchievementState`**、`computeAchievements`。
-- **运势走势（示意 K 线）**（`pages/fortune-trend/` + `utils/fortune-trend-candles.js`）
-  - 蜡烛衔接：**当日开盘价 = 上一交易日收盘价**（`chainedOHLCFromTier`）。
-  - **Y 轴自适应**：按当期可见区间 `min(low)`～`max(high)` 加留白绘制。
+- **心象日历 / 按日示意图**（`pages/fortune-trend/` + `utils/fortune-trend-candles.js`）
+  - 柱状示意衔接：**当日示意起点衔接上一日示意终点**（`chainedOHLCFromTier`，仅为图形连贯）。
+  - **Y 轴自适应**：按当期可见区间加留白绘制。
 - **首页签图（Canvas）**
-  - 首页 `scroll-view` **关闭 `enhanced`**（`pages/index/index.wxml`），避免 **iOS 上原生 `canvas-id` 错位到视口左上角**；运势趋势页同类处理（`pages/fortune-trend/fortune-trend.wxml`）。
+  - 首页 `scroll-view` **关闭 `enhanced`**（`pages/index/index.wxml`），避免 **iOS 上原生 `canvas-id` 错位到视口左上角**；心象日历页同类处理（`pages/fortune-trend/fortune-trend.wxml`）。
 - **道性测验结果 · 人物肖像**（`pages/personality/result/`）
   - `<image>` **仅用分包静态路径**，禁止把 `wx.getImageInfo` 返回的本地 path 绑给 `<image>`（部分基础库下仅 canvas 可用）。
   - **`portraitImgBind`**：`loadPortraitSubpackage` 成功后延迟再挂载；**`_portraitShowGen`** 防止多次 `onShow` 异步交错。
@@ -60,7 +60,7 @@ wx_program/
 ├── app.js / app.json / app.wxss
 ├── pages/
 │   ├── index/           # 心象主流程 + 展馆入口（scroll-view 勿开 enhanced，配合 Canvas）
-│   ├── fortune-trend/   # 运势走势：月历 + 示意 K 线
+│   ├── fortune-trend/   # 心象日历：月历 + 按日层级示意图（历史记录可视化）
 │   ├── lot-hall/
 │   ├── achieve-hall/
 │   ├── personality/     # quiz / result
@@ -87,9 +87,9 @@ wx_program/
 |------|-----------|------|
 | **首页心象** | `pages/index/index.*` | 调用 `lottery-core`；`scroll-view` 勿启用 **enhanced**（iOS 签图画布错位）。 |
 | **签图 Canvas** | `utils/lottery-core.js` · `lot-art.js` | `canvas-id`；`renderLotArt` / `paintLotToCanvas`。 |
-| **历史 / 成就 / 运势序列** | `utils/lottery-history.js` | `appendLotteryDraw`、`getDailyTrendSeries`、`buildAchievementState`、`ACHIEVEMENT_DEFS`。 |
+| **历史 / 成就 / 按日序列** | `utils/lottery-history.js` | `appendLotteryDraw`、`getDailyTrendSeries`、`buildAchievementState`、`ACHIEVEMENT_DEFS`。 |
 | **建议列表** | `utils/lottery-advice.js` · `lottery-advice-corpus.js` | `computeLotteryAdvices`；避让上一轮见 **`LOTTERY_ADVICE_RECENT`**。 |
-| **运势 K 线** | `utils/fortune-trend-candles.js` | 开盘衔接、Y 轴缩放、刻度。 |
+| **按日示意图绘制** | `utils/fortune-trend-candles.js` | 层级示意衔接、Y 轴缩放、刻度。 |
 | **道性结果 / 人像** | `pages/personality/result/result.js` · `result.wxml` | `portraitImgBind`、海报导出、`_portraitShowGen`。 |
 | **分包肖像** | `subpackages/portrait-assets/` · `app.json` | 路径与 `personalityPortraitSrc` 一致。 |
 | **摇动反馈** | `lottery-core.js` · `lottery-shake-sensory.js` | 首页 / lottery 卸载时 teardown。 |
@@ -149,7 +149,7 @@ wx_program/
 - **展馆 / 成就**
   - 历史：**`lotteryHistory_v1`**。
   - **成就**：自然日去重、末抽等第、重复签按不同日期计数；改规则编辑 **`lottery-history.js`**。
-  - **运势走势**：`getDailyTrendSeries`，同日多次取**最后一次**。
+  - **心象日历数据**：`getDailyTrendSeries`，同日多次取**最后一次**。
 
 ---
 
@@ -198,7 +198,7 @@ wx_program/
 
 ### 8.1 近期主题（2026-05）
 
-成就自然日与末抽口径、运势 K 线衔接与 Y 轴、iOS Canvas + enhanced 规避、道性人像 `portraitImgBind`、建议避让上一轮、`LOTTERY_ADVICE_RECENT`、抽签叠影修复等。
+成就自然日与末抽口径、按日层级示意图衔接与 Y 轴、iOS Canvas + enhanced 规避、道性人像 `portraitImgBind`、建议避让上一轮、`LOTTERY_ADVICE_RECENT`、抽签叠影修复等。
 
 ### 8.2 维护提示
 

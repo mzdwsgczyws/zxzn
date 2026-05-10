@@ -35,7 +35,7 @@
   </view>
 
   <view class="card thinking-card-page" wx:if="{{phase === 'thinking'}}">
-    <text class="thinking-hint">正在根据以下信息，参照周易八卦与紫微斗数意象演算中…</text>
+    <text class="thinking-hint">正在结合您已填写的档案与当日情境，整理纳入本轮箴言上下文的若干门类…</text>
     <text class="thinking-sub">下列为当日纳入运算的数据门类（不显细节）。完成后将自动进入箴言卡片。</text>
     <view class="thinking-cat-list">
       <view
