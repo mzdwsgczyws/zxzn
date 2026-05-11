@@ -156,8 +156,8 @@
       <view class="hall-btns">
         <view class="hall-col" hover-class="hall-col-hover" bindtap="goFortuneTrend">
           <view class="hall-circle hall-c0">
-            <text class="hall-circle-icon">势</text>
-            <text class="hall-circle-t">运势趋势</text>
+            <text class="hall-circle-icon">历</text>
+            <text class="hall-circle-t">趋势日历</text>
           </view>
           <text class="hall-meta">{{hallTrendDays}}天</text>
         </view>
@@ -176,7 +176,7 @@
           <text class="hall-meta">{{hallAchUnlocked}}/{{hallAchTotal}}</text>
         </view>
       </view>
-      <text class="hall-whisper">运势走势示意 · 长按可看释义 · 展馆首次收录</text>
+      <text class="hall-whisper">趋势走势示意 · 长按可看释义 · 展馆首次收录</text>
     </view>
 
     <view class="bottom-dock" style="height: {{bottomBarH}}px;">

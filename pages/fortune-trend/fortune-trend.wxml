@@ -6,7 +6,7 @@
     </view>
 
     <view class="chart-card card">
-      <text class="chart-title">运势走势（示意）</text>
+      <text class="chart-title">趋势走势（示意）</text>
       <canvas
         canvas-id="fortuneCandleCanvas"
         class="candle-canvas"
