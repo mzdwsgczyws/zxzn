@@ -34,7 +34,7 @@ const REFERENCE_WIKI = {
 const RADAR_FOOTER_LINES = [
   '五行雷达：自正上顺时针为 金 → 木 → 水 → 火 → 土。',
   '计分参照维基百科「Wuxing (Chinese philosophy)」「Traditional Chinese medicine」「Stress (biology)」等综述；TCM 脏腑为功能模型，不等于西医解剖器官。',
-  '本页分数与图形仅供自我观察，非中医辨证、非医疗诊断、非命理预测。情绪或睡眠持续困扰时请寻求专业帮助。',
+  '本页分数与图形仅供自我观察，非中医辨证、非医疗诊断，亦不构成对未来的断言。情绪或睡眠持续困扰时请寻求专业帮助。',
   '参考文献：' +
     REFERENCE_WIKI.wuxing +
     ' · ' +

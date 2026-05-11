@@ -1,8 +1,8 @@
 <view class="page">
-  <!-- iOS：同上，走势 canvas 避免放在 enhanced scroll-view 内 -->
+  <!-- iOS：同上，示意图 canvas 避免放在 enhanced scroll-view 内 -->
   <scroll-view scroll-y="{{true}}" class="scroll">
     <view class="card intro">
-      <text class="intro-p">按自然日展示抽签记录（同日多次取最后一次）。月历中有底色标记的为当日有签；长按该日可看诗文与释义。下方走势图为示意 K 线，仅供阅览趣味。</text>
+      <text class="intro-p">按自然日展示抽签记录（同日多次取最后一次）。月历中有底色标记的为当日有签；长按该日可看诗文与释义。下方为历史记录的层级示意图（类比图示，仅供自察趣味，不作任何前瞻判断）。</text>
     </view>
 
     <view class="chart-card card">
@@ -58,7 +58,7 @@
       </block>
     </view>
 
-    <text class="fine-print">仅供文化自察与行动参考。</text>
+    <text class="fine-print">仅供文化自察与行动参考；图示仅反映已抽取记录，不作前瞻推断。</text>
     <view class="scroll-pad"></view>
   </scroll-view>
 

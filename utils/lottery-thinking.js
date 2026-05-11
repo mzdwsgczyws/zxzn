@@ -6,14 +6,14 @@
 /** 与 fortune 种子相对应的高层类目，文案保持克制、不罗列字段值 */
 const THINKING_CATEGORIES = [
   '历法与时间锚点',
-  '卦象与文化映射',
+  '经典文案与文化意象',
   '环境与气象上下文',
   '道性分型与档案画像',
   '箴言偏好与近况'
 ]
 
 const THINKING_FOOTNOTE =
-  '周易八卦与紫微斗数为传统文化意象参照，非宿命断言；仅供文化自察与行动参考。'
+  '所用传统文化意象仅为修辞与联想参照，不作对未来的断言；仅供文化自察与行动参考。'
 
 /** @returns {{ categories: string[], footnote: string }} */
 function buildLotteryThinkingBrief() {
