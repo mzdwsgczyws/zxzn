@@ -248,11 +248,19 @@ function paintResultPoster(
   )
   y += 24
   const sc = result.scores || {}
-  const scoreFont = 24
-  const scoreC = is2d ? (px) => applyTextStyle(ctx, true, '#4a4034', px) : (px) => applyTextStyle(ctx, false, '#4a4034', px)
-  scoreC(scoreFont)
-  ;['动', '刚', '散', '显'].forEach((k) => {
-    ctx.fillText(`${k}  ${sc[k] || 0}%`, 56, y)
+  const POSTER_DIMS = [
+    { left: '静', right: '动', key: '动' },
+    { left: '柔', right: '刚', key: '刚' },
+    { left: '聚', right: '散', key: '散' },
+    { left: '隐', right: '显', key: '显' }
+  ]
+  POSTER_DIMS.forEach((d) => {
+    const rv = sc[d.key] || 50
+    const lv = 100 - rv
+    const dom = rv >= lv ? d.right : d.left
+    const pct = Math.max(rv, lv)
+    applyTextStyle(ctx, is2d, '#4a4034', 24)
+    ctx.fillText(`${d.left} / ${d.right}   ${dom} ${pct}%`, 56, y)
     y += 36
   })
   y += 16
@@ -533,12 +541,24 @@ Page({
       return
     }
     const s = result.scores || {}
-    const scoreList = [
-      { k: '动', v: s['动'] || 0 },
-      { k: '刚', v: s['刚'] || 0 },
-      { k: '散', v: s['散'] || 0 },
-      { k: '显', v: s['显'] || 0 }
+    const DIMS = [
+      { left: '静', right: '动', key: '动' },
+      { left: '柔', right: '刚', key: '刚' },
+      { left: '聚', right: '散', key: '散' },
+      { left: '隐', right: '显', key: '显' }
     ]
+    const scoreList = DIMS.map((d) => {
+      const rv = s[d.key] || 50
+      const lv = 100 - rv
+      return {
+        left: d.left,
+        right: d.right,
+        lv,
+        rv,
+        leftDom: lv > rv,
+        rightDom: rv > lv
+      }
+    })
     const tid = resultTypeId(result)
     const quizMetaLine = buildQuizMetaLine(result)
     const myGen = (this._portraitShowGen = (this._portraitShowGen || 0) + 1)
@@ -670,13 +690,22 @@ Page({
     y += 12
     ctx.setFillStyle('#3949ab')
     ctx.setFontSize(15)
-    ctx.fillText('四维 · 动 / 刚 / 散 / 显', leftX, y)
+    ctx.fillText('四维 · 静动 / 柔刚 / 聚散 / 隐显', leftX, y)
     y += 22
     const sc = result.scores || {}
+    const SHARE_DIMS = [
+      { left: '静', right: '动', key: '动' },
+      { left: '柔', right: '刚', key: '刚' },
+      { left: '聚', right: '散', key: '散' },
+      { left: '隐', right: '显', key: '显' }
+    ]
     ctx.setFillStyle('#4a4034')
     ctx.setFontSize(14)
-    ;['动', '刚', '散', '显'].forEach((k) => {
-      ctx.fillText(`${k} ${sc[k] || 0}%`, leftX, y)
+    SHARE_DIMS.forEach((d) => {
+      const rv = sc[d.key] || 50
+      const lv = 100 - rv
+      const dom = rv >= lv ? d.right : d.left
+      ctx.fillText(`${d.left}/${d.right}  ${dom} ${Math.max(rv, lv)}%`, leftX, y)
       y += 19
     })
 

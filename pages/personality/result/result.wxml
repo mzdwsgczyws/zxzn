@@ -27,12 +27,14 @@
     <text class="summary">{{result.summary}}</text>
 
     <view class="scores">
-      <view class="score-item" wx:for="{{scoreList}}" wx:key="k">
-        <text class="sk">{{item.k}}</text>
-        <view class="bar-bg">
-          <view class="bar-fill" style="width: {{item.v}}%;"></view>
+      <view class="score-row" wx:for="{{scoreList}}" wx:key="right">
+        <text class="score-label score-label--l {{item.leftDom ? 'score-label--dom' : ''}}">{{item.left}}</text>
+        <view class="dual-bar">
+          <view class="dual-bar-left {{item.leftDom ? 'dual-bar--dom' : ''}}" style="width: {{item.lv}}%;"></view>
+          <view class="dual-bar-right {{item.rightDom ? 'dual-bar--dom' : ''}}" style="width: {{item.rv}}%;"></view>
+          <text class="dual-bar-pct">{{item.leftDom ? item.lv : item.rv}}%</text>
         </view>
-        <text class="sv">{{item.v}}%</text>
+        <text class="score-label score-label--r {{item.rightDom ? 'score-label--dom' : ''}}">{{item.right}}</text>
       </view>
     </view>
 
