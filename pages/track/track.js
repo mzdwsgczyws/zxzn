@@ -1,6 +1,6 @@
 const KEYS = require('../../utils/storage-keys.js')
 const { analyzeRecords, TRACK_FOCUS_OPTIONS } = require('../../utils/cultivation-model.js')
-const { computeFiveElements, drawFiveRadar, RADAR_FOOTER_LINES } = require('../../utils/five-elements-chart.js')
+const { computeFiveElements, computeFiveElementsWithOffset, drawFiveRadar, RADAR_FOOTER_LINES } = require('../../utils/five-elements-chart.js')
 const { recordBiz } = require('../../utils/usage-analytics.js')
 
 function scheduleDraw(cb) {
@@ -9,11 +9,11 @@ function scheduleDraw(cb) {
 }
 
 const PHASE_OPTIONS = [
-  { id: 'si', label: '思多（脑力、反复琢磨）' },
-  { id: 'dong', label: '动多（事务、奔波）' },
-  { id: 'yan', label: '言多（沟通、表达）' },
-  { id: 'jing', label: '静多（独处、内向收）' },
-  { id: 'za', label: '杂 / 切换多' }
+  { id: 'si', label: '想得多（脑力消耗大）' },
+  { id: 'dong', label: '跑得多（事情多、到处忙）' },
+  { id: 'yan', label: '说得多（沟通、开会多）' },
+  { id: 'jing', label: '安静独处' },
+  { id: 'za', label: '什么都有、切换频繁' }
 ]
 
 function todayStr() {
@@ -127,9 +127,11 @@ Page({
     const profile = wx.getStorageSync(KEYS.USER_PROFILE) || {}
     const personality = wx.getStorageSync(KEYS.PERSONALITY_RESULT) || null
     const fe = computeFiveElements(records, profile, personality)
+    const prevFe = computeFiveElementsWithOffset(records, profile, personality, 1)
     this.setData({
       radarFooterExtra: fe.hint || '',
-      fiveRows: (fe.rows || []).map((r) => ({ name: r.name, value: r.value, tip: r.tip }))
+      fiveRows: (fe.rows || []).map((r) => ({ name: r.name, value: r.value, tip: r.tip })),
+      hasPrevWeek: !!(prevFe && prevFe.hasData)
     })
     scheduleDraw(() => {
       const q = wx.createSelectorQuery().in(this)
@@ -138,7 +140,7 @@ Page({
         .exec((res) => {
           const rect = res && res[0]
           if (!rect || rect.width < 8) return
-          drawFiveRadar('fiveRadar', this, rect, fe)
+          drawFiveRadar('fiveRadar', this, rect, fe, prevFe)
         })
     })
   },

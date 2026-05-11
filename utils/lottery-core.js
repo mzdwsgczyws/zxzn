@@ -298,6 +298,10 @@ function finalizeDraw(page, lat, lng, weather) {
   try {
     const prev = wx.getStorageSync(KEYS.LOTTERY_ADVICE_RECENT) || {}
     avoidAdviceTexts = Array.isArray(prev.texts) ? prev.texts : []
+    const fb = wx.getStorageSync(KEYS.ADVICE_FEEDBACK) || {}
+    if (Array.isArray(fb.dislikedTexts)) {
+      avoidAdviceTexts = avoidAdviceTexts.concat(fb.dislikedTexts)
+    }
   } catch (e) {}
 
   const adviceList = computeLotteryAdvices({

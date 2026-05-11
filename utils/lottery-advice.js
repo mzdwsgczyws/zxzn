@@ -5,6 +5,7 @@
 
 const { hashStr } = require('./fortune.js')
 const { collectCorpusEntries, resolveUserTone } = require('./lottery-advice-corpus.js')
+const KEYS = require('./storage-keys.js')
 
 function mulberry32(a) {
   return function () {
@@ -13,6 +14,16 @@ function mulberry32(a) {
     t ^= t + Math.imul(t ^ (t >>> 7), t | 61)
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296
   }
+}
+
+function pickTemplate(templates, rnd) {
+  return templates[Math.floor(rnd() * templates.length)]
+}
+
+function fillTpl(tpl, vars) {
+  let s = tpl
+  Object.keys(vars).forEach((k) => { s = s.replace(new RegExp('\\{' + k + '\\}', 'g'), vars[k]) })
+  return s
 }
 
 function seasonBucket(jieqi) {
@@ -57,7 +68,7 @@ function persFlags(pers) {
 /**
  * 生成候选池（每条带 tag 便于去重优先级）
  */
-function collectCandidates(ctx) {
+function collectCandidates(ctx, rnd) {
   const out = []
   const {
     tier,
@@ -78,6 +89,7 @@ function collectCandidates(ctx) {
     profile,
     userTone
   } = ctx
+  const _rnd = typeof rnd === 'function' ? rnd : Math.random
 
   const push = (cat, text, weight = 1) => {
     for (let i = 0; i < weight; i++) out.push({ cat, text })
@@ -90,56 +102,116 @@ function collectCandidates(ctx) {
   }
   if (tier === '下' || tier === '下下') {
     push('行动', '大事缓办，先处理睡眠与饮食节律，再谈外务。', 2)
-    push('情绪', '降低自我攻击，把「我必须」改成「我可以先试一步」。', 2)
-    push('人际', '避免冷战与拉黑式沟通，宁可简短说清楚边界。', 1)
+    push('情绪', '别对自己太狠，把"我必须"改成"我先试一步"。', 2)
+    push('人际', '别冷战也别拉黑，有话简单说清楚就好。', 1)
   }
   if (tier === '中') {
     push('起居', '平常一日，把起床、吃饭、睡觉的节奏稳住就好。', 2)
   }
 
   if (jianchu === '破' || jianchu === '危') {
-    push('事业', '检查合同、账单、消息记录三处细节，防微杜渐。', 2)
+    push('事业', '检查一下合同、账单和消息记录，别让小问题变大。', 2)
   }
   if (jianchu === '成' || jianchu === '开') {
-    push('事业', '适合开启短周期目标（7 天内可验收）的一小步。', 2)
+    push('事业', '适合开始一个小目标（7 天内能完成的那种）。', 2)
   }
   if (jianchu === '闭' || jianchu === '收') {
-    push('行动', '收束碎片任务，关闭多余标签页与群通知 2 小时。', 2)
+    push('行动', '收拾一下零碎的事，关掉多余的标签页和群消息 2 小时。', 2)
   }
 
-  /* —— 节气季节 —— */
+  /* —— 节气季节（模板变量化） —— */
   if (season === 'spring') {
-    push('起居', '晨起可在窗边活动约十分钟，提神即可，不必赶场。', 2)
-    push('饮食', '多喝温水，少空腹喝浓茶。', 1)
+    push('起居', pickTemplate([
+      '晨起可在窗边活动约十分钟，提神即可，不必赶场。',
+      '春日宜早起，窗边伸展几分钟，迎着晨光开始一天。',
+      '趁春光好，起床后在阳台站几分钟，唤醒身体再出门。'
+    ], _rnd), 2)
+    push('饮食', pickTemplate([
+      '多喝温水，少空腹喝浓茶。',
+      '春天宜温饮，空腹少碰浓茶与冰饮。',
+      '晨起一杯温水比浓茶更养胃。'
+    ], _rnd), 1)
   }
   if (season === 'summer') {
-    push('起居', '午间可小憩十五分钟左右，下午更有精神。', 2)
-    push('饮食', '饮食清淡些，瓜果适量，冷饮别连杯。', 2)
+    push('起居', pickTemplate([
+      '午间可小憩十五分钟左右，下午更有精神。',
+      '中午试试十五分钟短休，比硬撑到傍晚效率高。',
+      '午后留一刻钟闭眼时间，给大脑降降温。'
+    ], _rnd), 2)
+    push('饮食', pickTemplate([
+      '饮食清淡些，瓜果适量，冷饮别连杯。',
+      '夏日瓜果虽好，冰饮连灌伤脾胃，适可而止。',
+      '天热多补水，少喝冰的，温凉白开最稳妥。'
+    ], _rnd), 2)
   }
   if (season === 'autumn') {
-    push('起居', '早晚温差大，出门带件薄外套。', 2)
-    push('情绪', '随笔写几句心情，比硬撑聚会更轻松。', 1)
+    push('起居', pickTemplate([
+      '早晚温差大，出门带件薄外套。',
+      '秋意渐浓，薄外套随身备着，比感冒后补救省事。',
+      '早出晚归温差明显，多一件外套少一分风险。'
+    ], _rnd), 2)
+    push('情绪', pickTemplate([
+      '随笔写几句心情，比硬撑聚会更轻松。',
+      '秋天容易多愁，不妨写几行字释放，不必逢人倾诉。',
+      '情绪低沉时写下来比闷着好，三五行即可。'
+    ], _rnd), 1)
   }
   if (season === 'winter') {
-    push('起居', '尽量早睡，晚间少做大汗运动。', 2)
-    push('饮食', '热汤热粥适量，少熬夜加餐重油。', 1)
+    push('起居', pickTemplate([
+      '尽量早睡，晚间少做大汗运动。',
+      '冬日宜早卧，晚间剧烈运动反而影响入睡。',
+      '天冷早睡是最简单的养生，晚间散步代替跑步即可。'
+    ], _rnd), 2)
+    push('饮食', pickTemplate([
+      '热汤热粥适量，少熬夜加餐重油。',
+      '冬天一碗热粥比深夜外卖实在，少给身体加负担。',
+      '温热饮食养胃，宵夜重油不如一杯热牛奶。'
+    ], _rnd), 1)
   }
 
-  /* —— 天气 —— */
+  /* —— 天气（模板变量化） —— */
   if (wf.rain) {
-    push('行动', '出行预留缓冲时间，电子设备防潮；情绪上防「闷气」。', 2)
-    push('起居', '室内通风除湿，适度拉伸，防肩颈僵。', 1)
+    push('行动', pickTemplate([
+      '出门多留点时间，电子设备防潮；心情也别跟着阴天一起低落。',
+      '雨天路滑多留余量，心情也别跟天气一起阴沉。',
+      '下雨天少赶路，到得从容比到得准时更重要。'
+    ], _rnd), 2)
+    push('起居', pickTemplate([
+      '开窗通风，站起来拉伸一下，别让肩膀僵了。',
+      '雨天闷在屋里久了，站起来伸展几分钟活动活动。',
+      '潮湿天气容易犯困，开窗换换气比喝咖啡管用。'
+    ], _rnd), 1)
   }
   if (wf.hot) {
-    push('起居', '避开正午暴晒，补水适量；心烦时先凉快下来再办事。', 2)
-    push('人际', '高温易躁，回复消息前默念三秒。', 1)
+    push('起居', pickTemplate([
+      '避开正午暴晒，补水适量；心烦时先凉快下来再办事。',
+      '高温天先喝水再办事，头脑清醒比硬撑效率高。',
+      '热到心烦时找个阴凉处待五分钟，情绪会自然回落。'
+    ], _rnd), 2)
+    push('人际', pickTemplate([
+      '高温易躁，回复消息前默念三秒。',
+      '天热脾气短，开口前缓三秒，少说后悔的话。',
+      '大热天少做激烈讨论，约到凉快的时候再聊。'
+    ], _rnd), 1)
   }
   if (wf.cold) {
-    push('起居', '热身后再锻炼，关节部位注意保暖。', 2)
-    push('饮食', '温热饮品适量，忌空腹久处寒风。', 1)
+    push('起居', pickTemplate([
+      '热身后再锻炼，关节部位注意保暖。',
+      '天冷出门先暖身，膝盖脖子别受凉。',
+      '冷天运动前多热身两分钟，身体暖了再发力。'
+    ], _rnd), 2)
+    push('饮食', pickTemplate([
+      '温热饮品适量，忌空腹久处寒风。',
+      '冷天喝杯热水暖胃，比空着肚子吹风强。',
+      '寒冷天气一杯温饮就是对身体的善意。'
+    ], _rnd), 1)
   }
   if (wf.clear && !wf.rain) {
-    push('行动', '天气不错时，户外步行二十分钟左右，换换空气。', 2)
+    push('行动', pickTemplate([
+      '天气不错时，户外步行二十分钟左右，换换空气。',
+      '好天气别浪费，出门走走比刷手机更提神。',
+      '晴天是免费的能量补给，散步二十分钟即可。'
+    ], _rnd), 2)
   }
 
   /* —— 年龄 —— */
@@ -147,23 +219,23 @@ function collectCandidates(ctx) {
     push('学业', '用番茄钟拆作业，先完成最小一块再玩手机。', 2)
   }
   if (ab === 'youth') {
-    push('事业', '今日只盯一个主目标，拒绝「多线程虚荣忙碌」。', 2)
+    push('事业', '今天只盯一个主要目标，别被假忙碌带跑了。', 2)
   }
   if (ab === 'mid') {
-    push('起居', '安排一次与家人的高质量对话，不谈教只倾听。', 2)
-    push('事业', '梳理本周三件事：一件必须成，两件可推迟。', 1)
+    push('起居', '找个时间和家人好好聊聊，只听不教。', 2)
+    push('事业', '本周只抓 3 件事：1 件必须做完，2 件可以推迟。', 1)
   }
   if (ab === 'senior') {
-    push('起居', '起身、弯腰放慢，防体位性低血压；晒太阳适度。', 2)
-    push('情绪', '减少负面新闻摄入时长，改听舒缓音频。', 1)
+    push('起居', '站起来、弯腰都慢一点，防头晕；适当晒晒太阳。', 2)
+    push('情绪', '少看负面新闻，换成听点轻音乐。', 1)
   }
 
   /* —— 性别（仅作生活习惯向提示，避免刻板） —— */
   if (gender === 'female') {
-    push('起居', '关注体感温差与休息节奏，不适则减少强撑社交。', 1)
+    push('起居', '注意冷暖变化，不舒服就少社交，别硬撑。', 1)
   }
   if (gender === 'male') {
-    push('情绪', '练习用一句话表达感受，而非只讲解决方案。', 1)
+    push('情绪', '试试用一句话说出自己的感受，别只想着怎么解决问题。', 1)
   }
 
   /* —— 个人化（仅输出陈述，不暴露推断依据） —— */
@@ -204,10 +276,10 @@ function collectCandidates(ctx) {
   }
 
   if (rhythmType === 'regular') {
-    push('起居', '节律相对稳定时，把最需要专注的一件事卡在固定时段完成即可。', 1)
+    push('起居', '作息稳定的时候，把最需要集中精力的事放在固定时间做。', 1)
   }
   if (rhythmType === 'late_early') {
-    push('起居', '晚睡还要早起时更忌空腹浓茶咖啡叠加班；午间短憩补一刀也好过硬扛。', 2)
+    push('起居', '晚睡还得早起的话，别空腹喝浓茶咖啡；中午眯一会儿比硬撑强。', 2)
   }
   if (rhythmType === 'night') {
     push('起居', '晚间少刷短视频，睡前一小时光线调暗、少争论。', 2)
@@ -262,10 +334,108 @@ function collectCandidates(ctx) {
     })
   } catch (e) {}
 
+  /* —— 五行雷达联动（如有近期自修记录） —— */
+  try {
+    const feRecords = wx.getStorageSync(KEYS.TRACK_RECORDS) || []
+    if (feRecords.length >= 3) {
+      const { computeFiveElements } = require('./five-elements-chart.js')
+      const feProfile = wx.getStorageSync(KEYS.USER_PROFILE) || {}
+      const fePers = wx.getStorageSync(KEYS.PERSONALITY_RESULT) || null
+      const fe = computeFiveElements(feRecords, feProfile, fePers)
+      if (fe && fe.hasData) {
+        const sorted = fe.rows.slice().sort((a, b) => b.value - a.value)
+        const high = sorted[0]
+        const low = sorted[sorted.length - 1]
+        const FE_HIGH_TIPS = {
+          '金': '最近心情偏低落，今天试着少回忆烦心事，写一件还不错的小事。',
+          '木': '最近容易发火，快走 10 分钟或拉伸一下释放紧张感。',
+          '水': '最近太累了，先把觉睡够，大事明天再说。',
+          '火': '最近刷屏太多了，试试睡前 1 小时关掉短视频。',
+          '土': '最近想太多，把想法写成一个最小行动，做完就停。'
+        }
+        const FE_LOW_TIPS = {
+          '金': '最近表达太少了，试试深呼吸或读一段喜欢的文字。',
+          '木': '最近不太想动，出门走走或做一件简单的小事。',
+          '水': '最近休息不够，安排一段什么都不做的纯休息时间。',
+          '火': '最近缺点活力，选一件喜欢的小事投入 20 分钟。',
+          '土': '最近节奏有点乱，固定一餐饭的时间给自己一个小锚点。'
+        }
+        if (high.value >= 62 && FE_HIGH_TIPS[high.name]) {
+          push('自修', FE_HIGH_TIPS[high.name], 2)
+        }
+        if (low.value <= 38 && FE_LOW_TIPS[low.name]) {
+          push('自修', FE_LOW_TIPS[low.name], 2)
+        }
+      }
+    }
+  } catch (e) {}
+
+  /* —— 跨日趋势感知（连续恶化/改善检测） —— */
+  try {
+    const trendRecords = wx.getStorageSync(KEYS.TRACK_RECORDS) || []
+    if (trendRecords.length >= 3) {
+      const recent = trendRecords.slice(-5)
+      const tAvg = (key) => {
+        const xs = recent.map((r) => Number(r[key])).filter((n) => !Number.isNaN(n))
+        return xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : null
+      }
+      const tStreak = (key, pred) => {
+        let n = 0
+        for (let si = recent.length - 1; si >= 0; si--) {
+          const v = Number(recent[si][key])
+          if (Number.isNaN(v)) break
+          if (pred(v)) n++
+          else break
+        }
+        return n
+      }
+      const poorSleep = tStreak('sleepHours', (v) => v < 6.5)
+      if (poorSleep >= 3) {
+        push('起居', `已经连续 ${poorSleep} 天没睡够了，今天先把睡觉时间稳住，大事明天再说。`, 3)
+      }
+      const highAnger = tStreak('angerCount', (v) => v >= 3)
+      if (highAnger >= 3) {
+        push('情绪', `最近 ${highAnger} 天容易发火，回消息前先深呼吸 3 次，晚上别吵架。`, 2)
+      }
+      const lowRecovery = tStreak('recoveryScore', (v) => v <= 2)
+      if (lowRecovery >= 3) {
+        push('起居', `连续 ${lowRecovery} 天觉得没恢复过来，给自己 15 分钟彻底休息一下。`, 2)
+      }
+      const highDrain = tStreak('drainScore', (v) => v >= 4)
+      if (highDrain >= 3) {
+        push('行动', `已经累了 ${highDrain} 天了，砍掉一件不重要的事，只做最重要的。`, 2)
+      }
+      const avgSleep = tAvg('sleepHours')
+      const avgRecovery = tAvg('recoveryScore')
+      if (avgSleep != null && avgSleep >= 7 && avgRecovery != null && avgRecovery >= 3.5) {
+        push('日常', '最近睡得不错、恢复也行，保持这个节奏，把精力花在最重要的事上。', 2)
+      }
+    }
+  } catch (e) {}
+
+  /* —— 时段感知建议 —— */
+  const curHour = new Date().getHours()
+  if (curHour >= 5 && curHour < 9) {
+    push('起居', '晨间留十分钟缓冲再出门，空腹别灌浓茶咖啡。', 2)
+    push('行动', '上午精力最佳，把最费脑的一件事排在第一位。', 1)
+  } else if (curHour >= 9 && curHour < 13) {
+    push('事业', '上午专注时段，手机静音处理一件核心任务。', 1)
+    push('起居', '久坐满四十分钟起身倒杯水，活动肩颈。', 1)
+  } else if (curHour >= 13 && curHour < 17) {
+    push('起居', '午后犯困可小憩十五分钟，比硬撑效率更高。', 2)
+    push('饮食', '下午茶适量，少喝含糖饮料，温水更解乏。', 1)
+  } else if (curHour >= 17 && curHour < 21) {
+    push('行动', '傍晚收工后散步二十分钟，切换身心状态。', 2)
+    push('人际', '晚间适合一次轻松对话，不谈工作、只聊近况。', 1)
+  } else {
+    push('起居', '夜间调暗灯光，睡前一小时远离短视频和争论。', 2)
+    push('情绪', '睡前可数息三分钟或写一句今日收获，帮助安神。', 2)
+  }
+
   /* —— 保底池 —— */
   const fallback = [
     { cat: '起居', text: '睡前 30 分钟调暗灯光，减少短视频滑动。' },
-    { cat: '饮食', text: '正餐七分饱，细嚼慢咽数到 20 下再咽第一口。' },
+    { cat: '饮食', text: '吃饭七分饱就好，慢慢嚼别着急。' },
     { cat: '情绪', text: '心里烦时，先写下来，再去做一件最小的事。' },
     { cat: '人际', text: '发一条真诚感谢给最近帮过你的人，不求回复。' },
     { cat: '事业', text: '用 25 分钟只处理一件琐事，做完即停。' },
@@ -392,7 +562,7 @@ function computeLotteryAdvices(input) {
     profile,
     userTone
   }
-  const pool = collectCandidates(ctx)
+  const pool = collectCandidates(ctx, rnd)
   const need = 8
   const picked = uniquePick(pool, rnd, need, avoidAdviceTexts)
   const lines = picked.map((p, i) => `${i + 1}. ${p.text}`)

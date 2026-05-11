@@ -30,7 +30,9 @@ page {
   color: var(--dao-ink);
   font-size: 28rpx;
   line-height: 1.6;
+  letter-spacing: 0.5rpx;
   box-sizing: border-box;
+  -webkit-font-smoothing: antialiased;
 }
 
 .safe-bottom {
@@ -39,11 +41,14 @@ page {
 
 .card {
   background: var(--dao-bg-card);
-  border-radius: 20rpx;
-  padding: 32rpx;
-  margin: 24rpx;
-  box-shadow: 0 8rpx 32rpx var(--dao-shadow-purple);
+  border-radius: 24rpx;
+  padding: 36rpx 32rpx;
+  margin: 20rpx 24rpx;
+  box-shadow:
+    0 2rpx 8rpx rgba(26, 35, 126, 0.04),
+    0 8rpx 32rpx var(--dao-shadow-purple);
   border: 1rpx solid var(--dao-border-gold);
+  transition: box-shadow 0.3s ease;
 }
 
 .btn-primary {
@@ -53,11 +58,19 @@ page {
   padding: 24rpx 48rpx;
   font-size: 30rpx;
   font-weight: 500;
+  letter-spacing: 2rpx;
   border: none;
+  box-shadow: 0 4rpx 16rpx rgba(26, 35, 126, 0.18);
+  transition: opacity 0.2s ease, box-shadow 0.2s ease;
 }
 
 .btn-primary::after {
   border: none;
+}
+
+.btn-primary:active {
+  opacity: 0.88;
+  box-shadow: 0 2rpx 8rpx rgba(26, 35, 126, 0.12);
 }
 
 .btn-ghost {
@@ -68,10 +81,17 @@ page {
   padding: 20rpx 40rpx;
   font-size: 28rpx;
   font-weight: 500;
+  letter-spacing: 1rpx;
+  transition: background 0.2s ease, opacity 0.2s ease;
 }
 
 .btn-ghost::after {
   border: none;
+}
+
+.btn-ghost:active {
+  background: rgba(57, 73, 171, 0.06);
+  opacity: 0.88;
 }
 
 .title-lg {

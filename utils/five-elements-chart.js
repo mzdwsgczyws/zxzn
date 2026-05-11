@@ -105,11 +105,11 @@ function computeFiveElements(recordsAsc, profile, personality) {
       hint: emptyHint(),
       ref: REFERENCE_WIKI,
       rows: [
-        { name: '金', value: 50, tip: '肺（忧悲）· 言声、社交锋度' },
-        { name: '木', value: 50, tip: '肝（怒）· 郁滞与少动' },
-        { name: '水', value: 50, tip: '肾（恐）· 耗竭、根基感' },
-        { name: '火', value: 50, tip: '心（亢奋）· 屏刺激、缺眠' },
-        { name: '土', value: 50, tip: '脾（思）· 思虑内守' }
+        { name: '金', value: 50, tip: '社交压力、情绪低落' },
+        { name: '木', value: 50, tip: '容易发火、运动太少' },
+        { name: '水', value: 50, tip: '身体疲惫、精力透支' },
+        { name: '火', value: 50, tip: '刷屏太多、睡眠不足' },
+        { name: '土', value: 50, tip: '想太多、闷在心里' }
       ]
     }
   }
@@ -217,11 +217,11 @@ function computeFiveElements(recordsAsc, profile, personality) {
   tu = roundScore(tu)
 
   const rows = [
-    { name: '金', value: jin, tip: '肺（忧悲）· 恢复低、烦闷、言多社交' },
-    { name: '木', value: mu, tip: '肝（怒）· 易怒、少动、思多郁象' },
-    { name: '水', value: shui, tip: '肾（恐）· 耗竭、睡眠少、底虚感' },
-    { name: '火', value: huo, tip: '心（亢奋）· 缺眠、屏刺激、躁动耗竭' },
-    { name: '土', value: tu, tip: '脾（思）· 烦恼、思静、闷中少泄' }
+    { name: '金', value: jin, tip: '恢复不够、心情低落、社交消耗大' },
+    { name: '木', value: mu, tip: '容易生气、运动太少、想太多' },
+    { name: '水', value: shui, tip: '精力透支、睡得少、身体疲惫' },
+    { name: '火', value: huo, tip: '睡眠不足、刷屏多、内心浮躁' },
+    { name: '土', value: tu, tip: '烦心事多、一个人闷着、缺少释放' }
   ]
 
   return {
@@ -238,11 +238,43 @@ function computeFiveElements(recordsAsc, profile, personality) {
   }
 }
 
+const WX_COLORS = [
+  { key: 'jin',  main: '#C9B037', glow: 'rgba(201,176,55,0.45)',  stroke: 'rgba(160,140,40,0.85)',  label: '金' },
+  { key: 'mu',   main: '#2E7D32', glow: 'rgba(46,125,50,0.45)',   stroke: 'rgba(30,100,35,0.85)',   label: '木' },
+  { key: 'shui', main: '#1565C0', glow: 'rgba(21,101,192,0.45)',  stroke: 'rgba(15,80,160,0.85)',   label: '水' },
+  { key: 'huo',  main: '#C62828', glow: 'rgba(198,40,40,0.45)',   stroke: 'rgba(165,30,30,0.85)',   label: '火' },
+  { key: 'tu',   main: '#8D6E63', glow: 'rgba(141,110,99,0.45)',  stroke: 'rgba(110,85,75,0.85)',   label: '土' }
+]
+
+function vertexXY(cx, cy, r, i) {
+  const angle = -Math.PI / 2 + (i * 2 * Math.PI) / 5
+  return { x: cx + r * Math.cos(angle), y: cy + r * Math.sin(angle) }
+}
+
+function drawDashedLine(ctx, x0, y0, x1, y1, dash, gap) {
+  const dx = x1 - x0
+  const dy = y1 - y0
+  const len = Math.sqrt(dx * dx + dy * dy)
+  const ux = dx / len
+  const uy = dy / len
+  let d = 0
+  ctx.beginPath()
+  while (d < len) {
+    const s = d
+    const e = Math.min(d + dash, len)
+    ctx.moveTo(x0 + ux * s, y0 + uy * s)
+    ctx.lineTo(x0 + ux * e, y0 + uy * e)
+    d = e + gap
+  }
+  ctx.stroke()
+}
+
 /**
- * 旧版 Canvas API：只绘制网格与数据多边形；文字由页面 WXML 卡片展示，避免重叠。
+ * 旧版 Canvas API：渐变填充 + 五行配色 + 发光数据点 + 分层网格。
  * @param fe computeFiveElements 的完整返回值（含 jin…tu）
+ * @param prevFe 上一窗口的五行结果（可选，用于历史对比叠加）
  */
-function drawFiveRadar(canvasId, pageOrComp, rect, fe) {
+function drawFiveRadar(canvasId, pageOrComp, rect, fe, prevFe) {
   const width = rect.width
   const height = rect.height
   if (width < 10 || height < 10) return
@@ -250,73 +282,150 @@ function drawFiveRadar(canvasId, pageOrComp, rect, fe) {
   const ctx = wx.createCanvasContext(canvasId, pageOrComp)
   const cx = width / 2
   const cy = height / 2
-  const R = Math.min(width, height) * 0.4
+  const R = Math.min(width, height) * 0.38
 
-  ctx.setFillStyle('rgb(252, 250, 246)')
+  // -- 背景：中心暖白径向渐变 --
+  const bgGrd = ctx.createCircularGradient(cx, cy, R * 1.35)
+  bgGrd.addColorStop(0, 'rgba(255, 252, 245, 1)')
+  bgGrd.addColorStop(1, 'rgba(245, 240, 232, 1)')
+  ctx.setFillStyle(bgGrd)
   ctx.fillRect(0, 0, width, height)
 
+  // -- 同心五边形网格（5 层） --
   for (let level = 1; level <= 5; level++) {
     const r = (R * level) / 5
     ctx.beginPath()
     for (let i = 0; i <= 5; i++) {
-      const angle = -Math.PI / 2 + ((i % 5) * 2 * Math.PI) / 5
-      const x = cx + r * Math.cos(angle)
-      const y = cy + r * Math.sin(angle)
-      if (i === 0) ctx.moveTo(x, y)
-      else ctx.lineTo(x, y)
+      const p = vertexXY(cx, cy, r, i % 5)
+      if (i === 0) ctx.moveTo(p.x, p.y)
+      else ctx.lineTo(p.x, p.y)
     }
     ctx.closePath()
-    ctx.setStrokeStyle(level === 5 ? 'rgba(93, 84, 72, 0.45)' : 'rgba(210, 200, 186, 0.55)')
-    ctx.setLineWidth(level === 5 ? 1.2 : 0.55)
+    if (level === 5) {
+      ctx.setStrokeStyle('rgba(93, 84, 72, 0.5)')
+      ctx.setLineWidth(1.4)
+    } else {
+      const alpha = 0.15 + level * 0.08
+      ctx.setStrokeStyle('rgba(180, 170, 155, ' + alpha + ')')
+      ctx.setLineWidth(0.5)
+    }
     ctx.stroke()
   }
 
+  // -- 辐射线：虚线，颜色随五行 --
   for (let i = 0; i < 5; i++) {
-    const angle = -Math.PI / 2 + (i * 2 * Math.PI) / 5
+    const p = vertexXY(cx, cy, R, i)
+    ctx.setStrokeStyle(WX_COLORS[i].glow)
+    ctx.setLineWidth(0.7)
+    drawDashedLine(ctx, cx, cy, p.x, p.y, 4, 3)
+  }
+
+  // -- 历史对比多边形（上周，如有） --
+  if (prevFe && prevFe.hasData) {
+    const prevVals = [prevFe.jin, prevFe.mu, prevFe.shui, prevFe.huo, prevFe.tu]
     ctx.beginPath()
-    ctx.moveTo(cx, cy)
-    ctx.lineTo(cx + R * Math.cos(angle), cy + R * Math.sin(angle))
-    ctx.setStrokeStyle('rgba(200, 192, 178, 0.45)')
-    ctx.setLineWidth(0.6)
+    for (let i = 0; i < 5; i++) {
+      const t = clamp(prevVals[i] / 100, 0, 1)
+      const rr = R * (0.18 + 0.82 * t)
+      const p = vertexXY(cx, cy, rr, i)
+      if (i === 0) ctx.moveTo(p.x, p.y)
+      else ctx.lineTo(p.x, p.y)
+    }
+    ctx.closePath()
+    ctx.setFillStyle('rgba(160, 155, 145, 0.1)')
+    ctx.fill()
+    ctx.setStrokeStyle('rgba(140, 130, 120, 0.35)')
+    ctx.setLineWidth(1.2)
+    ctx.setLineDash([4, 3], 0)
     ctx.stroke()
+    ctx.setLineDash([], 0)
   }
 
+  // -- 当前数据多边形：径向渐变填充 --
   const vals = [fe.jin, fe.mu, fe.shui, fe.huo, fe.tu]
+  const dataGrd = ctx.createCircularGradient(cx, cy, R * 0.85)
+  dataGrd.addColorStop(0, 'rgba(63, 81, 181, 0.06)')
+  dataGrd.addColorStop(0.6, 'rgba(63, 81, 181, 0.18)')
+  dataGrd.addColorStop(1, 'rgba(48, 63, 159, 0.32)')
   ctx.beginPath()
+  const dataPoints = []
   for (let i = 0; i < 5; i++) {
-    const angle = -Math.PI / 2 + (i * 2 * Math.PI) / 5
     const t = clamp(vals[i] / 100, 0, 1)
     const rr = R * (0.18 + 0.82 * t)
-    const x = cx + rr * Math.cos(angle)
-    const y = cy + rr * Math.sin(angle)
-    if (i === 0) ctx.moveTo(x, y)
-    else ctx.lineTo(x, y)
+    const p = vertexXY(cx, cy, rr, i)
+    dataPoints.push(p)
+    if (i === 0) ctx.moveTo(p.x, p.y)
+    else ctx.lineTo(p.x, p.y)
   }
   ctx.closePath()
-  ctx.setFillStyle('rgba(57, 73, 171, 0.26)')
+  ctx.setFillStyle(dataGrd)
   ctx.fill()
-  ctx.setStrokeStyle('rgba(40, 53, 147, 0.92)')
-  ctx.setLineWidth(2.5)
+  ctx.setStrokeStyle('rgba(40, 53, 147, 0.88)')
+  ctx.setLineWidth(2.2)
   ctx.stroke()
 
-  const tick = ['金', '木', '水', '火', '土']
-  ctx.setTextAlign('center')
-  ctx.setTextBaseline('middle')
-  ctx.setFontSize(Math.max(12, Math.floor(Math.min(width, height) / 22)))
-  ctx.setFillStyle('#5c4d3d')
-  const labelR = R + 14
+  // -- 顶点发光圆点（五行专属色） --
   for (let i = 0; i < 5; i++) {
-    const angle = -Math.PI / 2 + (i * 2 * Math.PI) / 5
-    ctx.fillText(tick[i], cx + labelR * Math.cos(angle), cy + labelR * Math.sin(angle))
+    const dp = dataPoints[i]
+    const c = WX_COLORS[i]
+    ctx.setShadow(0, 0, 10, c.glow)
+    ctx.beginPath()
+    ctx.arc(dp.x, dp.y, 5, 0, Math.PI * 2)
+    ctx.setFillStyle(c.main)
+    ctx.fill()
+    ctx.setShadow(0, 0, 0, 'transparent')
+    ctx.beginPath()
+    ctx.arc(dp.x, dp.y, 5, 0, Math.PI * 2)
+    ctx.setStrokeStyle('rgba(255,255,255,0.85)')
+    ctx.setLineWidth(1.2)
+    ctx.stroke()
+  }
+
+  // -- 标签：五行色圆底 + 白字 + 分值 --
+  const labelR = R + 22
+  const circR = Math.max(11, Math.floor(Math.min(width, height) / 26))
+  const fontSize = Math.max(11, Math.floor(circR * 0.9))
+  const valFontSize = Math.max(9, fontSize - 3)
+  for (let i = 0; i < 5; i++) {
+    const p = vertexXY(cx, cy, labelR, i)
+    const c = WX_COLORS[i]
+    ctx.setShadow(0, 2, 6, c.glow)
+    ctx.beginPath()
+    ctx.arc(p.x, p.y, circR, 0, Math.PI * 2)
+    ctx.setFillStyle(c.main)
+    ctx.fill()
+    ctx.setShadow(0, 0, 0, 'transparent')
+    ctx.setTextAlign('center')
+    ctx.setTextBaseline('middle')
+    ctx.setFontSize(fontSize)
+    ctx.setFillStyle('#fff')
+    ctx.fillText(c.label, p.x, p.y)
+    ctx.setFontSize(valFontSize)
+    ctx.setFillStyle(c.stroke)
+    ctx.fillText(String(vals[i]), p.x, p.y + circR + valFontSize * 0.7)
   }
 
   ctx.draw()
 }
 
+/**
+ * 计算偏移窗口的五行结果（用于历史对比）。
+ * @param {number} windowOffset 0 = 最近 WINDOW 天，1 = 再往前 WINDOW 天
+ */
+function computeFiveElementsWithOffset(recordsAsc, profile, personality, windowOffset) {
+  const offset = windowOffset || 0
+  const end = recordsAsc.length - offset * WINDOW
+  if (end <= 0) return null
+  const slice = recordsAsc.slice(0, end)
+  return computeFiveElements(slice, profile, personality)
+}
+
 module.exports = {
   computeFiveElements,
+  computeFiveElementsWithOffset,
   drawFiveRadar,
   WINDOW,
+  WX_COLORS,
   REFERENCE_WIKI,
   RADAR_FOOTER_LINES
 }
