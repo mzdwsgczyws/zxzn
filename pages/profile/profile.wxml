@@ -1,4 +1,4 @@
-<view class="page">
+<view class="page dao-paper-bg">
   <view class="card">
     <text class="title-lg">用于箴言上下文与解读（仅存本机）</text>
     <text class="subtitle">用于心象箴言与建议的个性化参考；未填写的项不会使用。以下带「箴言上下文」的项填齐后，抽取时将不再提示完善档案。</text>

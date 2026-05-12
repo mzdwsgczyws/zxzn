@@ -14,7 +14,7 @@
 
 .hero-title {
   display: block;
-  font-family: var(--dao-font-display);
+  font-family: "DaoDisplay", "Songti SC", "STSong", "Noto Serif CJK SC", serif;
   font-size: 40rpx;
   font-weight: 700;
   color: #e8d4a8;

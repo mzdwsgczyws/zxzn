@@ -559,7 +559,7 @@
 
 .tier {
   display: block;
-  font-family: var(--dao-font-display);
+  font-family: "DaoDisplay", "Songti SC", "STSong", "Noto Serif CJK SC", serif;
   font-size: 36rpx;
   font-weight: 700;
   margin-bottom: 16rpx;
@@ -567,7 +567,7 @@
 
 .lot-name {
   display: block;
-  font-family: var(--dao-font-display);
+  font-family: "DaoDisplay", "Songti SC", "STSong", "Noto Serif CJK SC", serif;
   font-size: var(--dao-fs-title);
   font-weight: 600;
   color: #2c2416;
@@ -765,7 +765,7 @@
 
 .poem {
   display: block;
-  font-family: var(--dao-font-display);
+  font-family: "DaoDisplay", "Songti SC", "STSong", "Noto Serif CJK SC", serif;
   font-size: 28rpx;
   color: #3e3428;
   line-height: 1.8;
@@ -798,7 +798,7 @@
 
 .b-title {
   display: block;
-  font-family: var(--dao-font-display);
+  font-family: "DaoDisplay", "Songti SC", "STSong", "Noto Serif CJK SC", serif;
   font-size: 26rpx;
   font-weight: 600;
   color: #3949ab;

@@ -1,4 +1,4 @@
-<view class="page dao-enter">
+<view class="page dao-enter dao-paper-bg">
   <view class="period-tabs">
     <text class="tab {{period === 'week' ? 'tab--on' : ''}}" data-period="week" bindtap="switchPeriod">周报</text>
     <text class="tab {{period === 'month' ? 'tab--on' : ''}}" data-period="month" bindtap="switchPeriod">月报</text>

@@ -14,7 +14,7 @@
 
 .ft-hero-title {
   display: block;
-  font-family: var(--dao-font-display);
+  font-family: "DaoDisplay", "Songti SC", "STSong", "Noto Serif CJK SC", serif;
   font-size: var(--dao-fs-hero);
   font-weight: 700;
   color: var(--dao-gold-pale);

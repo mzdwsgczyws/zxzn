@@ -37,7 +37,7 @@
 }
 
 .nav-title {
-  font-family: var(--dao-font-display);
+  font-family: "DaoDisplay", "Songti SC", "STSong", "Noto Serif CJK SC", serif;
   font-size: 34rpx;
   font-weight: 600;
   letter-spacing: 6rpx;
@@ -115,7 +115,7 @@
 }
 
 .idle-tag {
-  font-family: var(--dao-font-display);
+  font-family: "DaoDisplay", "Songti SC", "STSong", "Noto Serif CJK SC", serif;
   font-size: 26rpx;
   color: #8d7b68;
   letter-spacing: 8rpx;
@@ -126,7 +126,7 @@
   width: 420rpx;
   padding: 32rpx 24rpx;
   line-height: 1.4;
-  font-family: var(--dao-font-display);
+  font-family: "DaoDisplay", "Songti SC", "STSong", "Noto Serif CJK SC", serif;
   font-size: 32rpx;
   font-weight: 600;
   letter-spacing: 4rpx;
@@ -845,7 +845,7 @@
 }
 
 .tier {
-  font-family: var(--dao-font-display);
+  font-family: "DaoDisplay", "Songti SC", "STSong", "Noto Serif CJK SC", serif;
   font-size: 36rpx;
   font-weight: 700;
 }
@@ -867,7 +867,7 @@
 
 .lot-name {
   display: block;
-  font-family: var(--dao-font-display);
+  font-family: "DaoDisplay", "Songti SC", "STSong", "Noto Serif CJK SC", serif;
   font-size: var(--dao-fs-title);
   font-weight: 600;
   color: #2c2416;
@@ -1088,7 +1088,7 @@
 
 .poem {
   display: block;
-  font-family: var(--dao-font-display);
+  font-family: "DaoDisplay", "Songti SC", "STSong", "Noto Serif CJK SC", serif;
   font-size: 28rpx;
   color: #3e3428;
   line-height: 1.8;
@@ -1119,7 +1119,7 @@
 
 .b-title {
   display: block;
-  font-family: var(--dao-font-display);
+  font-family: "DaoDisplay", "Songti SC", "STSong", "Noto Serif CJK SC", serif;
   font-size: 26rpx;
   font-weight: 600;
   color: #3949ab;
@@ -1302,7 +1302,7 @@
 }
 
 .hall-circle-t {
-  font-family: var(--dao-font-display);
+  font-family: "DaoDisplay", "Songti SC", "STSong", "Noto Serif CJK SC", serif;
   font-size: 20rpx;
   font-weight: 600;
   color: #2a1f15;
@@ -1479,7 +1479,7 @@
 }
 
 .dock-btn-text {
-  font-family: var(--dao-font-display);
+  font-family: "DaoDisplay", "Songti SC", "STSong", "Noto Serif CJK SC", serif;
   font-size: 26rpx;
   font-weight: 600;
   color: #e8d4a8;

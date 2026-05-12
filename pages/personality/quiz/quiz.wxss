@@ -42,7 +42,7 @@
 
 .q-text {
   display: block;
-  font-family: var(--dao-font-display);
+  font-family: "DaoDisplay", "Songti SC", "STSong", "Noto Serif CJK SC", serif;
   font-size: 34rpx;
   font-weight: 600;
   color: var(--dao-ink);

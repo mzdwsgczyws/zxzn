@@ -5,7 +5,7 @@
 
 .title-lg {
   display: block;
-  font-family: var(--dao-font-display);
+  font-family: "DaoDisplay", "Songti SC", "STSong", "Noto Serif CJK SC", serif;
   font-size: 34rpx;
   font-weight: 600;
   color: var(--dao-purple-deep);
@@ -72,7 +72,7 @@
 
 .sec-title {
   display: block;
-  font-family: var(--dao-font-display);
+  font-family: "DaoDisplay", "Songti SC", "STSong", "Noto Serif CJK SC", serif;
   font-size: 28rpx;
   font-weight: 600;
   color: var(--dao-purple-mid);
@@ -389,7 +389,7 @@
 }
 
 .wow-label {
-  font-family: var(--dao-font-display);
+  font-family: "DaoDisplay", "Songti SC", "STSong", "Noto Serif CJK SC", serif;
   font-size: 26rpx;
   color: var(--dao-ink-body);
 }

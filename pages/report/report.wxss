@@ -12,7 +12,7 @@
 }
 
 .tab {
-  font-family: var(--dao-font-display);
+  font-family: "DaoDisplay", "Songti SC", "STSong", "Noto Serif CJK SC", serif;
   font-size: 28rpx;
   color: var(--dao-ink-muted);
   padding: 8rpx 32rpx;
@@ -29,7 +29,7 @@
 
 .sec-title {
   display: block;
-  font-family: var(--dao-font-display);
+  font-family: "DaoDisplay", "Songti SC", "STSong", "Noto Serif CJK SC", serif;
   font-size: 30rpx;
   font-weight: 600;
   color: var(--dao-gold-pale);

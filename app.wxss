@@ -3,8 +3,8 @@
  * 千年赛博道观：静如宣纸，动如流水；金线勾勒，紫墨铺底。
  */
 page {
-  /* —— 字体 —— */
-  --dao-font-display: "Songti SC", "STSong", "Noto Serif CJK SC", "Source Han Serif SC", serif;
+  /* —— 字体（DaoDisplay 由 wx.loadFontFace 加载 LXGW WenKai） —— */
+  --dao-font-display: "DaoDisplay", "Songti SC", "STSong", "Noto Serif CJK SC", serif;
   --dao-font-body: -apple-system, "Helvetica Neue", "PingFang SC", "Noto Sans CJK SC", sans-serif;
 
   /* —— 字号阶梯 —— */
@@ -52,17 +52,13 @@ page {
   -webkit-font-smoothing: antialiased;
 }
 
-/* —— 宣纸质感底纹 —— */
-page::after {
-  content: '';
-  position: fixed;
-  left: 0; top: 0; right: 0; bottom: 0;
-  z-index: -1;
-  pointer-events: none;
-  background:
-    radial-gradient(ellipse at 15% 30%, rgba(180, 160, 120, 0.035) 0%, transparent 55%),
-    radial-gradient(ellipse at 85% 70%, rgba(140, 120, 90, 0.025) 0%, transparent 55%),
-    radial-gradient(ellipse at 50% 10%, rgba(200, 180, 140, 0.02) 0%, transparent 40%);
+/* —— 宣纸质感底纹（在 view 层而非 page 伪元素） —— */
+.dao-paper-bg {
+  background-color: var(--dao-bg-page);
+  background-image:
+    radial-gradient(ellipse at 15% 25%, rgba(180, 160, 120, 0.06) 0%, transparent 50%),
+    radial-gradient(ellipse at 85% 75%, rgba(160, 140, 100, 0.05) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 50%, rgba(200, 180, 140, 0.03) 0%, transparent 60%);
 }
 
 .safe-bottom {
@@ -87,26 +83,27 @@ page::after {
 .card::after {
   content: '';
   position: absolute;
-  width: 36rpx;
-  height: 36rpx;
-  border-color: var(--dao-gold-pale);
+  width: 48rpx;
+  height: 48rpx;
+  border-color: var(--dao-gold);
   border-style: solid;
-  opacity: 0.12;
+  opacity: 0.28;
   pointer-events: none;
+  z-index: 1;
 }
 
 .card::before {
-  top: 8rpx;
-  left: 8rpx;
-  border-width: 2rpx 0 0 2rpx;
-  border-radius: 6rpx 0 0 0;
+  top: 10rpx;
+  left: 10rpx;
+  border-width: 3rpx 0 0 3rpx;
+  border-radius: 8rpx 0 0 0;
 }
 
 .card::after {
-  bottom: 8rpx;
-  right: 8rpx;
-  border-width: 0 2rpx 2rpx 0;
-  border-radius: 0 0 6rpx 0;
+  bottom: 10rpx;
+  right: 10rpx;
+  border-width: 0 3rpx 3rpx 0;
+  border-radius: 0 0 8rpx 0;
 }
 
 .btn-primary {
@@ -153,7 +150,7 @@ page::after {
 }
 
 .title-lg {
-  font-family: var(--dao-font-display);
+  font-family: "DaoDisplay", "Songti SC", "STSong", "Noto Serif CJK SC", serif;
   font-size: var(--dao-fs-title);
   font-weight: 600;
   color: var(--dao-purple-deep);
@@ -256,14 +253,8 @@ page::after {
     --dao-divider: #2a2535;
   }
 
-  page::after {
-    background:
-      radial-gradient(ellipse at 15% 30%, rgba(60, 40, 80, 0.04) 0%, transparent 55%),
-      radial-gradient(ellipse at 85% 70%, rgba(40, 30, 60, 0.03) 0%, transparent 55%);
-  }
-
   .card::before,
   .card::after {
-    opacity: 0.08;
+    opacity: 0.2;
   }
 }

@@ -1,4 +1,4 @@
-<view class="page" wx:if="{{hasResult}}">
+<view class="page dao-paper-bg" wx:if="{{hasResult}}">
   <view class="top-bar">
     <text class="retest-link" bindtap="retest">重新测验</text>
   </view>
