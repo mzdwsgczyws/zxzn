@@ -14,14 +14,17 @@
       <view
         wx:for="{{achievements}}"
         wx:key="id"
-        class="ach acc-{{item.accent}} {{item.unlocked ? 'ach-on' : 'ach-off'}}"
-        catchtouchstart="onAchPressStart"
-        catchtouchend="onAchPressEnd"
-        catchtouchcancel="onAchPressEnd"
+        class="ach acc-{{item.accent}} {{item.unlocked ? 'ach-on' : 'ach-off'}} ach-s{{item.stars}}"
+        bindtouchstart="onAchPressStart"
+        bindtouchmove="onAchPressMove"
+        bindtouchend="onAchPressEnd"
+        bindtouchcancel="onAchPressEnd"
         data-id="{{item.id}}"
       >
         <view class="ach-inner">
-          <view class="ach-crown">{{item.unlocked ? '✦' : '◇'}}</view>
+          <view class="ach-stars">
+            <text wx:for="{{item.starsArr}}" wx:for-item="s" wx:key="*this" class="ach-star {{item.unlocked ? 'ach-star--lit' : ''}}">★</text>
+          </view>
           <text class="ach-name">{{item.name}}</text>
           <text class="ach-sub">{{item.subtitle}}</text>
           <text class="ach-hint">长按看评语</text>

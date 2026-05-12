@@ -118,6 +118,11 @@
   box-shadow: 0 10rpx 28rpx rgba(120, 80, 30, 0.22);
 }
 
+.acc-green {
+  background: linear-gradient(145deg, rgba(46, 125, 50, 0.9), rgba(129, 199, 132, 0.5));
+  box-shadow: 0 10rpx 28rpx rgba(27, 94, 32, 0.22);
+}
+
 .ach-inner {
   border-radius: 6rpx 26rpx 6rpx 26rpx;
   background: rgba(255, 252, 248, 0.94);
@@ -160,15 +165,50 @@
   }
 }
 
-.ach-crown {
-  font-size: 28rpx;
-  color: #c9a227;
+.ach-stars {
+  display: flex;
+  gap: 2rpx;
+  justify-content: center;
   margin-bottom: 8rpx;
   line-height: 1;
 }
 
-.ach-off .ach-crown {
-  color: #9a9a9a;
+.ach-star {
+  font-size: 22rpx;
+  color: #c0b8a8;
+}
+
+.ach-star--lit {
+  color: #c9a227;
+}
+
+.ach-s3 .ach-star--lit {
+  color: #d4a017;
+  text-shadow: 0 0 6rpx rgba(212, 160, 23, 0.4);
+}
+
+.ach-s4 .ach-star--lit {
+  color: #e8a817;
+  text-shadow: 0 0 10rpx rgba(232, 168, 23, 0.5);
+}
+
+.ach-s5 .ach-star--lit {
+  color: #ffd700;
+  text-shadow: 0 0 16rpx rgba(255, 215, 0, 0.6);
+}
+
+.ach-off .ach-star {
+  color: #b0aaa0;
+  opacity: 0.5;
+}
+
+.ach-on.ach-s4 {
+  box-shadow: 0 10rpx 36rpx rgba(166, 124, 31, 0.35);
+}
+
+.ach-on.ach-s5 {
+  box-shadow: 0 12rpx 48rpx rgba(255, 215, 0, 0.35);
+  border: 2rpx solid rgba(255, 215, 0, 0.4);
 }
 
 .ach-name {
