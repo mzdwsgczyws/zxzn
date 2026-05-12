@@ -1,13 +1,23 @@
 <view class="page">
   <loading-mask show="{{radarLoading}}" text="绘制雷达中" />
   <view class="card card-radar">
-    <text class="title-lg">五行意象雷达</text>
-    <text class="radar-lead">图形为近 7 天加权；分数与说明在下方卡片（与顶点顺序一致：上起顺时针 金→木→水→火→土）。</text>
+    <text class="title-lg">身心状态雷达</text>
+    <text class="radar-lead">基于最近 7 天的记录生成，分数越高表示该方面负荷越重。金→木→水→火→土，详情见下方卡片。</text>
     <canvas
       canvas-id="fiveRadar"
       class="five-radar-canvas"
       disable-scroll="true"
     ></canvas>
+    <view class="radar-legend" wx:if="{{hasPrevWeek}}">
+      <view class="legend-item">
+        <view class="legend-dot legend-dot--cur"></view>
+        <text class="legend-text">本周</text>
+      </view>
+      <view class="legend-item">
+        <view class="legend-dot legend-dot--prev"></view>
+        <text class="legend-text">上周</text>
+      </view>
+    </view>
     <view class="radar-axis-panel">
       <view class="radar-axis-card" wx:for="{{fiveRows}}" wx:key="name">
         <view class="radar-axis-top">
@@ -21,10 +31,10 @@
 
   <view class="card">
     <text class="title-lg">今日记录</text>
-    <text class="subtitle">记录可量化指标，便于观察趋势（非医疗诊断）。新增字段用于阴/阳与模态画像；旧记录会自动补默认。</text>
+    <text class="subtitle">每天花一分钟记录，帮你看清身心变化趋势（仅供参考，非医疗诊断）。</text>
 
-    <text class="sec-title sec-title-inline">自修重点（最多 3 项，用于排序建议）</text>
-    <text class="chip-hint">勾选后，相关建议会略提前；不选则各维度均衡。</text>
+    <text class="sec-title sec-title-inline">我最关注的方面（最多选 3 项）</text>
+    <text class="chip-hint">选中后，相关建议会优先展示；不选则各方面均衡。</text>
     <view class="chip-row">
       <view
         class="chip {{item.on ? 'chip-on' : ''}}"
@@ -40,44 +50,44 @@
       <slider min="0" max="12" step="0.5" show-value value="{{form.sleepHours}}" bindchange="onSleep" />
     </view>
     <view class="field">
-      <text class="label">主观恢复感（1 低—5 高）</text>
+      <text class="label">今天精力恢复如何？（1 很差—5 很好）</text>
       <slider min="1" max="5" step="1" show-value value="{{form.recoveryScore}}" bindchange="onRecovery" />
     </view>
     <view class="field">
-      <text class="label">耗竭 / 支出感（1 低—5 高）</text>
+      <text class="label">今天累不累？（1 不累—5 很累）</text>
       <slider min="1" max="5" step="1" show-value value="{{form.drainScore}}" bindchange="onDrain" />
     </view>
     <view class="field">
-      <text class="label">社交负荷（场次/强度综合，0—5）</text>
+      <text class="label">今天社交多吗？（0 没有—5 非常多）</text>
       <slider min="0" max="5" step="1" show-value value="{{form.socialLoad}}" bindchange="onSocial" />
     </view>
     <view class="field">
-      <text class="label">今日主模态（意象）</text>
+      <text class="label">今天主要在做什么？</text>
       <picker mode="selector" range="{{phaseLabels}}" value="{{phaseIndex}}" bindchange="onPhase">
         <view class="picker-val">{{phaseLabels[phaseIndex]}}</view>
       </picker>
     </view>
     <view class="field">
-      <text class="label">主动留白 / 放空（分钟，非 KPI）</text>
+      <text class="label">今天有多少放空时间？（分钟）</text>
       <slider min="0" max="60" step="5" show-value value="{{form.blankMinutes}}" bindchange="onBlank" />
     </view>
     <view class="field row-switch">
-      <text class="label">今日有一件微行动完成</text>
+      <text class="label">今天完成了一件小事</text>
       <switch checked="{{form.miniActionDone}}" bindchange="onMiniAction" />
     </view>
 
-    <view class="divider-label">以下为原有量化项</view>
+    <view class="divider-label">情绪与生活习惯</view>
 
     <view class="field">
-      <text class="label">生气 / 强烈烦躁（次）</text>
+      <text class="label">今天生气或烦躁了几次？</text>
       <slider min="0" max="20" step="1" show-value value="{{form.angerCount}}" bindchange="onAnger" />
     </view>
     <view class="field">
-      <text class="label">烦恼念头登记（次）</text>
+      <text class="label">反复想烦心事的次数</text>
       <slider min="0" max="30" step="1" show-value value="{{form.worryCount}}" bindchange="onWorry" />
     </view>
     <view class="field">
-      <text class="label">娱乐屏幕（小时）</text>
+      <text class="label">刷手机/看视频时间（小时）</text>
       <slider min="0" max="16" step="0.5" show-value value="{{form.screenHours}}" bindchange="onScreen" />
     </view>
     <view class="field">
@@ -85,7 +95,7 @@
       <slider min="0" max="180" step="5" show-value value="{{form.walkMinutes}}" bindchange="onWalk" />
     </view>
     <view class="field">
-      <text class="label">静坐 / 正念（分钟）</text>
+      <text class="label">静坐或冥想（分钟）</text>
       <slider min="0" max="120" step="5" show-value value="{{form.calmMinutes}}" bindchange="onCalm" />
     </view>
 
@@ -97,25 +107,25 @@
     <text class="para" wx:for="{{analysis.lines}}" wx:key="*this">{{item}}</text>
 
     <view class="focus-wrap" wx:if="{{analysis.modules}}">
-      <text class="sec-title">模块摘要</text>
-      <text class="li sm">· 阴阳：{{analysis.modules.yinyang.headline}}</text>
+      <text class="sec-title">状态总览</text>
+      <text class="li sm">· 消耗与恢复：{{analysis.modules.yinyang.headline}}</text>
       <text class="li sm muted-li" wx:if="{{analysis.modules.yinyang.detail}}">{{analysis.modules.yinyang.detail}}</text>
       <text class="li sm">· {{analysis.modules.phase.headline}}：{{analysis.modules.phase.detail}}</text>
       <text class="li sm">· {{analysis.modules.wuwei.headline}}：{{analysis.modules.wuwei.detail}}</text>
     </view>
 
     <view class="focus-wrap" wx:if="{{analysis.recommendations.length}}">
-      <text class="sec-title">排序建议（含调整与理由）</text>
+      <text class="sec-title">改善建议</text>
       <view class="rec-card" wx:for="{{analysis.recommendations}}" wx:key="priority">
         <text class="rec-p">优先级 {{item.priority}}</text>
         <text class="rec-title">{{item.title}}</text>
-        <text class="rec-block"><text class="rec-k">调整：</text>{{item.adjust}}</text>
-        <text class="rec-block"><text class="rec-k">理由：</text>{{item.reason}}</text>
+        <text class="rec-block"><text class="rec-k">建议：</text>{{item.adjust}}</text>
+        <text class="rec-block"><text class="rec-k">原因：</text>{{item.reason}}</text>
       </view>
     </view>
 
     <view class="focus-wrap" wx:if="{{analysis.focus.length}}">
-      <text class="sec-title">可执行一句话</text>
+      <text class="sec-title">今天可以做的一件事</text>
       <text class="li" wx:for="{{analysis.focus}}" wx:key="*this">· {{item}}</text>
     </view>
     <text class="muted tiny" wx:if="{{analysis.meta.disclaimer}}">{{analysis.meta.disclaimer}}</text>
@@ -123,8 +133,8 @@
   </view>
 
   <view class="card" wx:else>
-    <text class="muted">保存记录后，点击下方生成基于近几日数据的自修侧重点。</text>
-    <button class="btn-primary" bindtap="runAnalysis">生成自修方案</button>
+    <text class="muted">保存记录后，点击下方按钮查看个性化的改善建议。</text>
+    <button class="btn-primary" bindtap="runAnalysis">生成改善建议</button>
   </view>
 
   <view class="card" wx:if="{{records.length}}">

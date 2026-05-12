@@ -25,6 +25,8 @@ module.exports = {
   THEORY_INTRO_BANNER_DISMISSED: 'theoryIntroBannerDismissed_v1',
   /** 每日打卡：连续天数、累计天数、最后打卡日本地字符串，见 utils/checkin.js */
   CHECKIN_STATE: 'checkinState_v1',
+  /** 建议反馈：{ liked: { cat: count }, dislikedTexts: string[] } */
+  ADVICE_FEEDBACK: 'adviceFeedback_v1',
   /** 深色模式偏好：auto | light | dark */
   THEME_MODE: 'themeMode_v1',
   /** 新用户引导是否完成 */

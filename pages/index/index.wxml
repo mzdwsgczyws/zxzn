@@ -145,6 +145,16 @@
           <view class="block">
             <text class="b-title">建议</text>
             <text class="adv-line" wx:for="{{adviceList}}" wx:key="*this">{{item}}</text>
+            <view class="advice-feedback-row">
+              <view class="advice-fb-btn advice-fb-like {{adviceFbDone ? 'advice-fb-done' : ''}}" bindtap="tapAdviceLike">
+                <text class="advice-fb-icon">✦</text>
+                <text class="advice-fb-text">有启发</text>
+              </view>
+              <view class="advice-fb-btn advice-fb-skip {{adviceFbDone ? 'advice-fb-done' : ''}}" bindtap="tapAdviceSkip">
+                <text class="advice-fb-icon">✗</text>
+                <text class="advice-fb-text">不适用</text>
+              </view>
+            </view>
           </view>
         </block>
 

@@ -11,6 +11,7 @@ Page({
 
   data: Object.assign(core.lotteryDataDefaults(), {
     phase: 'idle',
+    adviceFbDone: false,
     statusBarH: 20,
     navTotalPx: 64,
     mainScrollH: 400,
@@ -204,6 +205,36 @@ Page({
   /** 清除当日缓存并回到抽取入口 */
   redrawLottery() {
     core.clearTodayAndReset(this, 'idle')
+  },
+
+  tapAdviceLike() {
+    if (this.data.adviceFbDone) return
+    this.setData({ adviceFbDone: true })
+    try {
+      const fb = wx.getStorageSync(KEYS.ADVICE_FEEDBACK) || { liked: {}, dislikedTexts: [] }
+      const list = this.data.adviceList || []
+      list.forEach((line) => {
+        const cat = String(line).replace(/^\d+\.\s*/, '').slice(0, 2)
+        fb.liked[cat] = (fb.liked[cat] || 0) + 1
+      })
+      wx.setStorageSync(KEYS.ADVICE_FEEDBACK, fb)
+    } catch (e) {}
+    wx.showToast({ title: '感谢反馈', icon: 'none' })
+  },
+
+  tapAdviceSkip() {
+    if (this.data.adviceFbDone) return
+    this.setData({ adviceFbDone: true })
+    try {
+      const fb = wx.getStorageSync(KEYS.ADVICE_FEEDBACK) || { liked: {}, dislikedTexts: [] }
+      const list = this.data.adviceList || []
+      const texts = list.map((l) => String(l).replace(/^\s*\d+\.\s*/, '').trim()).filter(Boolean)
+      const s = new Set(fb.dislikedTexts || [])
+      texts.forEach((t) => s.add(t))
+      fb.dislikedTexts = Array.from(s).slice(-50)
+      wx.setStorageSync(KEYS.ADVICE_FEEDBACK, fb)
+    } catch (e) {}
+    wx.showToast({ title: '已记录', icon: 'none' })
   },
 
   goHome() {
