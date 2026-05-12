@@ -96,8 +96,13 @@ Page({
     if (this.data.adviceFbDone) return
     this.setData({ adviceFbDone: true })
     try {
-      const fb = wx.getStorageSync(KEYS.ADVICE_FEEDBACK) || { liked: {}, dislikedTexts: [] }
+      const fb = wx.getStorageSync(KEYS.ADVICE_FEEDBACK) || { liked: {}, dislikedTexts: [], likedCats: {}, dislikedCats: {} }
+      if (!fb.likedCats) fb.likedCats = {}
+      const structured = this.data.adviceStructured || []
       const list = this.data.adviceList || []
+      structured.forEach((s) => {
+        if (s.cat) fb.likedCats[s.cat] = (fb.likedCats[s.cat] || 0) + 1
+      })
       list.forEach((line) => {
         const cat = String(line).replace(/^\d+\.\s*/, '').slice(0, 2)
         fb.liked[cat] = (fb.liked[cat] || 0) + 1
@@ -111,8 +116,13 @@ Page({
     if (this.data.adviceFbDone) return
     this.setData({ adviceFbDone: true })
     try {
-      const fb = wx.getStorageSync(KEYS.ADVICE_FEEDBACK) || { liked: {}, dislikedTexts: [] }
+      const fb = wx.getStorageSync(KEYS.ADVICE_FEEDBACK) || { liked: {}, dislikedTexts: [], likedCats: {}, dislikedCats: {} }
+      if (!fb.dislikedCats) fb.dislikedCats = {}
+      const structured = this.data.adviceStructured || []
       const list = this.data.adviceList || []
+      structured.forEach((s) => {
+        if (s.cat) fb.dislikedCats[s.cat] = (fb.dislikedCats[s.cat] || 0) + 1
+      })
       const texts = list.map((l) => String(l).replace(/^\s*\d+\.\s*/, '').trim()).filter(Boolean)
       const s = new Set(fb.dislikedTexts || [])
       texts.forEach((t) => s.add(t))

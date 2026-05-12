@@ -129,6 +129,7 @@ function lotteryDataDefaults() {
     revealed: false,
     tierColor: '#1565c0',
     adviceList: [],
+    adviceStructured: [],
     thinkingCategories: [],
     thinkingFootnote: '',
     thinkingVisibleCount: 0,
@@ -157,6 +158,7 @@ function restoreToday(page, options) {
         revealed: !!cache.revealed,
         tierColor: TIER_COLORS[lot.tier] || '#1565c0',
         adviceList: cache.adviceList || [],
+        adviceStructured: cache.adviceStructured || [],
         thinkingCategories: [],
         thinkingFootnote: '',
         thinkingVisibleCount: 0,
@@ -181,6 +183,7 @@ function restoreToday(page, options) {
       lot: null,
       revealed: false,
       adviceList: [],
+      adviceStructured: [],
       thinkingCategories: [],
       thinkingFootnote: '',
       thinkingVisibleCount: 0,
@@ -304,7 +307,7 @@ function finalizeDraw(page, lat, lng, weather) {
     }
   } catch (e) {}
 
-  const adviceList = computeLotteryAdvices({
+  const adviceResult = computeLotteryAdvices({
     dateStr: meta.dateStr,
     lotId: meta.lotId,
     tier: rawLot.tier,
@@ -322,9 +325,11 @@ function finalizeDraw(page, lat, lng, weather) {
     focusTags: profile.focusTags,
     avoidAdviceTexts
   })
+  const adviceList = adviceResult.lines || adviceResult
+  const adviceStructured = adviceResult.structured || []
 
   try {
-    const texts = adviceList.map(stripAdvicePlainLine).filter(Boolean)
+    const texts = (Array.isArray(adviceList) ? adviceList : []).map(stripAdvicePlainLine).filter(Boolean)
     wx.setStorageSync(KEYS.LOTTERY_ADVICE_RECENT, { texts, ts: now.getTime() })
   } catch (e) {}
 
@@ -334,6 +339,7 @@ function finalizeDraw(page, lat, lng, weather) {
     lotId: meta.lotId,
     revealed: false,
     adviceList,
+    adviceStructured,
     lotStylePref: stylePref,
     _drawVer: drawVer
   }
@@ -367,7 +373,8 @@ function finalizeDraw(page, lat, lng, weather) {
         lot,
         revealed: false,
         tierColor: TIER_COLORS[lot.tier] || '#1565c0',
-        adviceList
+        adviceList,
+        adviceStructured
       },
       () => startThinkingReveal(page)
     )

@@ -354,6 +354,51 @@ const ACHIEVEMENT_DEFS = [
     test: (s) => s.allMiddleLong,
     comment: '八个「抽签日」末抽都在「中」档！稳得像节拍器——偶尔也可以故意「跑调」一下换换心情。',
     commentLocked: '累计八个及以上自然日，且每日以最后一次抽签为准均为「中」档——佛系玩家专属彩蛋。'
+  },
+  {
+    id: 'checkin_7',
+    name: '周不断',
+    subtitle: '连续打卡 7 天',
+    accent: 'green',
+    test: (s) => s.checkinStreak >= 7 || s.checkinTotal >= 7,
+    comment: '连续七天都来打卡了——习惯的种子已经扎根。',
+    commentLocked: '连续打卡 7 天即可解锁。'
+  },
+  {
+    id: 'checkin_21',
+    name: '习惯养成',
+    subtitle: '连续打卡 21 天',
+    accent: 'green',
+    test: (s) => s.checkinStreak >= 21 || s.checkinTotal >= 21,
+    comment: '二十一天足以养成一个小习惯——这份坚持已经说明了一切。',
+    commentLocked: '连续打卡 21 天即可解锁。'
+  },
+  {
+    id: 'checkin_30',
+    name: '月如一',
+    subtitle: '累计打卡 30 天',
+    accent: 'gold',
+    test: (s) => s.checkinTotal >= 30,
+    comment: '三十天的记录，像一本小小的日记本。',
+    commentLocked: '累计打卡 30 天即可解锁。'
+  },
+  {
+    id: 'checkin_100',
+    name: '百念如一',
+    subtitle: '累计打卡 100 天',
+    accent: 'gold',
+    test: (s) => s.checkinTotal >= 100,
+    comment: '百日修行——你比绝大多数人都更了解自己。',
+    commentLocked: '累计打卡 100 天即可解锁。'
+  },
+  {
+    id: 'checkin_365',
+    name: '岁月为证',
+    subtitle: '累计打卡 365 天',
+    accent: 'rose',
+    test: (s) => s.checkinTotal >= 365,
+    comment: '一整年的坚持，时间是最好的见证者。',
+    commentLocked: '累计打卡 365 天即可解锁。'
   }
 ]
 
@@ -385,6 +430,14 @@ function getFirstUnlockListSorted() {
 function computeAchievements() {
   const raw = loadHistoryRaw()
   const s = buildAchievementState(raw.draws)
+  try {
+    const checkinState = wx.getStorageSync(KEYS.CHECKIN_STATE) || {}
+    s.checkinStreak = checkinState.streak || 0
+    s.checkinTotal = checkinState.totalDays || 0
+  } catch (e) {
+    s.checkinStreak = 0
+    s.checkinTotal = 0
+  }
   const list = ACHIEVEMENT_DEFS.map((def) => {
     const unlocked = def.test(s)
     return {

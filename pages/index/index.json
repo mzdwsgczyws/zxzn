@@ -1,4 +1,8 @@
 {
   "navigationStyle": "custom",
-  "usingComponents": {}
+  "usingComponents": {
+    "checkin-strip": "/components/checkin-strip/checkin-strip",
+    "micro-action": "/components/micro-action/micro-action",
+    "milestone-celebrate": "/components/milestone-celebrate/milestone-celebrate"
+  }
 }

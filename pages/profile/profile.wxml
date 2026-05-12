@@ -132,12 +132,13 @@
   </view>
 
   <view class="card hall-links-card">
-    <text class="title-lg hall-links-title">展馆</text>
-    <text class="subtitle hall-links-sub">趋势走势、已收录条目与成就（与首页入口一致）。</text>
+    <text class="title-lg hall-links-title">展馆与报告</text>
+    <text class="subtitle hall-links-sub">趋势走势、已收录条目、成就与修炼报告。</text>
     <view class="hall-links-row">
       <button class="btn-ghost hall-link-btn" bindtap="goFortuneTrend">趋势日历</button>
       <button class="btn-ghost hall-link-btn" bindtap="goLotHall">心象展馆</button>
       <button class="btn-ghost hall-link-btn" bindtap="goAchieveHall">成就展馆</button>
+      <button class="btn-ghost hall-link-btn" bindtap="goReport">修炼报告</button>
     </view>
   </view>
 </view>

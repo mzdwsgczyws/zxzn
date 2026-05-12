@@ -1,0 +1,19 @@
+<view class="ma-root" wx:if="{{actions.length}}">
+  <text class="ma-title">今日微行动</text>
+  <view class="ma-list">
+    <view
+      wx:for="{{actions}}"
+      wx:key="index"
+      class="ma-item {{item.done ? 'ma-item--done' : ''}}"
+      data-index="{{index}}"
+      bindtap="toggle"
+    >
+      <view class="ma-check">{{item.done ? '✓' : ''}}</view>
+      <view class="ma-content">
+        <text class="ma-text">{{item.text}}</text>
+        <text class="ma-reason" wx:if="{{item.reason}}">{{item.reason}}</text>
+      </view>
+    </view>
+  </view>
+  <text class="ma-footer" wx:if="{{yesterdaySummary}}">{{yesterdaySummary}}</text>
+</view>

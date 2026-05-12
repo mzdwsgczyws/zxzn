@@ -113,6 +113,10 @@ Page({
     wx.navigateTo({ url: '/pages/achieve-hall/achieve-hall' })
   },
 
+  goReport() {
+    wx.navigateTo({ url: '/pages/report/report' })
+  },
+
   goTheoryIntro() {
     wx.navigateTo({ url: '/pages/theory-intro/theory-intro' })
   },

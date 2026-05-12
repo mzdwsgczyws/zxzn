@@ -368,3 +368,56 @@
   margin-bottom: 10rpx;
   letter-spacing: 0.5rpx;
 }
+
+.wow-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+  margin-top: 16rpx;
+}
+
+.wow-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 12rpx 16rpx;
+  background: var(--dao-bg-card);
+  border-radius: 8rpx;
+  border: 1rpx solid var(--dao-divider);
+}
+
+.wow-label {
+  font-size: 26rpx;
+  color: var(--dao-ink-body);
+}
+
+.wow-diff {
+  font-size: 26rpx;
+  font-weight: 600;
+}
+
+.wow-good {
+  color: #2e7d32;
+}
+
+.wow-warn {
+  color: #c62828;
+}
+
+.wow-summary {
+  display: block;
+  font-size: 24rpx;
+  color: var(--dao-gold-muted);
+  text-align: center;
+  margin-top: 16rpx;
+}
+
+.analysis-actions {
+  display: flex;
+  gap: 16rpx;
+  margin-top: 16rpx;
+}
+
+.analysis-actions .btn-ghost {
+  flex: 1;
+}

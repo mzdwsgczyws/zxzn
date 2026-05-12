@@ -102,6 +102,18 @@
     <button class="btn-primary save-btn" bindtap="saveToday">保存今日</button>
   </view>
 
+  <view class="card" wx:if="{{weekChange && weekChange.hasData}}">
+    <text class="title-lg">你的变化</text>
+    <text class="subtitle">本周 vs 上周关键指标对比</text>
+    <view class="wow-list">
+      <view class="wow-item" wx:for="{{weekChange.changes}}" wx:key="key">
+        <text class="wow-label">{{item.label}}</text>
+        <text class="wow-diff {{item.improved ? 'wow-good' : 'wow-warn'}}">{{item.arrow}} {{item.text}}</text>
+      </view>
+    </view>
+    <text class="wow-summary" wx:if="{{weekChange.summary}}">{{weekChange.summary}}</text>
+  </view>
+
   <view class="card" wx:if="{{analysis}}">
     <text class="title-lg">{{analysis.title}}</text>
     <text class="para" wx:for="{{analysis.lines}}" wx:key="*this">{{item}}</text>
@@ -129,7 +141,10 @@
       <text class="li" wx:for="{{analysis.focus}}" wx:key="*this">· {{item}}</text>
     </view>
     <text class="muted tiny" wx:if="{{analysis.meta.disclaimer}}">{{analysis.meta.disclaimer}}</text>
-    <button class="btn-ghost" bindtap="runAnalysis">刷新分析</button>
+    <view class="analysis-actions">
+      <button class="btn-ghost" bindtap="runAnalysis">刷新分析</button>
+      <button class="btn-ghost" bindtap="goReport">查看完整报告</button>
+    </view>
   </view>
 
   <view class="card" wx:else>

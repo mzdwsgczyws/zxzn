@@ -566,9 +566,79 @@ function analyzeRecords(records, ctx = {}) {
   }
 }
 
+function computeWeekOverWeek(records) {
+  if (!Array.isArray(records) || records.length < 7) return null
+  const sorted = records.slice().sort((a, b) => (a.date > b.date ? 1 : -1))
+  const thisWeek = sorted.slice(-7)
+  const prevWeek = sorted.slice(-14, -7)
+  if (prevWeek.length < 3) return null
+
+  const wavg = (arr, key) => {
+    const xs = arr.map(r => Number(r[key])).filter(n => !Number.isNaN(n))
+    return xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : null
+  }
+
+  const metrics = ['sleepHours', 'recoveryScore', 'drainScore', 'angerCount', 'screenHours', 'walkMinutes']
+  const labels = {
+    sleepHours: '睡眠',
+    recoveryScore: '恢复感',
+    drainScore: '耗竭感',
+    angerCount: '易怒次数',
+    screenHours: '屏幕时间',
+    walkMinutes: '步行'
+  }
+  const units = {
+    sleepHours: 'h',
+    recoveryScore: '',
+    drainScore: '',
+    angerCount: '次',
+    screenHours: 'h',
+    walkMinutes: '分钟'
+  }
+  const betterWhenHigher = { sleepHours: true, recoveryScore: true, walkMinutes: true }
+
+  const changes = []
+  metrics.forEach(key => {
+    const cur = wavg(thisWeek, key)
+    const prev = wavg(prevWeek, key)
+    if (cur == null || prev == null) return
+    const diff = +(cur - prev).toFixed(1)
+    if (Math.abs(diff) < 0.1) return
+    const isHigherBetter = !!betterWhenHigher[key]
+    const improved = isHigherBetter ? diff > 0 : diff < 0
+    changes.push({
+      key,
+      label: labels[key],
+      unit: units[key],
+      cur: +cur.toFixed(1),
+      prev: +prev.toFixed(1),
+      diff,
+      improved,
+      arrow: diff > 0 ? '↑' : '↓',
+      text: `${labels[key]} ${diff > 0 ? '+' : ''}${diff}${units[key]}`
+    })
+  })
+
+  const improvements = changes.filter(c => c.improved)
+  const regressions = changes.filter(c => !c.improved)
+
+  return {
+    hasData: changes.length > 0,
+    changes,
+    improvements,
+    regressions,
+    summary: improvements.length > 0
+      ? `本周有 ${improvements.length} 项指标改善`
+      : regressions.length > 0
+        ? `本周有 ${regressions.length} 项指标需关注`
+        : ''
+  }
+}
+
 module.exports = {
   analyzeRecords,
   PHASE_LABELS,
+  computeWeekOverWeek,
   TRACK_FOCUS_OPTIONS: [
     { id: 'sleep', label: '睡眠' },
     { id: 'emotion', label: '情绪' },

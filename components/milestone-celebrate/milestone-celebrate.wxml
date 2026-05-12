@@ -1,0 +1,11 @@
+<view class="mc-overlay" wx:if="{{show}}" catchtouchmove="noop">
+  <view class="mc-card">
+    <text class="mc-icon">✦</text>
+    <text class="mc-title">{{title}}</text>
+    <text class="mc-streak">连续 {{streak}} 天</text>
+    <text class="mc-body">{{body}}</text>
+    <view class="mc-actions">
+      <dao-button type="primary" size="small" bind:tap="onClose">继续</dao-button>
+    </view>
+  </view>
+</view>

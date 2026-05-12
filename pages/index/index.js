@@ -26,7 +26,14 @@ Page({
     checkinTotalDays: 0,
     checkinCheckedToday: false,
     checkinMood: '',
-    seasonalHint: ''
+    checkinExpanded: false,
+    milestoneText: '',
+    milestoneStreak: 0,
+    showMilestone: false,
+    seasonalHint: '',
+    microActions: [],
+    yesterdayActionSummary: '',
+    weekHighlight: ''
   }),
 
   onLoad() {
@@ -82,6 +89,8 @@ Page({
     this.refreshTheoryBannerFlag()
     this.refreshCheckIn()
     this.refreshSeasonalHint()
+    this.refreshMicroActions()
+    this.refreshWeekHighlight()
   },
 
   refreshCheckIn() {
@@ -102,6 +111,92 @@ Page({
     } catch (e) {}
   },
 
+  refreshMicroActions() {
+    try {
+      const cache = wx.getStorageSync(KEYS.LOTTERY_TODAY) || {}
+      const structured = cache.adviceStructured || []
+      const actions = structured.filter(s => s.microAction).map(s => ({
+        text: s.microAction,
+        reason: s.reason || '',
+        done: false
+      }))
+      const state = wx.getStorageSync(KEYS.CHECKIN_STATE) || {}
+      const log = state.dayLog || {}
+      const d = new Date()
+      const today = `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`
+      if (log[today] && Array.isArray(log[today].actions)) {
+        log[today].actions.forEach((saved, i) => {
+          if (actions[i]) actions[i].done = !!saved.done
+        })
+      }
+      const yDate = new Date(d.getFullYear(), d.getMonth(), d.getDate() - 1)
+      const yesterday = `${yDate.getFullYear()}-${yDate.getMonth() + 1}-${yDate.getDate()}`
+      let yesterdaySummary = ''
+      if (log[yesterday] && Array.isArray(log[yesterday].actions)) {
+        const ya = log[yesterday].actions
+        const done = ya.filter(a => a.done).length
+        if (ya.length > 0) {
+          yesterdaySummary = `昨日完成 ${done}/${ya.length} 项微行动`
+        }
+      }
+      this.setData({ microActions: actions, yesterdayActionSummary: yesterdaySummary })
+    } catch (e) {}
+  },
+
+  onMicroActionChange(e) {
+    this.setData({ microActions: e.detail.actions })
+  },
+
+  closeMilestone() {
+    this.setData({ showMilestone: false })
+  },
+
+  refreshWeekHighlight() {
+    try {
+      const records = wx.getStorageSync(KEYS.TRACK_RECORDS) || []
+      if (records.length < 7) { this.setData({ weekHighlight: '' }); return }
+      const sorted = records.slice().sort((a, b) => (a.date > b.date ? 1 : -1))
+      const thisW = sorted.slice(-7)
+      const prevW = sorted.slice(-14, -7)
+      if (prevW.length < 3) { this.setData({ weekHighlight: '' }); return }
+      const wavg = (arr, k) => {
+        const xs = arr.map(r => Number(r[k])).filter(n => !Number.isNaN(n))
+        return xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : null
+      }
+      const curRec = wavg(thisW, 'recoveryScore')
+      const prevRec = wavg(prevW, 'recoveryScore')
+      const curSleep = wavg(thisW, 'sleepHours')
+      const prevSleep = wavg(prevW, 'sleepHours')
+      
+      let highlight = ''
+      if (curRec != null && prevRec != null && curRec > prevRec) {
+        const pct = Math.round((curRec - prevRec) / Math.max(prevRec, 0.1) * 100)
+        if (pct >= 5) highlight = `本周恢复感提升了 ${pct}%`
+      }
+      if (!highlight && curSleep != null && prevSleep != null && curSleep > prevSleep + 0.3) {
+        highlight = `本周平均多睡了 ${(curSleep - prevSleep).toFixed(1)}h`
+      }
+      
+      const state = wx.getStorageSync(KEYS.CHECKIN_STATE) || {}
+      const log = state.dayLog || {}
+      let streak = 0
+      const d = new Date()
+      for (let i = 0; i < 7; i++) {
+        const dd = new Date(d.getFullYear(), d.getMonth(), d.getDate() - i)
+        const ds = `${dd.getFullYear()}-${dd.getMonth() + 1}-${dd.getDate()}`
+        if (log[ds] && Array.isArray(log[ds].actions) && log[ds].actions.some(a => a.done)) {
+          streak++
+        } else break
+      }
+      if (!highlight && streak >= 3) {
+        highlight = `连续 ${streak} 天完成微行动`
+      }
+      this.setData({ weekHighlight: highlight || '' })
+    } catch (e) {
+      this.setData({ weekHighlight: '' })
+    }
+  },
+
   tapCheckIn() {
     const r = checkin.recordCheckIn()
     this.refreshCheckIn()
@@ -112,11 +207,18 @@ Page({
       wx.showToast({ title: '今日已打卡', icon: 'none' })
       return
     }
+    this.setData({ checkinExpanded: true })
     if (r.milestone) {
-      wx.showToast({ title: `「${r.milestone}」`, icon: 'none' })
+      this.setData({ milestoneText: r.milestone, milestoneStreak: r.streak, showMilestone: true })
     } else {
       wx.showToast({ title: `已连续 ${r.streak} 天`, icon: 'none' })
     }
+  },
+
+  onMoodPick(e) {
+    const mood = e.detail.mood
+    checkin.updateMood(mood)
+    this.setData({ checkinMood: mood })
   },
 
   refreshTheoryBannerFlag() {
@@ -211,8 +313,13 @@ Page({
     if (this.data.adviceFbDone) return
     this.setData({ adviceFbDone: true })
     try {
-      const fb = wx.getStorageSync(KEYS.ADVICE_FEEDBACK) || { liked: {}, dislikedTexts: [] }
+      const fb = wx.getStorageSync(KEYS.ADVICE_FEEDBACK) || { liked: {}, dislikedTexts: [], likedCats: {}, dislikedCats: {} }
+      if (!fb.likedCats) fb.likedCats = {}
+      const structured = this.data.adviceStructured || []
       const list = this.data.adviceList || []
+      structured.forEach((s) => {
+        if (s.cat) fb.likedCats[s.cat] = (fb.likedCats[s.cat] || 0) + 1
+      })
       list.forEach((line) => {
         const cat = String(line).replace(/^\d+\.\s*/, '').slice(0, 2)
         fb.liked[cat] = (fb.liked[cat] || 0) + 1
@@ -226,8 +333,13 @@ Page({
     if (this.data.adviceFbDone) return
     this.setData({ adviceFbDone: true })
     try {
-      const fb = wx.getStorageSync(KEYS.ADVICE_FEEDBACK) || { liked: {}, dislikedTexts: [] }
+      const fb = wx.getStorageSync(KEYS.ADVICE_FEEDBACK) || { liked: {}, dislikedTexts: [], likedCats: {}, dislikedCats: {} }
+      if (!fb.dislikedCats) fb.dislikedCats = {}
+      const structured = this.data.adviceStructured || []
       const list = this.data.adviceList || []
+      structured.forEach((s) => {
+        if (s.cat) fb.dislikedCats[s.cat] = (fb.dislikedCats[s.cat] || 0) + 1
+      })
       const texts = list.map((l) => String(l).replace(/^\s*\d+\.\s*/, '').trim()).filter(Boolean)
       const s = new Set(fb.dislikedTexts || [])
       texts.forEach((t) => s.add(t))
@@ -268,5 +380,9 @@ Page({
 
   goAchieveHall() {
     wx.navigateTo({ url: '/pages/achieve-hall/achieve-hall' })
+  },
+
+  goReport() {
+    wx.navigateTo({ url: '/pages/report/report' })
   }
 })

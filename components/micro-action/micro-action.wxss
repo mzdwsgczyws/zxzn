@@ -1,0 +1,88 @@
+.ma-root {
+  margin-top: 32rpx;
+  padding-top: 24rpx;
+  border-top: 1rpx solid var(--dao-divider);
+}
+
+.ma-title {
+  display: block;
+  font-size: 26rpx;
+  font-weight: 600;
+  color: var(--dao-purple-mid);
+  margin-bottom: 16rpx;
+  letter-spacing: 2rpx;
+}
+
+.ma-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+}
+
+.ma-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 16rpx;
+  padding: 16rpx 20rpx;
+  background: var(--dao-bg-card);
+  border-radius: 12rpx;
+  border: 1rpx solid var(--dao-divider);
+  transition: all 0.2s ease;
+}
+
+.ma-item--done {
+  background: rgba(57, 73, 171, 0.06);
+  border-color: var(--dao-purple-tint);
+}
+
+.ma-check {
+  flex-shrink: 0;
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: 50%;
+  border: 2rpx solid var(--dao-divider);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22rpx;
+  color: var(--dao-purple-deep);
+  transition: all 0.2s ease;
+}
+
+.ma-item--done .ma-check {
+  background: var(--dao-purple-mid);
+  border-color: var(--dao-purple-mid);
+  color: #fff;
+}
+
+.ma-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.ma-text {
+  display: block;
+  font-size: 26rpx;
+  color: var(--dao-ink);
+  line-height: 1.5;
+}
+
+.ma-item--done .ma-text {
+  text-decoration: line-through;
+  color: var(--dao-ink-muted);
+}
+
+.ma-reason {
+  display: block;
+  font-size: 20rpx;
+  color: var(--dao-ink-faint);
+  margin-top: 4rpx;
+}
+
+.ma-footer {
+  display: block;
+  font-size: 22rpx;
+  color: var(--dao-gold-muted);
+  margin-top: 16rpx;
+  text-align: center;
+}

@@ -91,8 +91,19 @@ function collectCandidates(ctx, rnd) {
   } = ctx
   const _rnd = typeof rnd === 'function' ? rnd : Math.random
 
+  let catBoost = {}
+  try {
+    const fb = wx.getStorageSync(KEYS.ADVICE_FEEDBACK) || {}
+    const liked = fb.likedCats || {}
+    const disliked = fb.dislikedCats || {}
+    Object.keys(liked).forEach(c => { catBoost[c] = (catBoost[c] || 0) + Math.min(liked[c], 3) })
+    Object.keys(disliked).forEach(c => { catBoost[c] = (catBoost[c] || 0) - Math.min(disliked[c], 2) })
+  } catch (e) {}
+
   const push = (cat, text, weight = 1) => {
-    for (let i = 0; i < weight; i++) out.push({ cat, text })
+    const boost = catBoost[cat] || 0
+    const w = Math.max(1, weight + boost)
+    for (let i = 0; i < w; i++) out.push({ cat, text })
   }
 
   /* —— 等第与建除 —— */
@@ -499,8 +510,86 @@ function uniquePick(list, rnd, need, avoidAdviceTexts) {
   return res
 }
 
+function buildDataDrivenAdvice(ctx) {
+  try {
+    const records = wx.getStorageSync(KEYS.TRACK_RECORDS) || []
+    if (records.length < 3) return null
+    const recent = records.slice(-5)
+    const tAvg = (key) => {
+      const xs = recent.map(r => Number(r[key])).filter(n => !Number.isNaN(n))
+      return xs.length ? +(xs.reduce((a, b) => a + b, 0) / xs.length).toFixed(1) : null
+    }
+    const avgSleep = tAvg('sleepHours')
+    const avgScreen = tAvg('screenHours')
+    const avgRecovery = tAvg('recoveryScore')
+    const avgDrain = tAvg('drainScore')
+    const avgAnger = tAvg('angerCount')
+    const n = recent.length
+
+    if (avgSleep != null && avgSleep < 6.5) {
+      return {
+        cat: '起居', 
+        text: `你近 ${n} 天平均睡眠仅 ${avgSleep}h，今天试试提前 30 分钟放下手机。`,
+        reason: `近 ${n} 天平均 ${avgSleep}h`,
+        microAction: '今晚提前 30 分钟放下手机'
+      }
+    }
+    if (avgScreen != null && avgScreen > 6) {
+      return {
+        cat: '行动',
+        text: `你近 ${n} 天日均屏幕 ${avgScreen}h，试试午后用 20 分钟散步替代刷手机。`,
+        reason: `近 ${n} 天日均 ${avgScreen}h`,
+        microAction: '午后散步 20 分钟替代刷手机'
+      }
+    }
+    if (avgRecovery != null && avgRecovery <= 2.5) {
+      return {
+        cat: '起居',
+        text: `你近 ${n} 天恢复感均值仅 ${avgRecovery}，给自己 15 分钟彻底休息。`,
+        reason: `恢复感均值 ${avgRecovery}/5`,
+        microAction: '安排 15 分钟纯休息'
+      }
+    }
+    if (avgDrain != null && avgDrain >= 4) {
+      return {
+        cat: '行动',
+        text: `你近 ${n} 天耗竭感均值 ${avgDrain}，砍掉一件不重要的事。`,
+        reason: `耗竭感均值 ${avgDrain}/5`,
+        microAction: '砍掉今天一件不重要的事'
+      }
+    }
+    if (avgAnger != null && avgAnger >= 3) {
+      return {
+        cat: '情绪',
+        text: `你近 ${n} 天日均发火 ${avgAnger} 次，回消息前试试深呼吸 3 次。`,
+        reason: `日均 ${avgAnger} 次`,
+        microAction: '回消息前深呼吸 3 次'
+      }
+    }
+    return null
+  } catch (e) {
+    return null
+  }
+}
+
+function deriveMicroAction(cat, text, rnd) {
+  const MAP = {
+    '起居': ['早睡 30 分钟', '站起来拉伸 5 分钟', '午休 15 分钟'],
+    '行动': ['快走 10 分钟', '整理桌面 5 分钟', '完成一件拖延的小事'],
+    '情绪': ['深呼吸 3 次', '写下一件好事', '听一首喜欢的歌'],
+    '人际': ['发一条真诚感谢', '认真听一个人说话', '给家人一个问候'],
+    '饮食': ['喝一杯温水', '午餐七分饱', '少喝一杯冷饮'],
+    '事业': ['番茄钟 25 分钟', '只盯一个主目标', '列出今日三件事'],
+    '学业': ['专注学 25 分钟', '用自己的话复述', '拆一个小概念'],
+    '日常': ['记一件做完的事', '留 10 分钟发呆', '少看负面新闻'],
+    '自修': ['记录今日状态', '翻看本周变化', '完成一个微行动']
+  }
+  const options = MAP[cat] || MAP['日常']
+  return options[Math.floor(rnd() * options.length)]
+}
+
 /**
- * @returns { string[] } 至少 5 条，通常 6–8 条
+ * @returns {{ lines: string[], structured: Array<{cat:string,text:string,reason:string,microAction:string}> }}
  */
 function computeLotteryAdvices(input) {
   const {
@@ -564,11 +653,27 @@ function computeLotteryAdvices(input) {
   }
   const pool = collectCandidates(ctx, rnd)
   const need = 8
-  const picked = uniquePick(pool, rnd, need, avoidAdviceTexts)
-  const lines = picked.map((p, i) => `${i + 1}. ${p.text}`)
-  return lines.length >= 5
-    ? lines
-    : lines.concat(['5. 今日把作息摆在第一位，外事能缓则缓。', '6. 记下一件已经做完的小事，给自己一点认可。'])
+  const allPicked = uniquePick(pool, rnd, need, avoidAdviceTexts)
+
+  const dataAdvice = buildDataDrivenAdvice(ctx)
+  const topPicked = allPicked.slice(0, 3)
+  if (dataAdvice && topPicked.length >= 2) {
+    topPicked[topPicked.length - 1] = dataAdvice
+  }
+
+  const structured = topPicked.map((p, i) => ({
+    cat: p.cat,
+    text: p.text,
+    reason: p.reason || '',
+    microAction: p.microAction || deriveMicroAction(p.cat, p.text, rnd),
+  }))
+
+  const lines = structured.map((s, i) => `${i + 1}. ${s.text}`)
+  const result = {
+    lines: lines.length >= 2 ? lines : lines.concat(['2. 今日把作息摆在第一位，外事能缓则缓。', '3. 记下一件已经做完的小事，给自己一点认可。']),
+    structured
+  }
+  return result
 }
 
-module.exports = { computeLotteryAdvices, seasonBucket, ageBracket, weatherFlags }
+module.exports = { computeLotteryAdvices, seasonBucket, ageBracket, weatherFlags, buildDataDrivenAdvice, deriveMicroAction }

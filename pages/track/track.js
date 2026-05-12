@@ -1,5 +1,5 @@
 const KEYS = require('../../utils/storage-keys.js')
-const { analyzeRecords, TRACK_FOCUS_OPTIONS } = require('../../utils/cultivation-model.js')
+const { analyzeRecords, TRACK_FOCUS_OPTIONS, computeWeekOverWeek } = require('../../utils/cultivation-model.js')
 const { computeFiveElements, computeFiveElementsWithOffset, drawFiveRadar, RADAR_FOOTER_LINES } = require('../../utils/five-elements-chart.js')
 const { recordBiz } = require('../../utils/usage-analytics.js')
 
@@ -82,7 +82,8 @@ Page({
     radarLoading: false,
     radarFooterLines: RADAR_FOOTER_LINES,
     radarFooterExtra: '',
-    fiveRows: []
+    fiveRows: [],
+    weekChange: null
   },
 
   onShow() {
@@ -121,6 +122,7 @@ Page({
       },
       () => this.updateFiveElementRadar()
     )
+    this.refreshWeekChange()
   },
 
   updateFiveElementRadar() {
@@ -222,5 +224,17 @@ Page({
       priorities: Array.isArray(priorities) ? priorities : []
     })
     this.setData({ analysis })
+  },
+
+  refreshWeekChange() {
+    try {
+      const records = wx.getStorageSync(KEYS.TRACK_RECORDS) || []
+      const wc = computeWeekOverWeek(records)
+      this.setData({ weekChange: wc })
+    } catch (e) {}
+  },
+
+  goReport() {
+    wx.navigateTo({ url: '/pages/report/report' })
   }
 })

@@ -1,0 +1,6 @@
+{
+  "component": true,
+  "usingComponents": {
+    "dao-button": "/components/dao-button/dao-button"
+  }
+}
