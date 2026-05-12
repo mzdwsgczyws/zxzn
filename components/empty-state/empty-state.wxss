@@ -12,9 +12,17 @@
   color: var(--dao-purple-soft);
   opacity: 0.45;
   margin-bottom: 24rpx;
+  background: radial-gradient(circle, rgba(57, 73, 171, 0.06) 0%, transparent 70%);
+  border-radius: 50%;
+  width: 120rpx;
+  height: 120rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .es-title {
+  font-family: var(--dao-font-display);
   font-size: 32rpx;
   font-weight: 600;
   color: var(--dao-purple-deep);

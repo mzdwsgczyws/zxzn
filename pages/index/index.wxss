@@ -16,6 +16,19 @@
   box-sizing: border-box;
 }
 
+.custom-nav::after {
+  content: '';
+  position: absolute;
+  bottom: -1rpx;
+  left: 0;
+  right: 0;
+  height: 3rpx;
+  background: repeating-linear-gradient(90deg,
+    var(--dao-gold) 0, var(--dao-gold) 6rpx,
+    transparent 6rpx, transparent 14rpx);
+  opacity: 0.3;
+}
+
 .nav-inner {
   height: 88rpx;
   display: flex;
@@ -24,6 +37,7 @@
 }
 
 .nav-title {
+  font-family: var(--dao-font-display);
   font-size: 34rpx;
   font-weight: 600;
   letter-spacing: 6rpx;
@@ -101,6 +115,7 @@
 }
 
 .idle-tag {
+  font-family: var(--dao-font-display);
   font-size: 26rpx;
   color: #8d7b68;
   letter-spacing: 8rpx;
@@ -111,8 +126,10 @@
   width: 420rpx;
   padding: 32rpx 24rpx;
   line-height: 1.4;
+  font-family: var(--dao-font-display);
   font-size: 32rpx;
   font-weight: 600;
+  letter-spacing: 4rpx;
   color: #2a1f15;
   background: linear-gradient(180deg, #f0dfa0 0%, #c9a227 45%, #a67c1f 100%);
   border: 3rpx solid rgba(90, 60, 30, 0.35);
@@ -810,7 +827,7 @@
 .lot-result {
   background: #fffef8;
   margin: 16rpx 20rpx 24rpx;
-  border-radius: 24rpx;
+  border-radius: 20rpx;
   padding: 32rpx 28rpx 40rpx;
   box-shadow:
     0 2rpx 8rpx rgba(26, 35, 126, 0.04),
@@ -828,6 +845,7 @@
 }
 
 .tier {
+  font-family: var(--dao-font-display);
   font-size: 36rpx;
   font-weight: 700;
 }
@@ -849,7 +867,8 @@
 
 .lot-name {
   display: block;
-  font-size: 32rpx;
+  font-family: var(--dao-font-display);
+  font-size: var(--dao-fs-title);
   font-weight: 600;
   color: #2c2416;
   margin-bottom: 20rpx;
@@ -963,7 +982,7 @@
     rgba(255, 236, 180, 0.1) 60%,
     transparent 100%
   );
-  animation: sealed-mystery-sweep 2.6s ease-in-out infinite;
+  animation: sealed-mystery-sweep 3s ease-in-out infinite;
 }
 
 .sealed-mystery-spark {
@@ -1069,6 +1088,7 @@
 
 .poem {
   display: block;
+  font-family: var(--dao-font-display);
   font-size: 28rpx;
   color: #3e3428;
   line-height: 1.8;
@@ -1099,6 +1119,7 @@
 
 .b-title {
   display: block;
+  font-family: var(--dao-font-display);
   font-size: 26rpx;
   font-weight: 600;
   color: #3949ab;
@@ -1281,6 +1302,7 @@
 }
 
 .hall-circle-t {
+  font-family: var(--dao-font-display);
   font-size: 20rpx;
   font-weight: 600;
   color: #2a1f15;
@@ -1457,6 +1479,7 @@
 }
 
 .dock-btn-text {
+  font-family: var(--dao-font-display);
   font-size: 26rpx;
   font-weight: 600;
   color: #e8d4a8;

@@ -14,17 +14,19 @@
 
 .hero-title {
   display: block;
+  font-family: var(--dao-font-display);
   font-size: 40rpx;
   font-weight: 700;
   color: #e8d4a8;
   letter-spacing: 8rpx;
   margin-bottom: 12rpx;
   text-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.35);
+  animation: daoHeroIn 0.5s ease both;
 }
 
 .hero-sub {
   display: block;
-  font-size: 24rpx;
+  font-size: var(--dao-fs-caption);
   color: rgba(232, 212, 168, 0.78);
   line-height: 1.5;
   margin-bottom: 28rpx;

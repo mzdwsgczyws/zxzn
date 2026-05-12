@@ -559,6 +559,7 @@
 
 .tier {
   display: block;
+  font-family: var(--dao-font-display);
   font-size: 36rpx;
   font-weight: 700;
   margin-bottom: 16rpx;
@@ -566,7 +567,8 @@
 
 .lot-name {
   display: block;
-  font-size: 34rpx;
+  font-family: var(--dao-font-display);
+  font-size: var(--dao-fs-title);
   font-weight: 600;
   color: #2c2416;
   margin-bottom: 24rpx;
@@ -657,7 +659,7 @@
     rgba(255, 236, 180, 0.1) 60%,
     transparent 100%
   );
-  animation: sealed-mystery-sweep 2.6s ease-in-out infinite;
+  animation: sealed-mystery-sweep 3s ease-in-out infinite;
 }
 
 .sealed-mystery-spark {
@@ -763,6 +765,7 @@
 
 .poem {
   display: block;
+  font-family: var(--dao-font-display);
   font-size: 28rpx;
   color: #3e3428;
   line-height: 1.8;
@@ -795,6 +798,7 @@
 
 .b-title {
   display: block;
+  font-family: var(--dao-font-display);
   font-size: 26rpx;
   font-weight: 600;
   color: #3949ab;

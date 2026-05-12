@@ -1,11 +1,39 @@
 .page {
-  min-height: 100vh;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
   background: var(--dao-bg-page);
   box-sizing: border-box;
 }
 
+.ft-hero {
+  flex-shrink: 0;
+  padding: 28rpx 32rpx;
+  background: linear-gradient(165deg, var(--dao-ritual-purple-a) 0%, var(--dao-ritual-purple-b) 100%);
+}
+
+.ft-hero-title {
+  display: block;
+  font-family: var(--dao-font-display);
+  font-size: var(--dao-fs-hero);
+  font-weight: 700;
+  color: var(--dao-gold-pale);
+  letter-spacing: 6rpx;
+  margin-bottom: 12rpx;
+  text-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.35);
+  animation: daoHeroIn 0.5s ease both;
+}
+
+.ft-hero-sub {
+  display: block;
+  font-size: var(--dao-fs-caption);
+  color: rgba(232, 212, 168, 0.78);
+  line-height: 1.5;
+}
+
 .scroll {
-  height: 100vh;
+  flex: 1;
+  min-height: 0;
   box-sizing: border-box;
 }
 

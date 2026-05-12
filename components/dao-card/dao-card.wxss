@@ -1,9 +1,11 @@
 .dao-card {
+  position: relative;
   background: var(--dao-bg-card);
   border-radius: 20rpx;
   padding: 32rpx;
   margin: 24rpx;
-  box-shadow: 0 8rpx 32rpx var(--dao-shadow-purple);
+  box-shadow: 0 8rpx 32rpx var(--dao-shadow-purple),
+              inset 0 0 60rpx rgba(180, 160, 120, 0.04);
   border: 1rpx solid var(--dao-border-gold);
   box-sizing: border-box;
 }

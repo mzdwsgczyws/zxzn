@@ -1,4 +1,9 @@
 <view class="page">
+  <view class="ft-hero">
+    <text class="ft-hero-title">趋势日历</text>
+    <text class="ft-hero-sub">以日为轴，回看心象箴言的脉络走势。</text>
+  </view>
+
   <!-- iOS：同上，示意图 canvas 避免放在 enhanced scroll-view 内 -->
   <scroll-view scroll-y="{{true}}" class="scroll">
     <view class="card intro">

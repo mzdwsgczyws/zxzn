@@ -9,14 +9,14 @@
 
 .progress-bar {
   height: 12rpx;
-  background: #e8e0d4;
+  background: var(--dao-divider);
   border-radius: 8rpx;
   overflow: hidden;
 }
 
 .progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, #5c6bc0, #3949ab);
+  background: linear-gradient(90deg, var(--dao-purple-soft), var(--dao-purple-mid));
   border-radius: 8rpx;
   transition: width 0.2s ease;
 }
@@ -25,7 +25,7 @@
   display: block;
   margin-top: 12rpx;
   font-size: 24rpx;
-  color: #8d7b68;
+  color: var(--dao-ink-faint);
   text-align: right;
 }
 
@@ -42,9 +42,10 @@
 
 .q-text {
   display: block;
+  font-family: var(--dao-font-display);
   font-size: 34rpx;
   font-weight: 600;
-  color: #2c2416;
+  color: var(--dao-ink);
   line-height: 1.55;
   margin-bottom: 32rpx;
 }
@@ -57,8 +58,8 @@
   font-size: 28rpx;
   line-height: 1.5;
   text-align: left;
-  background: #f8f6f0;
-  color: #2c2416;
+  background: var(--dao-bg-card);
+  color: var(--dao-ink);
   border-radius: 16rpx;
   border: 2rpx solid #e0d8c8;
   transition: background 0.15s, border-color 0.15s;
@@ -74,7 +75,7 @@
 
 .opt--selected {
   background: #e8e2f0;
-  border-color: #7e57c2;
+  border-color: var(--dao-purple-soft);
   color: #4a148c;
   animation: optPop 0.25s ease;
 }
@@ -89,7 +90,7 @@
   background: #f5f2eb;
   border-style: dashed;
   font-size: 26rpx;
-  color: #6d5d4a;
+  color: var(--dao-ink-muted);
 }
 
 /* 导航行 */
@@ -105,7 +106,7 @@
   padding: 16rpx 32rpx;
   font-size: 26rpx;
   line-height: 1.4;
-  color: #5c4d3d;
+  color: var(--dao-brown-warm);
   background: rgba(212, 175, 55, 0.15);
   border: 1rpx solid rgba(139, 115, 85, 0.35);
   border-radius: 12rpx;
@@ -134,7 +135,7 @@
   padding: 20rpx 24rpx;
   font-size: 26rpx;
   line-height: 1.45;
-  color: #5c4d3d;
+  color: var(--dao-brown-warm);
   background: #fff;
   border: 2rpx dashed #b0a080;
   border-radius: 16rpx;

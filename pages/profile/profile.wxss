@@ -5,16 +5,17 @@
 
 .title-lg {
   display: block;
+  font-family: var(--dao-font-display);
   font-size: 32rpx;
   font-weight: 600;
-  color: #1a237e;
+  color: var(--dao-purple-deep);
 }
 
 .subtitle {
   display: block;
   margin: 12rpx 0 32rpx;
   font-size: 24rpx;
-  color: #6d5d4a;
+  color: var(--dao-ink-muted);
   line-height: 1.55;
 }
 
@@ -40,7 +41,7 @@
   padding: 12rpx 22rpx;
   border-radius: 999rpx;
   font-size: 26rpx;
-  color: #5d4d3d;
+  color: var(--dao-brown-warm);
   background: #f0ebe3;
   border: 2rpx solid #e0d8c8;
 }
@@ -54,12 +55,12 @@
 .label {
   display: block;
   font-size: 26rpx;
-  color: #4a4034;
+  color: var(--dao-ink-body);
   margin-bottom: 12rpx;
 }
 
 .input {
-  background: #f8f6f0;
+  background: var(--dao-bg-card);
   border: 2rpx solid #e0d8c8;
   border-radius: 12rpx;
   padding: 20rpx 24rpx;
@@ -67,12 +68,12 @@
 }
 
 .picker-val {
-  background: #f8f6f0;
+  background: var(--dao-bg-card);
   border: 2rpx solid #e0d8c8;
   border-radius: 12rpx;
   padding: 20rpx 24rpx;
   font-size: 28rpx;
-  color: #2c2416;
+  color: var(--dao-ink);
 }
 
 .muted-card {
@@ -88,7 +89,7 @@
 .loc-hint {
   display: block;
   font-size: 22rpx;
-  color: #8d7b68;
+  color: var(--dao-ink-faint);
   line-height: 1.5;
   margin-bottom: 16rpx;
 }
@@ -119,20 +120,20 @@
 .loc-name {
   display: block;
   font-size: 26rpx;
-  color: #3949ab;
+  color: var(--dao-purple-mid);
   line-height: 1.45;
 }
 
 .loc-empty {
   display: block;
   font-size: 24rpx;
-  color: #9a8b7a;
+  color: var(--dao-ink-caption);
 }
 
 .label-sm {
   margin-top: 20rpx;
   font-size: 24rpx;
-  color: #6d5d4a;
+  color: var(--dao-ink-muted);
 }
 
 .textarea {
@@ -142,7 +143,7 @@
 }
 
 .picker-muted {
-  color: #9a8b7a;
+  color: var(--dao-ink-caption);
 }
 
 .theory-card {
@@ -150,7 +151,7 @@
 }
 
 .theory-card-title {
-  color: #3949ab;
+  color: var(--dao-purple-mid);
 }
 
 .theory-card-sub {

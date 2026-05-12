@@ -2,17 +2,7 @@
   min-height: 100vh;
   padding: 24rpx 24rpx 48rpx;
   box-sizing: border-box;
-  background: #f5f0e8;
-}
-
-.card {
-  background: #fffef8;
-  border-radius: 16rpx;
-  padding: 28rpx 24rpx;
-  margin-bottom: 20rpx;
-  border: 1rpx solid rgba(212, 175, 55, 0.22);
-  box-shadow: 0 6rpx 20rpx rgba(26, 35, 126, 0.06);
-  box-sizing: border-box;
+  background: var(--dao-bg-page);
 }
 
 .lead-card {
@@ -21,9 +11,10 @@
 
 .lead-title {
   display: block;
+  font-family: var(--dao-font-display);
   font-size: 30rpx;
   font-weight: 600;
-  color: #3949ab;
+  color: var(--dao-purple-mid);
   margin-bottom: 16rpx;
 }
 
@@ -40,14 +31,15 @@
   margin-top: 20rpx;
   font-size: 22rpx;
   line-height: 1.55;
-  color: #8d7b68;
+  color: var(--dao-ink-faint);
 }
 
 .sec-title {
   display: block;
+  font-family: var(--dao-font-display);
   font-size: 28rpx;
   font-weight: 600;
-  color: #3949ab;
+  color: var(--dao-purple-mid);
   margin-bottom: 20rpx;
 }
 
@@ -68,21 +60,21 @@
   flex: 0 0 88rpx;
   font-size: 26rpx;
   font-weight: 600;
-  color: #5c4d3d;
+  color: var(--dao-brown-warm);
 }
 
 .col-b {
   flex: 1;
   font-size: 26rpx;
   line-height: 1.6;
-  color: #4a4034;
+  color: var(--dao-ink-body);
 }
 
 .para {
   display: block;
   font-size: 26rpx;
   line-height: 1.65;
-  color: #4a4034;
+  color: var(--dao-ink-body);
 }
 
 .muted-card {
@@ -93,5 +85,5 @@
 .muted {
   font-size: 24rpx;
   line-height: 1.6;
-  color: #8d7b68;
+  color: var(--dao-ink-faint);
 }

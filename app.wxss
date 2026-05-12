@@ -1,8 +1,20 @@
 /**
- * 全局样式与「紫金墨」设计令牌（详见 docs/UI_DESIGN_SYSTEM.md）
- * 新页面优先使用 var(--dao-*)，避免重复 hex。
+ * 全局样式与「紫金墨」设计令牌
+ * 千年赛博道观：静如宣纸，动如流水；金线勾勒，紫墨铺底。
  */
 page {
+  /* —— 字体 —— */
+  --dao-font-display: "Songti SC", "STSong", "Noto Serif CJK SC", "Source Han Serif SC", serif;
+  --dao-font-body: -apple-system, "Helvetica Neue", "PingFang SC", "Noto Sans CJK SC", sans-serif;
+
+  /* —— 字号阶梯 —— */
+  --dao-fs-hero: 44rpx;
+  --dao-fs-title: 34rpx;
+  --dao-fs-sub: 28rpx;
+  --dao-fs-body: 26rpx;
+  --dao-fs-caption: 22rpx;
+  --dao-fs-fine: 20rpx;
+
   /* —— 色彩 —— */
   --dao-bg-page: #f5f0e8;
   --dao-bg-card: #fffef8;
@@ -11,6 +23,7 @@ page {
   --dao-ink-faint: #8d7b68;
   --dao-ink-caption: #9a8b7a;
   --dao-ink-body: #4a4034;
+  --dao-ink-light: #b8a990;
   --dao-brown-warm: #5c4d3d;
   --dao-purple-deep: #1a237e;
   --dao-purple-mid: #3949ab;
@@ -21,6 +34,9 @@ page {
   --dao-gold: #d4af37;
   --dao-gold-pale: #e8d4a8;
   --dao-gold-muted: #9a7b2e;
+  --dao-jade: #5d8a68;
+  --dao-jade-pale: #a8c5ad;
+  --dao-cinnabar: #c04040;
   --dao-border-gold: rgba(212, 175, 55, 0.2);
   --dao-border-gold-strong: rgba(212, 175, 55, 0.45);
   --dao-shadow-purple: rgba(26, 35, 126, 0.08);
@@ -28,11 +44,25 @@ page {
 
   background-color: var(--dao-bg-page);
   color: var(--dao-ink);
-  font-size: 28rpx;
+  font-family: var(--dao-font-body);
+  font-size: var(--dao-fs-body);
   line-height: 1.6;
   letter-spacing: 0.5rpx;
   box-sizing: border-box;
   -webkit-font-smoothing: antialiased;
+}
+
+/* —— 宣纸质感底纹 —— */
+page::after {
+  content: '';
+  position: fixed;
+  left: 0; top: 0; right: 0; bottom: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 15% 30%, rgba(180, 160, 120, 0.035) 0%, transparent 55%),
+    radial-gradient(ellipse at 85% 70%, rgba(140, 120, 90, 0.025) 0%, transparent 55%),
+    radial-gradient(ellipse at 50% 10%, rgba(200, 180, 140, 0.02) 0%, transparent 40%);
 }
 
 .safe-bottom {
@@ -41,14 +71,42 @@ page {
 
 .card {
   background: var(--dao-bg-card);
-  border-radius: 24rpx;
-  padding: 36rpx 32rpx;
+  border-radius: 20rpx;
+  padding: 32rpx;
   margin: 20rpx 24rpx;
   box-shadow:
     0 2rpx 8rpx rgba(26, 35, 126, 0.04),
-    0 8rpx 32rpx var(--dao-shadow-purple);
+    0 8rpx 32rpx var(--dao-shadow-purple),
+    inset 0 0 60rpx rgba(180, 160, 120, 0.04);
   border: 1rpx solid var(--dao-border-gold);
   transition: box-shadow 0.3s ease;
+  position: relative;
+}
+
+.card::before,
+.card::after {
+  content: '';
+  position: absolute;
+  width: 36rpx;
+  height: 36rpx;
+  border-color: var(--dao-gold-pale);
+  border-style: solid;
+  opacity: 0.12;
+  pointer-events: none;
+}
+
+.card::before {
+  top: 8rpx;
+  left: 8rpx;
+  border-width: 2rpx 0 0 2rpx;
+  border-radius: 6rpx 0 0 0;
+}
+
+.card::after {
+  bottom: 8rpx;
+  right: 8rpx;
+  border-width: 0 2rpx 2rpx 0;
+  border-radius: 0 0 6rpx 0;
 }
 
 .btn-primary {
@@ -95,15 +153,26 @@ page {
 }
 
 .title-lg {
-  font-size: 40rpx;
+  font-family: var(--dao-font-display);
+  font-size: var(--dao-fs-title);
   font-weight: 600;
   color: var(--dao-purple-deep);
+  letter-spacing: 4rpx;
 }
 
 .subtitle {
-  font-size: 26rpx;
+  font-size: var(--dao-fs-caption);
   color: var(--dao-ink-muted);
   margin-top: 12rpx;
+  line-height: 1.6;
+}
+
+/* —— 分隔线渐变消散 —— */
+.dao-divider {
+  height: 1rpx;
+  background: linear-gradient(90deg, transparent, var(--dao-divider) 20%, var(--dao-divider) 80%, transparent);
+  border: none;
+  margin: 24rpx 0;
 }
 
 /* —— 全局入场动效 —— */
@@ -134,6 +203,30 @@ page {
   animation: daoFadeSlideIn 0.35s ease both;
 }
 
+/* —— 页面统一入场 —— */
+.page {
+  animation: daoFadeSlideIn 0.35s ease both;
+}
+
+/* —— 卡片错落入场 —— */
+.card:nth-child(1) { animation: daoFadeSlideIn 0.4s ease both 0.05s; }
+.card:nth-child(2) { animation: daoFadeSlideIn 0.4s ease both 0.12s; }
+.card:nth-child(3) { animation: daoFadeSlideIn 0.4s ease both 0.19s; }
+.card:nth-child(4) { animation: daoFadeSlideIn 0.4s ease both 0.26s; }
+.card:nth-child(5) { animation: daoFadeSlideIn 0.4s ease both 0.33s; }
+
+/* —— Hero 标题淡入上移 —— */
+@keyframes daoHeroIn {
+  from { opacity: 0; transform: translateY(16rpx); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* —— 深色模式金色微呼吸 —— */
+@keyframes daoGoldPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.75; }
+}
+
 @media (prefers-color-scheme: dark) {
   page {
     --dao-bg-page: #121018;
@@ -143,6 +236,7 @@ page {
     --dao-ink-faint: #7a6e62;
     --dao-ink-caption: #6d6258;
     --dao-ink-body: #c4b8a8;
+    --dao-ink-light: #6a5e52;
     --dao-brown-warm: #b0a090;
     --dao-purple-deep: #9fa8da;
     --dao-purple-mid: #7986cb;
@@ -153,9 +247,23 @@ page {
     --dao-gold: #d4af37;
     --dao-gold-pale: #c9a848;
     --dao-gold-muted: #a8923a;
+    --dao-jade: #6a9a75;
+    --dao-jade-pale: #4a7a58;
+    --dao-cinnabar: #d05555;
     --dao-border-gold: rgba(212, 175, 55, 0.15);
     --dao-border-gold-strong: rgba(212, 175, 55, 0.35);
     --dao-shadow-purple: rgba(0, 0, 0, 0.25);
     --dao-divider: #2a2535;
+  }
+
+  page::after {
+    background:
+      radial-gradient(ellipse at 15% 30%, rgba(60, 40, 80, 0.04) 0%, transparent 55%),
+      radial-gradient(ellipse at 85% 70%, rgba(40, 30, 60, 0.03) 0%, transparent 55%);
+  }
+
+  .card::before,
+  .card::after {
+    opacity: 0.08;
   }
 }
