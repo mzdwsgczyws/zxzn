@@ -102,7 +102,23 @@
       </view>
     </view>
 
+    <view class="field section-gap">
+      <text class="label">显示设置</text>
+      <view class="row-switch">
+        <text class="label" style="margin-bottom:0;">大字体模式</text>
+        <switch checked="{{largeFont}}" bindchange="onLargeFontChange" />
+      </view>
+    </view>
+
     <button class="btn-primary" bindtap="save">保存</button>
+
+    <view class="field section-gap">
+      <text class="label">数据备份</text>
+      <view class="backup-row">
+        <button class="btn-backup" hover-class="btn-hover" bindtap="onExport">导出数据</button>
+        <button class="btn-backup" hover-class="btn-hover" bindtap="onImport">导入数据</button>
+      </view>
+    </view>
   </view>
 
   <view class="card muted-card">

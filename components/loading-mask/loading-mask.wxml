@@ -1,0 +1,6 @@
+<view class="lm-mask" wx:if="{{show}}" catchtouchmove="noop">
+  <view class="lm-body">
+    <view class="lm-ring"></view>
+    <text class="lm-text" wx:if="{{text}}">{{text}}</text>
+  </view>
+</view>

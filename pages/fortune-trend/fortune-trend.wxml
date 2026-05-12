@@ -28,9 +28,14 @@
         </picker>
       </view>
 
-      <view class="empty-box" wx:if="{{empty}}">
-        <text class="empty-t">暂无抽签记录</text>
-      </view>
+      <empty-state
+        wx:if="{{empty}}"
+        icon="☽"
+        title="尚无趋势数据"
+        body="去首页抽取第一签，记录便会出现在这里"
+        actionText="去首页"
+        bind:action="goHome"
+      />
 
       <block wx:if="{{!empty}}">
         <view class="cal-weekdays">

@@ -1,0 +1,119 @@
+.cs-root {
+  display: flex;
+  flex-direction: column;
+  margin: 0 24rpx 16rpx;
+  border-radius: 16rpx;
+  background: rgba(57, 73, 171, 0.07);
+  border: 1rpx solid rgba(57, 73, 171, 0.2);
+  box-sizing: border-box;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.cs-main {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18rpx 22rpx;
+}
+
+.cs-left {
+  flex: 1;
+  min-width: 0;
+  padding-right: 16rpx;
+}
+
+.cs-streak {
+  display: block;
+  font-size: 28rpx;
+  font-weight: 600;
+  color: var(--dao-purple-deep);
+}
+
+.cs-sub {
+  display: block;
+  margin-top: 8rpx;
+  font-size: 22rpx;
+  color: var(--dao-ink-muted);
+  line-height: 1.45;
+}
+
+.cs-btn {
+  flex-shrink: 0;
+  margin: 0;
+  padding: 0 28rpx;
+  height: 56rpx;
+  line-height: 56rpx;
+  font-size: 24rpx;
+  background: linear-gradient(180deg, var(--dao-purple-mid) 0%, var(--dao-purple-deep) 100%);
+  color: #f5f0e8;
+  border-radius: 28rpx;
+  border: none;
+}
+
+.cs-btn::after {
+  border: none;
+}
+
+.cs-btn-hover {
+  opacity: 0.92;
+}
+
+.cs-btn[disabled] {
+  background: var(--dao-ink-faint);
+  color: var(--dao-bg-page);
+  opacity: 0.6;
+}
+
+.cs-btn--flash {
+  animation: csFlash 0.5s ease;
+}
+
+@keyframes csFlash {
+  0% { transform: scale(1); }
+  30% { transform: scale(1.15); }
+  60% { transform: scale(0.95); }
+  100% { transform: scale(1); }
+}
+
+.cs-expand {
+  padding: 0 22rpx 18rpx;
+  animation: csSlideDown 0.25s ease;
+}
+
+@keyframes csSlideDown {
+  from { opacity: 0; max-height: 0; }
+  to { opacity: 1; max-height: 200rpx; }
+}
+
+.cs-expand-title {
+  display: block;
+  font-size: 22rpx;
+  color: var(--dao-ink-faint);
+  margin-bottom: 12rpx;
+}
+
+.cs-moods {
+  display: flex;
+  flex-direction: row;
+  gap: 20rpx;
+}
+
+.cs-mood {
+  width: 56rpx;
+  height: 56rpx;
+  line-height: 56rpx;
+  text-align: center;
+  font-size: 32rpx;
+  border-radius: 50%;
+  background: var(--dao-bg-card);
+  border: 2rpx solid var(--dao-divider);
+  transition: transform 0.15s, border-color 0.15s;
+}
+
+.cs-mood--on {
+  border-color: var(--dao-purple-mid);
+  transform: scale(1.15);
+  box-shadow: 0 4rpx 12rpx rgba(57, 73, 171, 0.2);
+}

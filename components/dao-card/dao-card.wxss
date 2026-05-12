@@ -1,0 +1,14 @@
+.dao-card {
+  background: var(--dao-bg-card);
+  border-radius: 20rpx;
+  padding: 32rpx;
+  margin: 24rpx;
+  box-shadow: 0 8rpx 32rpx var(--dao-shadow-purple);
+  border: 1rpx solid var(--dao-border-gold);
+  box-sizing: border-box;
+}
+
+.dao-card--plain {
+  margin: 0;
+  box-shadow: none;
+}

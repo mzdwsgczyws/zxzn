@@ -46,7 +46,8 @@
           <text class="idle-moon">☽</text>
         </view>
         <text class="idle-tag">今日心象箴言</text>
-        <button class="idle-btn" bindtap="tapStartLottery">轻触开始 · 摇动揭晓</button>
+        <button class="idle-btn" bindtap="tapStartLottery" aria-label="开始摇签抽取心象箴言">轻触开始 · 摇动揭晓</button>
+        <text class="idle-seasonal" wx:if="{{seasonalHint}}">{{seasonalHint}}</text>
         <text class="idle-hint">点击按钮后感应手机摇动，约 9 次有效晃动后生成当日一条</text>
         <text class="idle-theory-link" bindtap="openTheoryIntro">量化 × 修道 · 理念简介</text>
       </view>
@@ -191,15 +192,15 @@
         </view>
       </view>
       <view class="dock-divider dock-divider--home"></view>
-      <view class="dock-btn" hover-class="dock-btn-hover" bindtap="goQuiz">
+      <view class="dock-btn" hover-class="dock-btn-hover" bindtap="goQuiz" aria-role="button" aria-label="道性测验">
         <text class="dock-btn-text">道性测验</text>
       </view>
       <view class="dock-divider"></view>
-      <view class="dock-btn" hover-class="dock-btn-hover" bindtap="goTrack">
+      <view class="dock-btn" hover-class="dock-btn-hover" bindtap="goTrack" aria-role="button" aria-label="自修记录">
         <text class="dock-btn-text">自修记录</text>
       </view>
       <view class="dock-divider"></view>
-      <view class="dock-btn" hover-class="dock-btn-hover" bindtap="goProfile">
+      <view class="dock-btn" hover-class="dock-btn-hover" bindtap="goProfile" aria-role="button" aria-label="个人档案">
         <text class="dock-btn-text">个人档案</text>
       </view>
     </view>

@@ -79,6 +79,7 @@ Page({
     priorityChips: buildPriorityChips([]),
     records: [],
     analysis: null,
+    radarLoading: false,
     radarFooterLines: RADAR_FOOTER_LINES,
     radarFooterExtra: '',
     fiveRows: []
@@ -123,6 +124,7 @@ Page({
   },
 
   updateFiveElementRadar() {
+    this.setData({ radarLoading: true })
     const records = wx.getStorageSync(KEYS.TRACK_RECORDS) || []
     const profile = wx.getStorageSync(KEYS.USER_PROFILE) || {}
     const personality = wx.getStorageSync(KEYS.PERSONALITY_RESULT) || null
@@ -137,6 +139,7 @@ Page({
         .boundingClientRect()
         .exec((res) => {
           const rect = res && res[0]
+          this.setData({ radarLoading: false })
           if (!rect || rect.width < 8) return
           drawFiveRadar('fiveRadar', this, rect, fe)
         })

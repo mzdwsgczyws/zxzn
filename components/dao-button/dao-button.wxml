@@ -1,0 +1,9 @@
+<button
+  class="db {{type === 'ghost' ? 'db--ghost' : 'db--primary'}} {{block ? 'db--block' : ''}} {{size === 'small' ? 'db--sm' : ''}}"
+  disabled="{{disabled || loading}}"
+  loading="{{loading}}"
+  hover-class="db--hover"
+  bindtap="onTap"
+>
+  <slot />
+</button>

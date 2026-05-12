@@ -17,6 +17,8 @@
         src="{{portraitImgBind.src}}"
         mode="aspectFill"
         binderror="onPortraitImgError"
+        aria-label="{{result.typeName}}肖像"
+        lazy-load
       />
     </block>
   </view>

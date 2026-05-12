@@ -1,3 +1,6 @@
 {
-  "navigationBarTitleText": "量化自修记录"
+  "navigationBarTitleText": "量化自修记录",
+  "usingComponents": {
+    "loading-mask": "/components/loading-mask/loading-mask"
+  }
 }

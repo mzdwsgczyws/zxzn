@@ -1,0 +1,3 @@
+<view class="dao-card {{plain ? 'dao-card--plain' : ''}}">
+  <slot />
+</view>

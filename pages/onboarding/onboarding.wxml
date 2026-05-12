@@ -1,0 +1,30 @@
+<view class="ob-page">
+  <swiper
+    class="ob-swiper"
+    indicator-dots="{{true}}"
+    indicator-color="rgba(212, 175, 55, 0.3)"
+    indicator-active-color="#d4af37"
+    current="{{current}}"
+    bindchange="onSwiperChange"
+    circular="{{false}}"
+  >
+    <swiper-item wx:for="{{slides}}" wx:key="title">
+      <view class="ob-slide">
+        <text class="ob-icon">{{item.icon}}</text>
+        <text class="ob-title">{{item.title}}</text>
+        <text class="ob-body">{{item.body}}</text>
+      </view>
+    </swiper-item>
+  </swiper>
+
+  <view class="ob-actions safe-bottom">
+    <block wx:if="{{current < slides.length - 1}}">
+      <text class="ob-skip" bindtap="skip">跳过</text>
+    </block>
+    <block wx:else>
+      <dao-button type="primary" block="{{true}}" bind:tap="startQuick">快速体验 · 开始摇签</dao-button>
+      <view style="height: 20rpx;"></view>
+      <dao-button type="ghost" block="{{true}}" bind:tap="startProfile">先完善个人档案</dao-button>
+    </block>
+  </view>
+</view>

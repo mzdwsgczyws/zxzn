@@ -39,6 +39,7 @@ Page({
     this._pressTimer = setTimeout(() => {
       this._pressTimer = null
       if (this._pressPendingId !== id) return
+      try { wx.vibrateShort({ type: 'heavy' }) } catch (e) {}
       this.setData({
         pressVisible: true,
         pressComment: item.comment

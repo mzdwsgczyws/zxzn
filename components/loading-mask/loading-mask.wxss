@@ -1,0 +1,41 @@
+.lm-mask {
+  position: fixed;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9990;
+  background: rgba(26, 21, 32, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lm-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24rpx;
+  padding: 48rpx;
+  border-radius: 24rpx;
+  background: var(--dao-bg-card);
+  box-shadow: 0 12rpx 48rpx rgba(0, 0, 0, 0.2);
+}
+
+.lm-ring {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 50%;
+  border: 6rpx solid var(--dao-divider);
+  border-top-color: var(--dao-purple-mid);
+  animation: lmSpin 0.8s linear infinite;
+}
+
+@keyframes lmSpin {
+  to { transform: rotate(360deg); }
+}
+
+.lm-text {
+  font-size: 26rpx;
+  color: var(--dao-ink-muted);
+}

@@ -24,5 +24,23 @@ module.exports = {
   /** 首页「量化×修道」提示条是否已关闭或已点阅（读过后不再自动弹出） */
   THEORY_INTRO_BANNER_DISMISSED: 'theoryIntroBannerDismissed_v1',
   /** 每日打卡：连续天数、累计天数、最后打卡日本地字符串，见 utils/checkin.js */
-  CHECKIN_STATE: 'checkinState_v1'
+  CHECKIN_STATE: 'checkinState_v1',
+  /** 深色模式偏好：auto | light | dark */
+  THEME_MODE: 'themeMode_v1',
+  /** 新用户引导是否完成 */
+  ONBOARDING_DONE: 'onboardingDone_v1',
+  /** 大字体模式 */
+  LARGE_FONT: 'largeFont_v1',
+  /** 心象签行记录（供备份导出） */
+  LOT_ROWS: 'lotRows_v1',
+  /** 心象展馆收录数据（供备份导出） */
+  LOT_HALL: 'lotHall_v1',
+  /** 用户档案（备份别名，值同 USER_PROFILE） */
+  PROFILE: 'userProfile_v2',
+  /** 测验结果（备份别名，值同 PERSONALITY_RESULT） */
+  QUIZ_RESULT: 'personalityResult_v1',
+  /** 成就状态 */
+  ACHIEVE_STATE: 'achieveState_v1',
+  /** 使用状态（轻量行为标记，区别于 USAGE_STATS 的统计聚合） */
+  USAGE_STATE: 'usageState_v1'
 }

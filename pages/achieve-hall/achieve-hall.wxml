@@ -2,12 +2,11 @@
   <view class="hero">
     <text class="hero-title">心象成就</text>
     <text class="hero-sub">长按成就块查看趣味评语 · 松开即消失</text>
-    <view class="progress-wrap">
-      <view class="progress-bar">
-        <view class="progress-fill" style="width: {{progressPct}}%;"></view>
-      </view>
-      <text class="progress-text">已解锁 {{unlockedCount}} / {{total}}</text>
-    </view>
+    <progress-bar
+      percent="{{progressPct}}"
+      caption="已解锁 {{unlockedCount}} / {{total}}"
+      ariaLabel="成就进度"
+    />
   </view>
 
   <scroll-view scroll-y class="scroll" enhanced="{{true}}">

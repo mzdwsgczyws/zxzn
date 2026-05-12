@@ -1,0 +1,63 @@
+.ob-page {
+  min-height: 100vh;
+  background: linear-gradient(165deg, var(--dao-ritual-purple-b) 0%, var(--dao-bg-page) 55%);
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+.ob-swiper {
+  flex: 1;
+  width: 100%;
+}
+
+.ob-slide {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 100rpx 56rpx 40rpx;
+  box-sizing: border-box;
+  height: 100%;
+}
+
+.ob-icon {
+  font-size: 120rpx;
+  color: var(--dao-gold);
+  margin-bottom: 48rpx;
+  opacity: 0.8;
+}
+
+.ob-title {
+  font-size: 40rpx;
+  font-weight: 700;
+  color: var(--dao-gold-pale);
+  letter-spacing: 4rpx;
+  text-align: center;
+  margin-bottom: 32rpx;
+  text-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.2);
+}
+
+.ob-body {
+  font-size: 28rpx;
+  line-height: 1.7;
+  color: var(--dao-ink-body);
+  text-align: center;
+  max-width: 580rpx;
+}
+
+.ob-actions {
+  padding: 32rpx 48rpx;
+  min-height: 160rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.ob-skip {
+  font-size: 28rpx;
+  color: var(--dao-ink-faint);
+  padding: 20rpx 40rpx;
+  text-decoration: underline;
+  text-decoration-color: rgba(212, 175, 55, 0.3);
+}

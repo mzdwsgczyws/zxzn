@@ -85,3 +85,57 @@ page {
   color: var(--dao-ink-muted);
   margin-top: 12rpx;
 }
+
+/* —— 全局入场动效 —— */
+@keyframes daoFadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(24rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes daoScaleBounce {
+  0% { transform: scale(0.85); opacity: 0; }
+  60% { transform: scale(1.05); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes daoPop {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.12); }
+  100% { transform: scale(1); }
+}
+
+.dao-enter {
+  animation: daoFadeSlideIn 0.35s ease both;
+}
+
+@media (prefers-color-scheme: dark) {
+  page {
+    --dao-bg-page: #121018;
+    --dao-bg-card: #1e1a28;
+    --dao-ink: #e0d8cc;
+    --dao-ink-muted: #a09888;
+    --dao-ink-faint: #7a6e62;
+    --dao-ink-caption: #6d6258;
+    --dao-ink-body: #c4b8a8;
+    --dao-brown-warm: #b0a090;
+    --dao-purple-deep: #9fa8da;
+    --dao-purple-mid: #7986cb;
+    --dao-purple-soft: #5c6bc0;
+    --dao-purple-tint: #3949ab;
+    --dao-ritual-purple-a: #2d2248;
+    --dao-ritual-purple-b: #1a1530;
+    --dao-gold: #d4af37;
+    --dao-gold-pale: #c9a848;
+    --dao-gold-muted: #a8923a;
+    --dao-border-gold: rgba(212, 175, 55, 0.15);
+    --dao-border-gold-strong: rgba(212, 175, 55, 0.35);
+    --dao-shadow-purple: rgba(0, 0, 0, 0.25);
+    --dao-divider: #2a2535;
+  }
+}

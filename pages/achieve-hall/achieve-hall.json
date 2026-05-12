@@ -1,5 +1,8 @@
 {
   "navigationBarTitleText": "成就展馆",
   "navigationBarBackgroundColor": "#2a1f4a",
-  "navigationBarTextStyle": "white"
+  "navigationBarTextStyle": "white",
+  "usingComponents": {
+    "progress-bar": "/components/progress-bar/progress-bar"
+  }
 }

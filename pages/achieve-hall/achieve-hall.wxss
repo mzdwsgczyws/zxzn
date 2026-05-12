@@ -141,6 +141,25 @@
   filter: saturate(0.45);
 }
 
+.ach-on .ach-inner {
+  animation: achBounceIn 0.4s ease both;
+}
+
+@keyframes achBounceIn {
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.06);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
 .ach-crown {
   font-size: 28rpx;
   color: #c9a227;

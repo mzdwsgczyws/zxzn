@@ -1,0 +1,41 @@
+.cc-root {
+  margin-top: 16rpx;
+}
+
+.cc-title {
+  display: block;
+  font-size: 22rpx;
+  color: var(--dao-ink-faint);
+  margin-bottom: 12rpx;
+}
+
+.cc-grid {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 4rpx;
+}
+
+.cc-cell {
+  width: 24rpx;
+  height: 24rpx;
+  border-radius: 4rpx;
+  background: var(--dao-divider);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.cc-cell--on {
+  background: var(--dao-purple-mid);
+}
+
+.cc-cell--today {
+  box-shadow: 0 0 0 2rpx var(--dao-gold);
+}
+
+.cc-mood {
+  font-size: 14rpx;
+  line-height: 1;
+}

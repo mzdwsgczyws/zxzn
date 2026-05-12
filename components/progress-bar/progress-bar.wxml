@@ -1,0 +1,13 @@
+<view class="pb-wrap">
+  <view
+    class="pb-bar"
+    role="progressbar"
+    aria-valuenow="{{percent}}"
+    aria-valuemin="0"
+    aria-valuemax="100"
+    aria-label="{{ariaLabel}}"
+  >
+    <view class="pb-fill" style="width: {{percent}}%;"></view>
+  </view>
+  <text class="pb-caption" wx:if="{{caption}}">{{caption}}</text>
+</view>

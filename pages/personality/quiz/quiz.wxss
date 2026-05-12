@@ -76,6 +76,13 @@
   background: #e8e2f0;
   border-color: #7e57c2;
   color: #4a148c;
+  animation: optPop 0.25s ease;
+}
+
+@keyframes optPop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.04); }
+  100% { transform: scale(1); }
 }
 
 .opt--neither {

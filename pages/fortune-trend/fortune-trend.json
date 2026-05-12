@@ -1,4 +1,7 @@
 {
   "navigationBarTitleText": "趋势日历",
-  "usingComponents": {}
+  "usingComponents": {
+    "empty-state": "/components/empty-state/empty-state",
+    "loading-mask": "/components/loading-mask/loading-mask"
+  }
 }

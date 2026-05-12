@@ -1,0 +1,30 @@
+<view class="bs-stage bs-stage--{{variant}}">
+  <view class="bamboo-ambient"></view>
+  <view
+    class="bamboo-wrap {{shaking ? 'bamboo-wrap--shaking' : ''}} {{phase === 'anim' ? 'bamboo-wrap--drawing' : ''}}"
+  >
+    <view class="bamboo-crown"></view>
+    <view class="bamboo-slips">
+      <view class="bamboo-slip bamboo-slip--1"></view>
+      <view class="bamboo-slip bamboo-slip--2"></view>
+      <view class="bamboo-slip bamboo-slip--3"></view>
+      <view class="bamboo-slip bamboo-slip--4"></view>
+      <view class="bamboo-slip bamboo-slip--5"></view>
+      <view class="bamboo-slip bamboo-slip--6"></view>
+      <view class="bamboo-slip bamboo-slip--7"></view>
+    </view>
+    <view class="bamboo-tube">
+      <view class="bamboo-tube-patina"></view>
+      <view class="bamboo-tube-grain"></view>
+      <view class="bamboo-tube-crack"></view>
+      <view class="bamboo-node bamboo-node--a"></view>
+      <view class="bamboo-node bamboo-node--b"></view>
+      <view class="bamboo-node bamboo-node--c"></view>
+      <view class="bamboo-tube-gloss"></view>
+    </view>
+    <view class="bamboo-base-ring"></view>
+    <view class="bamboo-ground"></view>
+  </view>
+  <text class="shake-tip">{{shakeHint}}</text>
+  <text class="sim-tip" wx:if="{{showSimTip}}" bindtap="onSimTap">{{simTipText}}</text>
+</view>

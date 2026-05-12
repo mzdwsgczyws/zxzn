@@ -1,4 +1,5 @@
 <view class="page">
+  <loading-mask show="{{radarLoading}}" text="绘制雷达中" />
   <view class="card card-radar">
     <text class="title-lg">五行意象雷达</text>
     <text class="radar-lead">图形为近 7 天加权；分数与说明在下方卡片（与顶点顺序一致：上起顺时针 金→木→水→火→土）。</text>

@@ -9,16 +9,20 @@
     "pages/track/track",
     "pages/lottery/lottery",
     "pages/theory-intro/theory-intro",
-    "pages/profile/profile"
+    "pages/profile/profile",
+    "pages/report/report",
+    "pages/onboarding/onboarding"
   ],
   "window": {
     "navigationBarTitleText": "量化自修正念",
-    "navigationBarBackgroundColor": "#1a237e",
-    "navigationBarTextStyle": "white",
-    "backgroundColor": "#f5f0e8",
+    "navigationBarBackgroundColor": "@navBgColor",
+    "navigationBarTextStyle": "@navTextStyle",
+    "backgroundColor": "@bgColor",
     "backgroundTextStyle": "dark"
   },
   "style": "v2",
+  "darkmode": true,
+  "themeLocation": "theme.json",
   "permission": {
     "scope.writePhotosAlbum": {
       "desc": "用于将道性测验海报保存到您的相册"

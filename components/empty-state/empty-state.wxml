@@ -1,0 +1,12 @@
+<view class="es-root" role="region" aria-label="{{title}}">
+  <text class="es-icon" wx:if="{{icon}}">{{icon}}</text>
+  <text class="es-title">{{title}}</text>
+  <text class="es-body" wx:if="{{body}}">{{body}}</text>
+  <dao-button
+    wx:if="{{actionText}}"
+    type="primary"
+    size="small"
+    block="{{false}}"
+    bind:tap="onAction"
+  >{{actionText}}</dao-button>
+</view>

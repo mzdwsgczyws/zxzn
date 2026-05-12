@@ -23,10 +23,18 @@ Page({
     theoryBannerEligible: false,
     checkinStreak: 0,
     checkinTotalDays: 0,
-    checkinCheckedToday: false
+    checkinCheckedToday: false,
+    checkinMood: '',
+    seasonalHint: ''
   }),
 
   onLoad() {
+    try {
+      if (!wx.getStorageSync(KEYS.ONBOARDING_DONE)) {
+        wx.redirectTo({ url: '/pages/onboarding/onboarding' })
+        return
+      }
+    } catch (e) {}
     this.shakeAccum = 0
     this.lastShake = 0
     const win = wx.getWindowInfo ? wx.getWindowInfo() : wx.getSystemInfoSync()
@@ -46,8 +54,8 @@ Page({
       hallStripH: hallStripPx
     })
     core.onLotteryLoad(this)
-    this.refreshHallStrip()
     this.refreshTheoryBannerFlag()
+    wx.nextTick(() => this.refreshHallStrip())
   },
 
   refreshHallStrip() {
@@ -72,6 +80,7 @@ Page({
     this.refreshHallStrip()
     this.refreshTheoryBannerFlag()
     this.refreshCheckIn()
+    this.refreshSeasonalHint()
   },
 
   refreshCheckIn() {
@@ -79,13 +88,25 @@ Page({
     this.setData({
       checkinStreak: s.streak,
       checkinTotalDays: s.totalDays,
-      checkinCheckedToday: s.checkedToday
+      checkinCheckedToday: s.checkedToday,
+      checkinMood: s.todayMood
     })
+  },
+
+  refreshSeasonalHint() {
+    try {
+      const { getSeasonalContext } = require('../../utils/seasonal.js')
+      const ctx = getSeasonalContext()
+      this.setData({ seasonalHint: ctx.idleHint || '' })
+    } catch (e) {}
   },
 
   tapCheckIn() {
     const r = checkin.recordCheckIn()
     this.refreshCheckIn()
+    if (!r.already) {
+      try { wx.vibrateShort({ type: 'medium' }) } catch (e) {}
+    }
     if (r.already) {
       wx.showToast({ title: '今日已打卡', icon: 'none' })
       return

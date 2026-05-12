@@ -1,0 +1,41 @@
+.db {
+  margin: 0;
+  border-radius: 48rpx;
+  font-weight: 500;
+  border: none;
+  box-sizing: border-box;
+}
+
+.db::after {
+  border: none;
+}
+
+.db--primary {
+  background: linear-gradient(135deg, var(--dao-purple-mid) 0%, var(--dao-purple-deep) 100%);
+  color: #fff;
+  padding: 24rpx 48rpx;
+  font-size: 30rpx;
+}
+
+.db--ghost {
+  background: transparent;
+  color: var(--dao-purple-mid);
+  border: 2rpx solid var(--dao-purple-mid) !important;
+  padding: 20rpx 40rpx;
+  font-size: 28rpx;
+}
+
+.db--block {
+  width: 100%;
+  display: block;
+}
+
+.db--sm {
+  padding: 14rpx 28rpx !important;
+  font-size: 26rpx !important;
+  border-radius: 36rpx;
+}
+
+.db--hover {
+  opacity: 0.9;
+}

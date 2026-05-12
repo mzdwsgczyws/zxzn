@@ -343,6 +343,9 @@ function finalizeDraw(page, lat, lng, weather) {
   })
   recordBiz('lot_draw', String(meta.lotId))
 
+  const seasonal = require('./seasonal.js')
+  const seasonCtx = seasonal.getSeasonalContext(now)
+
   const thinking = buildLotteryThinkingBrief()
 
   setTimeout(() => {

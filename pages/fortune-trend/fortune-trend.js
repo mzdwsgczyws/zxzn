@@ -39,13 +39,27 @@ Page({
     const h = Math.floor(Math.min(320, win.windowWidth * 0.46))
     this.setData({ chartW: w, chartH: h })
     this._trendByDate = {}
+    this._chartPainted = false
+    this._setupChartObserver()
   },
 
   onShow() {
     this.reload()
   },
 
+  _setupChartObserver() {
+    if (this._chartObserver) return
+    this._chartObserver = this.createIntersectionObserver()
+    this._chartObserver.relativeToViewport({ bottom: 0 })
+    this._chartObserver.observe('.candle-canvas', (res) => {
+      if (res.intersectionRatio > 0 && !this._chartPainted && this.data.rows.length) {
+        this.paintChart()
+      }
+    })
+  },
+
   reload() {
+    this._chartPainted = false
     const profile = wx.getStorageSync(KEYS.USER_PROFILE) || {}
     const pref = profile.lotStylePref || 'rich'
     const series = getDailyTrendSeries()
@@ -127,10 +141,12 @@ Page({
   },
 
   paintChart() {
+    if (this._chartPainted) return
     const ctx = wx.createCanvasContext('fortuneCandleCanvas', this)
     const series = (this.data.rows || []).map((r) => ({ tier: r.tier, dateStr: r.dateStr }))
     paintFortuneCandles(ctx, this.data.chartW, this.data.chartH, series)
     ctx.draw(false)
+    this._chartPainted = true
   },
 
   onCalLongPress(e) {
@@ -157,5 +173,9 @@ Page({
     this.setData({ detailVisible: false, detail: null })
   },
 
-  noop() {}
+  noop() {},
+
+  goHome() {
+    wx.reLaunch({ url: '/pages/index/index' })
+  }
 })

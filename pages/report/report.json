@@ -1,0 +1,8 @@
+{
+  "usingComponents": {
+    "dao-card": "/components/dao-card/dao-card",
+    "dao-button": "/components/dao-button/dao-button",
+    "progress-bar": "/components/progress-bar/progress-bar",
+    "checkin-calendar": "/components/checkin-calendar/checkin-calendar"
+  }
+}

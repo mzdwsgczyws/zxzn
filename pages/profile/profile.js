@@ -1,4 +1,5 @@
 const KEYS = require('../../utils/storage-keys.js')
+const backup = require('../../utils/data-backup.js')
 const {
   getProvinceLabels,
   getCityLabels,
@@ -96,7 +97,8 @@ Page({
     styleLabels: STYLE_LABELS,
     styleIndex: 0,
     focusChips: buildFocusChips([]),
-    focusTagsSelected: []
+    focusTagsSelected: [],
+    largeFont: false
   },
 
   goFortuneTrend() {
@@ -307,6 +309,11 @@ Page({
         cityIndex: findCityIndex(provinceIndex, p.addrCity)
       })
     }
+
+    try {
+      const lf = wx.getStorageSync(KEYS.LARGE_FONT)
+      this.setData({ largeFont: !!lf })
+    } catch (e) {}
   },
 
   onAge(e) {
@@ -332,6 +339,14 @@ Page({
     this.setData({ styleIndex: Number(e.detail.value) || 0 })
   },
 
+  onLargeFontChange(e) {
+    const val = !!e.detail.value
+    this.setData({ largeFont: val })
+    try {
+      wx.setStorageSync(KEYS.LARGE_FONT, val)
+    } catch (e2) {}
+  },
+
   toggleFocus(e) {
     const id = e.currentTarget.dataset.id
     if (!id) return
@@ -341,6 +356,44 @@ Page({
     else set.add(id)
     const arr = Array.from(set)
     this.setData({ focusTagsSelected: arr, focusChips: buildFocusChips(arr) })
+  },
+
+  async onExport() {
+    wx.showLoading({ title: '导出中...' })
+    try {
+      const res = await backup.exportData()
+      wx.hideLoading()
+      if (res.method === 'file') {
+        wx.showToast({ title: res.msg || '已保存到本地', icon: 'none' })
+      } else {
+        wx.showToast({ title: '导出成功', icon: 'success' })
+      }
+    } catch (e) {
+      wx.hideLoading()
+      wx.showModal({ title: '导出失败', content: e.message || '未知错误', showCancel: false })
+    }
+  },
+
+  async onImport() {
+    try {
+      const confirm = await new Promise((resolve) => {
+        wx.showModal({
+          title: '导入数据',
+          content: '导入将覆盖当前数据，确定继续？',
+          success: (r) => resolve(r.confirm)
+        })
+      })
+      if (!confirm) return
+
+      const res = await backup.importData()
+      if (res.cancelled) return
+      if (res.ok) {
+        wx.showToast({ title: `已恢复 ${res.restored} 项数据`, icon: 'success' })
+        setTimeout(() => this.onShow(), 800)
+      }
+    } catch (e) {
+      wx.showModal({ title: '导入失败', content: e.message || '未知错误', showCancel: false })
+    }
   },
 
   save() {

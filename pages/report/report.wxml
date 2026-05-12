@@ -1,0 +1,53 @@
+<view class="page dao-enter">
+  <view class="period-tabs">
+    <text class="tab {{period === 'week' ? 'tab--on' : ''}}" data-period="week" bindtap="switchPeriod">周报</text>
+    <text class="tab {{period === 'month' ? 'tab--on' : ''}}" data-period="month" bindtap="switchPeriod">月报</text>
+  </view>
+
+  <dao-card>
+    <text class="sec-title">{{periodLabel}}打卡概览</text>
+    <view class="stat-row">
+      <view class="stat-item">
+        <text class="stat-num">{{checkinDays}}</text>
+        <text class="stat-label">打卡天数</text>
+      </view>
+      <view class="stat-item">
+        <text class="stat-num">{{checkinRate}}%</text>
+        <text class="stat-label">出勤率</text>
+      </view>
+      <view class="stat-item">
+        <text class="stat-num">{{streak}}</text>
+        <text class="stat-label">当前连续</text>
+      </view>
+      <view class="stat-item">
+        <text class="stat-num">{{lotteryCount}}</text>
+        <text class="stat-label">摇签次数</text>
+      </view>
+    </view>
+    <progress-bar percent="{{checkinRate}}" caption="出勤率 {{checkinRate}}%" />
+  </dao-card>
+
+  <dao-card wx:if="{{moodSummary.length > 0}}">
+    <text class="sec-title">心境分布</text>
+    <view class="mood-bars">
+      <view class="mood-bar-row" wx:for="{{moodSummary}}" wx:key="mood">
+        <text class="mood-emoji">{{item.mood}}</text>
+        <view class="mood-bar-track">
+          <view class="mood-bar-fill" style="width: {{item.count / checkinDays * 100}}%;"></view>
+        </view>
+        <text class="mood-count">{{item.count}}</text>
+      </view>
+    </view>
+  </dao-card>
+
+  <dao-card>
+    <text class="sec-title">打卡热力图</text>
+    <checkin-calendar days="{{heatmapDays}}" />
+  </dao-card>
+
+  <view class="bottom-actions">
+    <dao-button type="primary" block="{{true}}" open-type="share">分享报告</dao-button>
+    <view style="height:16rpx;"></view>
+    <dao-button type="ghost" block="{{true}}" bind:tap="goBack">返回</dao-button>
+  </view>
+</view>

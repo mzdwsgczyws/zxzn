@@ -1,0 +1,13 @@
+<view class="cc-root">
+  <text class="cc-title">近 {{days.length}} 天打卡</text>
+  <view class="cc-grid">
+    <view
+      wx:for="{{days}}"
+      wx:key="dateStr"
+      class="cc-cell {{item.checked ? 'cc-cell--on' : ''}} {{item.dateStr === today ? 'cc-cell--today' : ''}}"
+      aria-label="{{item.dateStr}} {{item.checked ? '已打卡' : '未打卡'}}"
+    >
+      <text class="cc-mood" wx:if="{{item.mood}}">{{item.mood}}</text>
+    </view>
+  </view>
+</view>
