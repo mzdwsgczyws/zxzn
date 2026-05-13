@@ -384,5 +384,9 @@ Page({
 
   goReport() {
     wx.navigateTo({ url: '/pages/report/report' })
+  },
+
+  goTreeHole() {
+    wx.navigateTo({ url: '/pages/tree-hole/tree-hole' })
   }
 })

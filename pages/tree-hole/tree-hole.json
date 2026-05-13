@@ -1,0 +1,9 @@
+{
+  "usingComponents": {
+    "dao-card": "/components/dao-card/dao-card"
+  },
+  "navigationBarTitleText": "心事寄此",
+  "navigationBarBackgroundColor": "#1a1028",
+  "navigationBarTextStyle": "white",
+  "backgroundColor": "#1a1028"
+}

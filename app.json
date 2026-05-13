@@ -11,7 +11,8 @@
     "pages/theory-intro/theory-intro",
     "pages/profile/profile",
     "pages/report/report",
-    "pages/onboarding/onboarding"
+    "pages/onboarding/onboarding",
+    "pages/tree-hole/tree-hole"
   ],
   "window": {
     "navigationBarTitleText": "量化自修正念",

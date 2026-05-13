@@ -44,5 +44,9 @@ module.exports = {
   /** 成就状态 */
   ACHIEVE_STATE: 'achieveState_v1',
   /** 使用状态（轻量行为标记，区别于 USAGE_STATS 的统计聚合） */
-  USAGE_STATE: 'usageState_v1'
+  USAGE_STATE: 'usageState_v1',
+  /** 树洞信件 token 列表：[{ letterToken, content, createdAt }] */
+  TREE_HOLE_LETTERS: 'treeHoleLetters_v1',
+  /** 树洞每日投信计数：{ date: 'YYYY-MM-DD', count: number } */
+  TREE_HOLE_DAILY: 'treeHoleDaily_v1'
 }

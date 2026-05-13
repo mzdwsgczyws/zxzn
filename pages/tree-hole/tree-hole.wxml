@@ -1,0 +1,89 @@
+<view class="tree-hole-page">
+  <!-- Hero -->
+  <view class="th-hero">
+    <view class="th-hero-title">心事寄此</view>
+    <view class="th-hero-sub">将烦恼写成一封匿名信，投入树洞。</view>
+    <view class="th-hero-sub">道观主人会在另一头读到，写下回信寄还给你。</view>
+  </view>
+
+  <!-- 匿名承诺 -->
+  <view class="th-anon-bar">
+    <text class="th-anon-icon">🛡️</text>
+    <text class="th-anon-text">纯匿名 · 不记录身份 · 开发者无法知晓发信人</text>
+  </view>
+
+  <!-- 写信区 -->
+  <view class="th-letter-card">
+    <view class="th-letter-label">写下你的烦恼</view>
+    <textarea
+      class="th-textarea"
+      placeholder="在此倾诉心事..."
+      placeholder-style="color: #b8a88a;"
+      maxlength="500"
+      value="{{letterContent}}"
+      bindinput="onInput"
+      auto-height
+    />
+    <view class="th-char-count">{{letterContent.length || 0}} / 500</view>
+    <view class="th-submit-wrap">
+      <button
+        class="th-submit-btn {{submitting ? 'th-submitting' : ''}}"
+        bindtap="submitLetter"
+        disabled="{{submitting || !letterContent.trim()}}"
+      >
+        {{submitting ? '投递中...' : '投入树洞'}}
+      </button>
+    </view>
+    <view class="th-daily-hint">每人每日至多投 3 封信</view>
+  </view>
+
+  <!-- 飞入动画遮罩 -->
+  <view class="th-fly-mask {{flyAnim ? 'th-fly-active' : ''}}" wx:if="{{flyAnim}}">
+    <view class="th-fly-letter">📜</view>
+  </view>
+
+  <!-- 我的信箱 -->
+  <view class="th-divider">
+    <view class="th-divider-line"></view>
+    <text class="th-divider-text">我的信箱</text>
+    <view class="th-divider-line"></view>
+  </view>
+
+  <!-- 已回复 -->
+  <block wx:for="{{repliedLetters}}" wx:key="letterToken">
+    <view class="th-reply-card">
+      <view class="th-reply-seal"></view>
+      <view class="th-reply-body">
+        <view class="th-reply-section">
+          <text class="th-reply-label">你的来信</text>
+          <text class="th-reply-content">{{item.content}}</text>
+        </view>
+        <view class="th-reply-section th-reply-answer">
+          <text class="th-reply-label">道观回信</text>
+          <text class="th-reply-content th-reply-text">{{item.reply}}</text>
+        </view>
+        <text class="th-reply-time">回信于 {{item.repliedAtStr}}</text>
+      </view>
+    </view>
+  </block>
+
+  <!-- 等待中 -->
+  <block wx:for="{{pendingLetters}}" wx:key="letterToken">
+    <view class="th-pending-card">
+      <text class="th-pending-icon">🕊️</text>
+      <view class="th-pending-body">
+        <text class="th-pending-content">{{item.contentPreview}}</text>
+        <text class="th-pending-hint">已投入树洞，静候回信...</text>
+        <text class="th-pending-time">{{item.createdAtStr}}</text>
+      </view>
+    </view>
+  </block>
+
+  <!-- 空状态 -->
+  <view class="th-empty" wx:if="{{!repliedLetters.length && !pendingLetters.length && loaded}}">
+    <text class="th-empty-icon">🌿</text>
+    <text class="th-empty-text">信箱空空，写下第一封信吧</text>
+  </view>
+
+  <view class="th-footer"></view>
+</view>

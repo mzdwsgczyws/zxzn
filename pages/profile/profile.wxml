@@ -141,4 +141,13 @@
       <button class="btn-ghost hall-link-btn" bindtap="goReport">修炼报告</button>
     </view>
   </view>
+
+  <view class="card treehole-entry-card" bindtap="goTreeHole">
+    <text class="treehole-entry-icon">🌿</text>
+    <view class="treehole-entry-body">
+      <text class="treehole-entry-title">心事寄此 · 匿名树洞</text>
+      <text class="treehole-entry-sub">写下烦恼，静候道观主人回信</text>
+    </view>
+    <text class="treehole-entry-arrow">›</text>
+  </view>
 </view>

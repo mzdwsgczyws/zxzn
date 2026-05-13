@@ -52,6 +52,7 @@
         <text class="idle-seasonal" wx:if="{{seasonalHint}}">{{seasonalHint}}</text>
         <text class="idle-hint">点击按钮后感应手机摇动，约 9 次有效晃动后生成当日一条</text>
         <text class="idle-theory-link" bindtap="openTheoryIntro">量化 × 修道 · 理念简介</text>
+        <text class="idle-treehole-link" bindtap="goTreeHole">心事寄此 · 匿名树洞</text>
       </view>
 
       <!-- 摇动中 / 动画：竹筒 -->

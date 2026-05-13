@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>树洞管理后台 · 心事寄此</title>
+<style>
+  :root {
+    --bg: #1a1028;
+    --card: #2d1f3d;
+    --gold: #d4a857;
+    --gold-dim: rgba(212,168,87,0.3);
+    --text: #e8e0d0;
+    --text-dim: rgba(232,224,208,0.5);
+    --seal: #c0392b;
+    --paper: #faf5e8;
+    --ink: #3a2e22;
+    --border: rgba(255,255,255,0.08);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Songti SC", "Noto Serif SC", "STSong", Georgia, serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 0;
+  }
+  .header {
+    text-align: center;
+    padding: 48px 24px 24px;
+    background: linear-gradient(180deg, #1a1028, #2d1f3d);
+  }
+  .header h1 {
+    font-size: 28px;
+    color: var(--gold);
+    letter-spacing: 6px;
+    text-shadow: 0 0 20px rgba(212,168,87,0.3);
+  }
+  .header p { color: var(--text-dim); font-size: 14px; margin-top: 8px; }
+  .login-wrap {
+    max-width: 400px;
+    margin: 60px auto;
+    padding: 32px;
+    background: var(--card);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+  }
+  .login-wrap label { display: block; color: var(--text-dim); font-size: 13px; margin-bottom: 8px; }
+  .login-wrap input {
+    width: 100%;
+    padding: 12px 16px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-size: 16px;
+    outline: none;
+  }
+  .login-wrap input:focus { border-color: var(--gold-dim); }
+  .login-wrap button {
+    display: block;
+    width: 100%;
+    margin-top: 16px;
+    padding: 12px;
+    background: linear-gradient(135deg, var(--gold), #b8860b);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    letter-spacing: 2px;
+  }
+  .login-wrap button:hover { opacity: 0.9; }
+  .main { max-width: 720px; margin: 0 auto; padding: 24px 16px 60px; display: none; }
+  .tabs { display: flex; gap: 12px; margin-bottom: 24px; }
+  .tab-btn {
+    flex: 1;
+    padding: 10px;
+    text-align: center;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text-dim);
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s;
+  }
+  .tab-btn.active { background: rgba(212,168,87,0.12); border-color: var(--gold-dim); color: var(--gold); }
+  .letter-card {
+    background: var(--card);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    margin-bottom: 16px;
+    overflow: hidden;
+  }
+  .letter-header {
+    padding: 16px 20px 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .letter-token { font-size: 12px; color: var(--text-dim); font-family: monospace; }
+  .letter-time { font-size: 12px; color: var(--text-dim); }
+  .letter-content {
+    padding: 0 20px 16px;
+    font-size: 15px;
+    line-height: 1.8;
+    color: var(--text);
+    white-space: pre-wrap;
+  }
+  .letter-reply-area { padding: 0 20px 20px; }
+  .letter-reply-area textarea {
+    width: 100%;
+    min-height: 100px;
+    padding: 12px;
+    background: var(--paper);
+    color: var(--ink);
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    line-height: 1.8;
+    font-family: inherit;
+    resize: vertical;
+  }
+  .letter-reply-area button {
+    margin-top: 8px;
+    padding: 8px 24px;
+    background: linear-gradient(135deg, var(--gold), #b8860b);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  .letter-reply-area button:disabled { opacity: 0.4; cursor: not-allowed; }
+  .replied-badge {
+    display: inline-block;
+    padding: 2px 10px;
+    background: rgba(46,125,50,0.15);
+    color: #66bb6a;
+    border-radius: 4px;
+    font-size: 12px;
+  }
+  .reply-preview {
+    padding: 12px 20px 16px;
+    border-top: 1px solid var(--border);
+  }
+  .reply-preview-label { font-size: 12px; color: var(--gold); margin-bottom: 4px; display: block; }
+  .reply-preview-text { font-size: 14px; color: var(--text); line-height: 1.7; white-space: pre-wrap; }
+  .empty-msg { text-align: center; padding: 60px 0; color: var(--text-dim); font-size: 14px; }
+  .status-bar {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    padding: 8px 16px;
+    background: var(--card);
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--text-dim);
+    text-align: center;
+    z-index: 10;
+  }
+  .err { color: var(--seal); }
+  .refresh-btn {
+    position: fixed; bottom: 40px; right: 20px;
+    width: 48px; height: 48px;
+    border-radius: 50%;
+    background: var(--gold);
+    color: #fff;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    z-index: 10;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>心事寄此 · 管理后台</h1>
+  <p>匿名树洞回信管理</p>
+</div>
+
+<div class="login-wrap" id="loginWrap">
+  <label>管理密钥</label>
+  <input type="password" id="keyInput" placeholder="输入 ADMIN_KEY">
+  <label style="margin-top:16px;">云环境 ID</label>
+  <input type="text" id="envInput" placeholder="如 dao-xxxx">
+  <button onclick="doLogin()">进入后台</button>
+</div>
+
+<div class="main" id="mainPanel">
+  <div class="tabs">
+    <div class="tab-btn active" id="tabPending" onclick="switchTab('pending')">待回复</div>
+    <div class="tab-btn" id="tabReplied" onclick="switchTab('replied')">已回复</div>
+  </div>
+  <div id="letterList"></div>
+</div>
+
+<button class="refresh-btn" id="refreshBtn" style="display:none;" onclick="loadLetters()">↻</button>
+<div class="status-bar" id="statusBar">请先登录</div>
+
+<script>
+let adminKey = ''
+let envId = ''
+let currentTab = 'pending'
+
+function doLogin() {
+  adminKey = document.getElementById('keyInput').value.trim()
+  envId = document.getElementById('envInput').value.trim()
+  if (!adminKey || !envId) {
+    setStatus('请填写密钥和环境 ID', true)
+    return
+  }
+  localStorage.setItem('th_admin_key', adminKey)
+  localStorage.setItem('th_env_id', envId)
+  document.getElementById('loginWrap').style.display = 'none'
+  document.getElementById('mainPanel').style.display = 'block'
+  document.getElementById('refreshBtn').style.display = 'block'
+  loadLetters()
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  const savedKey = localStorage.getItem('th_admin_key')
+  const savedEnv = localStorage.getItem('th_env_id')
+  if (savedKey && savedEnv) {
+    adminKey = savedKey
+    envId = savedEnv
+    document.getElementById('keyInput').value = savedKey
+    document.getElementById('envInput').value = savedEnv
+    doLogin()
+  }
+})
+
+function setStatus(msg, isErr) {
+  const bar = document.getElementById('statusBar')
+  bar.textContent = msg
+  bar.className = isErr ? 'status-bar err' : 'status-bar'
+}
+
+function switchTab(tab) {
+  currentTab = tab
+  document.getElementById('tabPending').className = tab === 'pending' ? 'tab-btn active' : 'tab-btn'
+  document.getElementById('tabReplied').className = tab === 'replied' ? 'tab-btn active' : 'tab-btn'
+  loadLetters()
+}
+
+async function callCloudFn(fnName, data) {
+  const url = `https://api.weixin.qq.com/tcb/invokecloudfunction?env=${envId}&name=${fnName}`
+  const resp = await fetch('/api/cloud-proxy', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ url, data })
+  }).catch(() => null)
+
+  if (resp && resp.ok) {
+    const json = await resp.json()
+    return json
+  }
+
+  const directResp = await fetch(`https://${envId}.service.tcloudbase.com/${fnName}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  })
+  return directResp.json()
+}
+
+async function loadLetters() {
+  setStatus('加载中...')
+  try {
+    const result = await callCloudFn('treehole-admin', {
+      action: 'list',
+      adminKey,
+      status: currentTab
+    })
+
+    if (result && result.resp_data) {
+      const parsed = JSON.parse(result.resp_data)
+      renderLetters(parsed.letters || [])
+      setStatus(`已加载 ${(parsed.letters || []).length} 封信件`)
+    } else if (result && result.letters) {
+      renderLetters(result.letters || [])
+      setStatus(`已加载 ${(result.letters || []).length} 封信件`)
+    } else if (result && result.success === false) {
+      setStatus(result.error || '请求失败', true)
+    } else {
+      setStatus('返回格式异常，请检查云函数部署', true)
+    }
+  } catch (e) {
+    setStatus('请求失败: ' + e.message, true)
+  }
+}
+
+function fmtDate(d) {
+  if (!d) return ''
+  const dt = new Date(d)
+  if (isNaN(dt.getTime())) return String(d)
+  return dt.toLocaleString('zh-CN', { hour12: false })
+}
+
+function renderLetters(letters) {
+  const list = document.getElementById('letterList')
+  if (!letters.length) {
+    list.innerHTML = '<div class="empty-msg">暂无信件</div>'
+    return
+  }
+  list.innerHTML = letters.map((l, i) => {
+    const isPending = l.status === 'pending'
+    return `
+      <div class="letter-card">
+        <div class="letter-header">
+          <span class="letter-token">${l.letterToken || '?'}</span>
+          <span class="letter-time">${fmtDate(l.createdAt)}</span>
+        </div>
+        <div class="letter-content">${escHtml(l.content || '')}</div>
+        ${isPending ? `
+          <div class="letter-reply-area">
+            <textarea id="reply_${i}" placeholder="写下回信..."></textarea>
+            <button id="btn_${i}" onclick="submitReply('${l.letterToken}', ${i})">回信</button>
+          </div>
+        ` : `
+          <div class="letter-header">
+            <span class="replied-badge">已回复</span>
+            <span class="letter-time">${fmtDate(l.repliedAt)}</span>
+          </div>
+          <div class="reply-preview">
+            <span class="reply-preview-label">回信内容</span>
+            <div class="reply-preview-text">${escHtml(l.reply || '')}</div>
+          </div>
+        `}
+      </div>
+    `
+  }).join('')
+}
+
+function escHtml(s) {
+  const d = document.createElement('div')
+  d.textContent = s
+  return d.innerHTML
+}
+
+async function submitReply(token, idx) {
+  const textarea = document.getElementById('reply_' + idx)
+  const btn = document.getElementById('btn_' + idx)
+  const reply = textarea.value.trim()
+  if (!reply) { setStatus('回信内容不能为空', true); return }
+
+  btn.disabled = true
+  btn.textContent = '提交中...'
+  setStatus('正在提交回信...')
+
+  try {
+    const result = await callCloudFn('treehole-admin', {
+      action: 'reply',
+      adminKey,
+      letterToken: token,
+      reply
+    })
+
+    const parsed = result.resp_data ? JSON.parse(result.resp_data) : result
+    if (parsed && parsed.success) {
+      setStatus('回信成功')
+      setTimeout(loadLetters, 500)
+    } else {
+      setStatus((parsed && parsed.error) || '回信失败', true)
+      btn.disabled = false
+      btn.textContent = '回信'
+    }
+  } catch (e) {
+    setStatus('提交失败: ' + e.message, true)
+    btn.disabled = false
+    btn.textContent = '回信'
+  }
+}
+</script>
+
+</body>
+</html>

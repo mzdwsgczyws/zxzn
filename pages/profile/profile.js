@@ -121,6 +121,10 @@ Page({
     wx.navigateTo({ url: '/pages/theory-intro/theory-intro' })
   },
 
+  goTreeHole() {
+    wx.navigateTo({ url: '/pages/tree-hole/tree-hole' })
+  },
+
   applyCountryIndex(ci, resetPc) {
     const countryLabels = getCountryLabels()
     const idx = Math.max(0, Math.min(countryLabels.length - 1, ci | 0))

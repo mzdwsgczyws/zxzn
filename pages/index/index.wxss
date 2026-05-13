@@ -171,6 +171,16 @@
   text-decoration-color: rgba(201, 162, 39, 0.45);
   padding: 12rpx;
 }
+.idle-treehole-link {
+  display: block;
+  margin-top: 20rpx;
+  font-family: "DaoDisplay", "Songti SC", "Noto Serif SC", "STSong", serif;
+  font-size: 22rpx;
+  color: rgba(180, 160, 130, 0.55);
+  text-align: center;
+  letter-spacing: 3rpx;
+  padding: 8rpx;
+}
 
 /* 首次空闲态：轻提示条（关闭或点阅后不再出现） */
 .theory-nudge {

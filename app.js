@@ -3,6 +3,12 @@ const KEYS = require('./utils/storage-keys.js')
 
 App({
   onLaunch() {
+    if (wx.cloud) {
+      wx.cloud.init({
+        env: 'YOUR_CLOUD_ENV_ID',
+        traceUser: false
+      })
+    }
     usageAnalytics.onAppLaunch()
     this._initTheme()
     this._loadDisplayFont()
