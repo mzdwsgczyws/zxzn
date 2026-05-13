@@ -36,7 +36,7 @@
 .q-label {
   display: block;
   font-size: 24rpx;
-  color: #78909c;
+  color: var(--dao-ink-faint);
   margin-bottom: 12rpx;
 }
 
@@ -76,7 +76,7 @@
 .opt--selected {
   background: #e8e2f0;
   border-color: var(--dao-purple-soft);
-  color: #4a148c;
+  color: var(--dao-purple-deep);
   animation: optPop 0.25s ease;
 }
 

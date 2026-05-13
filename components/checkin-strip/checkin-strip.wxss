@@ -115,5 +115,11 @@
 .cs-mood--on {
   border-color: var(--dao-purple-mid);
   transform: scale(1.15);
-  box-shadow: 0 4rpx 12rpx rgba(57, 73, 171, 0.2); /* --dao-purple-mid @20% */
+  box-shadow: 0 4rpx 12rpx rgba(57, 73, 171, 0.2);
+  animation: csGoldGlow 1.8s ease-in-out infinite;
+}
+
+@keyframes csGoldGlow {
+  0%, 100% { box-shadow: 0 4rpx 12rpx rgba(57, 73, 171, 0.2); }
+  50% { box-shadow: 0 4rpx 18rpx rgba(212, 175, 55, 0.4); }
 }

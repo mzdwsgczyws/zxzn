@@ -29,6 +29,7 @@
 }
 
 .ob-title {
+  font-family: var(--dao-font-display);
   font-size: 40rpx;
   font-weight: 700;
   color: var(--dao-gold-pale);

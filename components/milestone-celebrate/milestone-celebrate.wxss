@@ -52,6 +52,7 @@
 }
 
 .mc-streak {
+  font-family: var(--dao-font-display);
   font-size: 28rpx;
   color: var(--dao-purple-deep);
   font-weight: 600;

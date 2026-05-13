@@ -66,7 +66,7 @@
   box-sizing: border-box;
 }
 
-.card {
+.lh-card {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -78,6 +78,7 @@
   border: 1rpx solid rgba(212, 175, 55, 0.28);
   box-shadow: 0 8rpx 28rpx rgba(45, 34, 74, 0.08);
   box-sizing: border-box;
+  border-left: 6rpx solid transparent;
 }
 
 .card-left {

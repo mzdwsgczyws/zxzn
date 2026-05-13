@@ -10,6 +10,27 @@
   box-sizing: border-box;
 }
 
+.dao-card::before, .dao-card::after {
+  content: '';
+  position: absolute;
+  width: 40rpx;
+  height: 40rpx;
+  border-color: var(--dao-gold);
+  border-style: solid;
+  opacity: 0.3;
+  pointer-events: none;
+}
+.dao-card::before {
+  top: 8rpx; left: 8rpx;
+  border-width: 2rpx 0 0 2rpx;
+  border-radius: 4rpx 0 0 0;
+}
+.dao-card::after {
+  bottom: 8rpx; right: 8rpx;
+  border-width: 0 2rpx 2rpx 0;
+  border-radius: 0 0 4rpx 0;
+}
+
 .dao-card--plain {
   margin: 0;
   box-shadow: none;

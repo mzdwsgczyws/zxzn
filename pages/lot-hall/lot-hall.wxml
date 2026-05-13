@@ -12,7 +12,7 @@
   />
 
   <scroll-view wx:else scroll-y class="list" enhanced="{{true}}">
-    <view class="card" wx:for="{{rows}}" wx:key="lotId">
+    <view class="lh-card" wx:for="{{rows}}" wx:key="lotId" style="border-left-color: {{item.tierColor}};">
       <view class="card-left">
         <view class="tier-dot" style="background: {{item.tierColor}};"></view>
         <view class="card-text">

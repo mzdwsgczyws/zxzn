@@ -56,8 +56,8 @@
 
 .portrait-img {
   display: block;
-  width: 280px;
-  height: 280px;
+  width: 560rpx;
+  height: 560rpx;
   border-radius: 16rpx;
   box-shadow: 0 8rpx 24rpx rgba(26, 35, 126, 0.15);
   background: var(--dao-divider);
@@ -79,14 +79,14 @@
   display: block;
   margin-top: 12rpx;
   font-size: 26rpx;
-  color: #8d6e63;
+  color: var(--dao-ink-faint);
 }
 
 .summary {
   display: block;
   margin-top: 24rpx;
   font-size: 28rpx;
-  color: #3e3428;
+  color: var(--dao-ink-body);
   line-height: 1.65;
 }
 

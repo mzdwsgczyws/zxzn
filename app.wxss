@@ -3,7 +3,7 @@
  * 千年赛博道观：静如宣纸，动如流水；金线勾勒，紫墨铺底。
  */
 page {
-  /* —— 字体（DaoDisplay 由 wx.loadFontFace 加载 LXGW WenKai） —— */
+  /* —— 字体 —— */
   --dao-font-display: "DaoDisplay", "Songti SC", "STSong", "Noto Serif CJK SC", serif;
   --dao-font-body: -apple-system, "Helvetica Neue", "PingFang SC", "Noto Sans CJK SC", sans-serif;
 
@@ -32,6 +32,7 @@ page {
   --dao-ritual-purple-a: #3d2b69;
   --dao-ritual-purple-b: #2a1f4a;
   --dao-gold: #d4af37;
+  --dao-gold-bright: #e8c84a;
   --dao-gold-pale: #e8d4a8;
   --dao-gold-muted: #9a7b2e;
   --dao-jade: #5d8a68;
@@ -41,6 +42,8 @@ page {
   --dao-border-gold-strong: rgba(212, 175, 55, 0.45);
   --dao-shadow-purple: rgba(26, 35, 126, 0.08);
   --dao-divider: #ece5d8;
+  --dao-glow-gold: 0 0 20rpx rgba(212, 175, 55, 0.2), 0 0 48rpx rgba(212, 175, 55, 0.08);
+  --dao-glow-purple: 0 0 20rpx rgba(57, 73, 171, 0.15), 0 0 48rpx rgba(26, 35, 126, 0.06);
 
   background-color: var(--dao-bg-page);
   color: var(--dao-ink);
@@ -52,13 +55,24 @@ page {
   -webkit-font-smoothing: antialiased;
 }
 
-/* —— 宣纸质感底纹（在 view 层而非 page 伪元素） —— */
+/* —— 宣纸质感底纹（浅色页面使用） —— */
 .dao-paper-bg {
   background-color: var(--dao-bg-page);
   background-image:
-    radial-gradient(ellipse at 15% 25%, rgba(180, 160, 120, 0.06) 0%, transparent 50%),
-    radial-gradient(ellipse at 85% 75%, rgba(160, 140, 100, 0.05) 0%, transparent 50%),
-    radial-gradient(ellipse at 50% 50%, rgba(200, 180, 140, 0.03) 0%, transparent 60%);
+    radial-gradient(ellipse at 15% 25%, rgba(180, 160, 120, 0.07) 0%, transparent 50%),
+    radial-gradient(ellipse at 85% 75%, rgba(160, 140, 100, 0.06) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 50%, rgba(200, 180, 140, 0.04) 0%, transparent 60%),
+    repeating-linear-gradient(0deg, transparent, transparent 120rpx, rgba(180, 160, 130, 0.02) 120rpx, rgba(180, 160, 130, 0.02) 121rpx);
+}
+
+/* —— 深色殿堂底纹（深色页面使用） —— */
+.dao-dark-bg {
+  background: linear-gradient(180deg, #1a1028 0%, #2d1f3d 40%, #1e1530 100%);
+  background-image:
+    radial-gradient(ellipse at 20% 30%, rgba(61, 43, 105, 0.3) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 70%, rgba(42, 31, 74, 0.25) 0%, transparent 50%),
+    radial-gradient(circle at 50% 0%, rgba(212, 175, 55, 0.03) 0%, transparent 40%),
+    linear-gradient(180deg, #1a1028 0%, #2d1f3d 40%, #1e1530 100%);
 }
 
 .safe-bottom {
@@ -83,40 +97,61 @@ page {
 .card::after {
   content: '';
   position: absolute;
-  width: 48rpx;
-  height: 48rpx;
+  width: 52rpx;
+  height: 52rpx;
   border-color: var(--dao-gold);
   border-style: solid;
-  opacity: 0.28;
+  opacity: 0.35;
   pointer-events: none;
   z-index: 1;
 }
 
 .card::before {
-  top: 10rpx;
-  left: 10rpx;
-  border-width: 3rpx 0 0 3rpx;
-  border-radius: 8rpx 0 0 0;
+  top: 8rpx;
+  left: 8rpx;
+  border-width: 2rpx 0 0 2rpx;
+  border-radius: 6rpx 0 0 0;
 }
 
 .card::after {
-  bottom: 10rpx;
-  right: 10rpx;
-  border-width: 0 3rpx 3rpx 0;
-  border-radius: 0 0 8rpx 0;
+  bottom: 8rpx;
+  right: 8rpx;
+  border-width: 0 2rpx 2rpx 0;
+  border-radius: 0 0 6rpx 0;
+}
+
+/* —— 玻璃拟态卡片（深色背景浮层） —— */
+.card--glass {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1rpx solid rgba(212, 175, 55, 0.15);
+  box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.2), inset 0 1rpx 0 rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(10rpx);
+}
+
+.card--glass::before,
+.card--glass::after {
+  border-color: rgba(212, 175, 55, 0.25);
+}
+
+/* —— 信纸卡片（古旧信笺） —— */
+.card--letter {
+  background: #faf5e8;
+  border: 1rpx solid rgba(180, 160, 130, 0.3);
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.06), 0 12rpx 40rpx rgba(120, 100, 70, 0.08), 2rpx 3rpx 0 rgba(200, 185, 155, 0.3);
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, var(--dao-purple-mid) 0%, var(--dao-purple-deep) 100%);
-  color: #fff;
-  border-radius: 48rpx;
+  background: linear-gradient(165deg, #f0dfa0 0%, #d4af37 40%, #b8892a 100%);
+  color: #2a1f15;
+  border-radius: 12rpx;
   padding: 24rpx 48rpx;
+  font-family: var(--dao-font-display);
   font-size: 30rpx;
-  font-weight: 500;
-  letter-spacing: 2rpx;
+  font-weight: 600;
+  letter-spacing: 3rpx;
   border: none;
-  box-shadow: 0 4rpx 16rpx rgba(26, 35, 126, 0.18);
-  transition: opacity 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 4rpx 16rpx rgba(166, 124, 31, 0.25), 0 1rpx 0 rgba(255, 248, 220, 0.4) inset;
+  transition: transform 0.15s ease, box-shadow 0.2s ease;
 }
 
 .btn-primary::after {
@@ -124,20 +159,21 @@ page {
 }
 
 .btn-primary:active {
-  opacity: 0.88;
-  box-shadow: 0 2rpx 8rpx rgba(26, 35, 126, 0.12);
+  transform: translateY(2rpx);
+  box-shadow: 0 2rpx 8rpx rgba(166, 124, 31, 0.2);
 }
 
 .btn-ghost {
   background: transparent;
-  color: var(--dao-purple-mid);
-  border: 2rpx solid var(--dao-purple-mid);
-  border-radius: 48rpx;
+  color: var(--dao-gold-muted);
+  border: 1rpx solid var(--dao-border-gold-strong);
+  border-radius: 12rpx;
   padding: 20rpx 40rpx;
+  font-family: var(--dao-font-display);
   font-size: 28rpx;
   font-weight: 500;
-  letter-spacing: 1rpx;
-  transition: background 0.2s ease, opacity 0.2s ease;
+  letter-spacing: 2rpx;
+  transition: background 0.2s ease, transform 0.15s ease;
 }
 
 .btn-ghost::after {
@@ -145,9 +181,24 @@ page {
 }
 
 .btn-ghost:active {
-  background: rgba(57, 73, 171, 0.06);
-  opacity: 0.88;
+  background: rgba(212, 175, 55, 0.06);
+  transform: translateY(2rpx);
 }
+
+.btn-danger {
+  background: linear-gradient(165deg, #d05555 0%, #c04040 100%);
+  color: #fff;
+  border-radius: 12rpx;
+  padding: 20rpx 40rpx;
+  font-size: 28rpx;
+  font-weight: 500;
+  letter-spacing: 1rpx;
+  border: none;
+  transition: transform 0.15s ease;
+}
+
+.btn-danger::after { border: none; }
+.btn-danger:active { transform: translateY(2rpx); }
 
 .title-lg {
   font-family: "DaoDisplay", "Songti SC", "STSong", "Noto Serif CJK SC", serif;
@@ -164,24 +215,74 @@ page {
   line-height: 1.6;
 }
 
-/* —— 分隔线渐变消散 —— */
+/* —— 分隔线 —— */
 .dao-divider {
+  display: flex;
+  align-items: center;
+  margin: 32rpx 0;
+}
+
+.dao-divider::before,
+.dao-divider::after {
+  content: '';
+  flex: 1;
   height: 1rpx;
-  background: linear-gradient(90deg, transparent, var(--dao-divider) 20%, var(--dao-divider) 80%, transparent);
-  border: none;
-  margin: 24rpx 0;
+  background: linear-gradient(90deg, transparent, var(--dao-border-gold-strong), transparent);
+}
+
+.dao-divider::before {
+  margin-right: 20rpx;
+}
+
+.dao-divider::after {
+  margin-left: 20rpx;
+}
+
+/* —— 区域标题 —— */
+.dao-section-title {
+  display: flex;
+  align-items: center;
+  font-family: var(--dao-font-display);
+  font-size: var(--dao-fs-sub);
+  font-weight: 600;
+  color: var(--dao-ink);
+  letter-spacing: 3rpx;
+  margin: 32rpx 0 20rpx;
+  padding-left: 20rpx;
+  position: relative;
+}
+
+.dao-section-title::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 4rpx;
+  bottom: 4rpx;
+  width: 4rpx;
+  background: var(--dao-cinnabar);
+  border-radius: 2rpx;
+}
+
+/* —— 印章装饰 —— */
+.dao-seal {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56rpx;
+  height: 56rpx;
+  border: 2rpx solid var(--dao-cinnabar);
+  border-radius: 6rpx;
+  font-family: var(--dao-font-display);
+  font-size: 24rpx;
+  color: var(--dao-cinnabar);
+  transform: rotate(-4deg);
+  opacity: 0.7;
 }
 
 /* —— 全局入场动效 —— */
 @keyframes daoFadeSlideIn {
-  from {
-    opacity: 0;
-    transform: translateY(24rpx);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(20rpx); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes daoScaleBounce {
@@ -196,33 +297,37 @@ page {
   100% { transform: scale(1); }
 }
 
-.dao-enter {
-  animation: daoFadeSlideIn 0.35s ease both;
-}
-
-/* —— 页面统一入场 —— */
-.page {
-  animation: daoFadeSlideIn 0.35s ease both;
-}
-
-/* —— 卡片错落入场 —— */
-.card:nth-child(1) { animation: daoFadeSlideIn 0.4s ease both 0.05s; }
-.card:nth-child(2) { animation: daoFadeSlideIn 0.4s ease both 0.12s; }
-.card:nth-child(3) { animation: daoFadeSlideIn 0.4s ease both 0.19s; }
-.card:nth-child(4) { animation: daoFadeSlideIn 0.4s ease both 0.26s; }
-.card:nth-child(5) { animation: daoFadeSlideIn 0.4s ease both 0.33s; }
-
-/* —— Hero 标题淡入上移 —— */
 @keyframes daoHeroIn {
   from { opacity: 0; transform: translateY(16rpx); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* —— 深色模式金色微呼吸 —— */
+@keyframes daoGlowPulse {
+  0%, 100% { box-shadow: 0 0 16rpx rgba(212, 175, 55, 0.15), 0 0 40rpx rgba(212, 175, 55, 0.06); }
+  50% { box-shadow: 0 0 24rpx rgba(212, 175, 55, 0.3), 0 0 60rpx rgba(212, 175, 55, 0.12); }
+}
+
 @keyframes daoGoldPulse {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.75; }
 }
+
+@keyframes daoBreath {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+.dao-enter,
+.page {
+  animation: daoFadeSlideIn 0.4s cubic-bezier(0.23, 1, 0.32, 1) both;
+}
+
+/* —— 卡片错落入场 —— */
+.card:nth-child(1) { animation: daoFadeSlideIn 0.45s cubic-bezier(0.23, 1, 0.32, 1) both 0.05s; }
+.card:nth-child(2) { animation: daoFadeSlideIn 0.45s cubic-bezier(0.23, 1, 0.32, 1) both 0.13s; }
+.card:nth-child(3) { animation: daoFadeSlideIn 0.45s cubic-bezier(0.23, 1, 0.32, 1) both 0.21s; }
+.card:nth-child(4) { animation: daoFadeSlideIn 0.45s cubic-bezier(0.23, 1, 0.32, 1) both 0.29s; }
+.card:nth-child(5) { animation: daoFadeSlideIn 0.45s cubic-bezier(0.23, 1, 0.32, 1) both 0.37s; }
 
 @media (prefers-color-scheme: dark) {
   page {
@@ -242,6 +347,7 @@ page {
     --dao-ritual-purple-a: #2d2248;
     --dao-ritual-purple-b: #1a1530;
     --dao-gold: #d4af37;
+    --dao-gold-bright: #e8c84a;
     --dao-gold-pale: #c9a848;
     --dao-gold-muted: #a8923a;
     --dao-jade: #6a9a75;
@@ -251,10 +357,17 @@ page {
     --dao-border-gold-strong: rgba(212, 175, 55, 0.35);
     --dao-shadow-purple: rgba(0, 0, 0, 0.25);
     --dao-divider: #2a2535;
+    --dao-glow-gold: 0 0 20rpx rgba(212, 175, 55, 0.15), 0 0 48rpx rgba(212, 175, 55, 0.06);
+    --dao-glow-purple: 0 0 20rpx rgba(121, 134, 203, 0.12), 0 0 48rpx rgba(92, 107, 192, 0.05);
   }
 
   .card::before,
   .card::after {
-    opacity: 0.2;
+    opacity: 0.22;
+  }
+
+  .card--glass {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(212, 175, 55, 0.1);
   }
 }

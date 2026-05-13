@@ -3,14 +3,6 @@
   padding: 24rpx 0 64rpx;
 }
 
-.title-lg {
-  display: block;
-  font-family: "DaoDisplay", "Songti SC", "STSong", "Noto Serif CJK SC", serif;
-  font-size: 32rpx;
-  font-weight: 600;
-  color: var(--dao-purple-deep);
-}
-
 .subtitle {
   display: block;
   margin: 12rpx 0 32rpx;
@@ -47,9 +39,9 @@
 }
 
 .tag-on {
-  color: #fff;
-  background: linear-gradient(135deg, #5c4d8a 0%, #3d2b69 100%);
-  border-color: rgba(212, 175, 55, 0.45);
+  color: var(--dao-brown-warm);
+  background: rgba(212, 175, 55, 0.12);
+  border-color: var(--dao-gold);
 }
 
 .label {
@@ -61,7 +53,7 @@
 
 .input {
   background: var(--dao-bg-card);
-  border: 2rpx solid #e0d8c8;
+  border: 2rpx solid var(--dao-border-gold);
   border-radius: 12rpx;
   padding: 20rpx 24rpx;
   font-size: 28rpx;
@@ -69,7 +61,7 @@
 
 .picker-val {
   background: var(--dao-bg-card);
-  border: 2rpx solid #e0d8c8;
+  border: 2rpx solid var(--dao-border-gold);
   border-radius: 12rpx;
   padding: 20rpx 24rpx;
   font-size: 28rpx;
@@ -77,12 +69,12 @@
 }
 
 .muted-card {
-  background: rgba(120, 144, 156, 0.08);
+  background: rgba(141, 123, 104, 0.08);
 }
 
 .muted {
   font-size: 24rpx;
-  color: #78909c;
+  color: var(--dao-ink-caption);
   line-height: 1.6;
 }
 
@@ -140,6 +132,8 @@
   min-height: 120rpx;
   width: 100%;
   box-sizing: border-box;
+  border: 2rpx solid var(--dao-border-gold);
+  border-radius: 12rpx;
 }
 
 .picker-muted {
@@ -220,7 +214,9 @@
   padding: 28rpx 24rpx;
   margin-top: 20rpx;
   background: linear-gradient(135deg, rgba(26, 16, 40, 0.04), rgba(212, 168, 87, 0.06));
-  border: 1rpx solid rgba(212, 168, 87, 0.15);
+  border: 1rpx solid rgba(212, 175, 55, 0.3);
+  border-radius: 20rpx;
+  box-shadow: 0 0 16rpx rgba(212, 175, 55, 0.1), 0 0 40rpx rgba(212, 175, 55, 0.04);
 }
 .treehole-entry-icon {
   font-size: 40rpx;

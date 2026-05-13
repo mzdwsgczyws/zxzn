@@ -108,7 +108,7 @@
 }
 
 .d {
-  color: #78909c;
+  color: var(--dao-ink-faint);
 }
 
 .r {
@@ -400,11 +400,11 @@
 }
 
 .wow-good {
-  color: #2e7d32;
+  color: var(--dao-jade);
 }
 
 .wow-warn {
-  color: #c62828;
+  color: var(--dao-cinnabar);
 }
 
 .wow-summary {
