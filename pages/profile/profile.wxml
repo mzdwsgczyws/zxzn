@@ -1,7 +1,15 @@
 <view class="page dao-paper-bg">
   <view class="card">
-    <text class="title-lg">用于箴言上下文与解读（仅存本机）</text>
-    <text class="subtitle">用于心象箴言与建议的个性化参考；未填写的项不会使用。以下带「箴言上下文」的项填齐后，抽取时将不再提示完善档案。</text>
+    <view class="pf-header" bindtap="toggleForm">
+      <view class="pf-header-left">
+        <text class="title-lg">个人档案</text>
+        <text class="pf-summary">{{profileSummary}}</text>
+      </view>
+      <text class="pf-toggle-arrow {{formExpanded ? 'pf-toggle-open' : ''}}">›</text>
+    </view>
+
+    <view class="pf-form-body {{formExpanded ? 'pf-form-expanded' : 'pf-form-collapsed'}}">
+    <text class="subtitle" style="margin-top:16rpx;">用于心象箴言与建议的个性化参考；未填写的项不会使用。以下带「箴言上下文」的项填齐后，抽取时将不再提示完善档案。</text>
 
     <view class="field section-gap">
       <text class="label">近期状态（箴言上下文）</text>
@@ -119,6 +127,7 @@
         <button class="btn-backup" hover-class="btn-hover" bindtap="onImport">导入数据</button>
       </view>
     </view>
+    </view><!-- pf-form-body -->
   </view>
 
   <view class="card muted-card">

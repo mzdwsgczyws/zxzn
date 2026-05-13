@@ -278,7 +278,7 @@ Page({
         cancelText: '继续抽取',
         success: (res) => {
           if (res.confirm) {
-            wx.navigateTo({ url: '/pages/profile/profile' })
+            wx.navigateTo({ url: '/pages/profile/profile?expand=1' })
           } else {
             core.startShakeFromIdle(this)
           }

@@ -38,7 +38,7 @@ Page({
 
   startProfile() {
     this._markDone()
-    wx.reLaunch({ url: '/pages/profile/profile' })
+    wx.reLaunch({ url: '/pages/profile/profile?expand=1' })
   },
 
   skip() {

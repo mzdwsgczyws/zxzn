@@ -73,6 +73,8 @@ Page({
   behaviors: [pageAnalytics],
 
   data: {
+    formExpanded: false,
+    profileSummary: '',
     age: '',
     birthMonth: '',
     genderIndex: 0,
@@ -99,6 +101,16 @@ Page({
     focusChips: buildFocusChips([]),
     focusTagsSelected: [],
     largeFont: false
+  },
+
+  onLoad(opts) {
+    if (opts && opts.expand === '1') {
+      this.setData({ formExpanded: true })
+    }
+  },
+
+  toggleForm() {
+    this.setData({ formExpanded: !this.data.formExpanded })
   },
 
   goFortuneTrend() {
@@ -322,6 +334,20 @@ Page({
       const lf = wx.getStorageSync(KEYS.LARGE_FONT)
       this.setData({ largeFont: !!lf })
     } catch (e) {}
+
+    this._refreshSummary(p)
+  },
+
+  _refreshSummary(p) {
+    if (!p) p = wx.getStorageSync(KEYS.USER_PROFILE) || {}
+    const parts = []
+    if (p.recentState) parts.push(RECENT_LABELS[RECENT_VALUES.indexOf(p.recentState)] || '')
+    if (p.age) parts.push(`${p.age}岁`)
+    if (p.gender === 'male') parts.push('男')
+    else if (p.gender === 'female') parts.push('女')
+    if (p.addrProvince) parts.push(p.addrProvince)
+    const filled = parts.filter(Boolean).join(' · ')
+    this.setData({ profileSummary: filled || '尚未填写档案信息' })
   },
 
   onAge(e) {

@@ -242,3 +242,47 @@
   font-size: 36rpx;
   color: var(--dao-ink-light, #999);
 }
+
+/* ── 档案表单折叠 ── */
+.pf-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4rpx 0;
+}
+.pf-header-left {
+  flex: 1;
+  min-width: 0;
+}
+.pf-summary {
+  display: block;
+  font-size: var(--dao-fs-caption);
+  color: var(--dao-ink-caption);
+  margin-top: 8rpx;
+  letter-spacing: 1rpx;
+}
+.pf-toggle-arrow {
+  font-size: 40rpx;
+  color: var(--dao-gold-muted);
+  transition: transform 0.3s ease;
+  flex-shrink: 0;
+  margin-left: 16rpx;
+}
+.pf-toggle-open {
+  transform: rotate(90deg);
+}
+
+.pf-form-body {
+  overflow: hidden;
+  transition: max-height 0.4s cubic-bezier(0.23, 1, 0.32, 1), opacity 0.3s ease;
+}
+.pf-form-collapsed {
+  max-height: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+.pf-form-expanded {
+  max-height: 8000rpx;
+  opacity: 1;
+  pointer-events: auto;
+}
