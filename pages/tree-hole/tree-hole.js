@@ -1,6 +1,6 @@
 const SK = require('../../utils/storage-keys')
 
-const API_BASE = 'https://YOUR_SERVICE_DOMAIN'
+const SERVICE_NAME = 'tree-hole'
 
 function uuid() {
   return 'xxxxxxxxxxxx4xxxyxxxxxxxxxxxxxxx'.replace(/[xy]/g, c => {
@@ -22,12 +22,13 @@ function todayStr() {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 }
 
-function post(path, data) {
+function callServer(path, data) {
   return new Promise((resolve, reject) => {
-    wx.request({
-      url: API_BASE + path,
+    wx.cloud.callContainer({
+      config: { env: 'prod-3gfos7n3a3e061a4' },
+      path,
       method: 'POST',
-      header: { 'content-type': 'application/json' },
+      header: { 'X-WX-SERVICE': SERVICE_NAME, 'content-type': 'application/json' },
       data,
       success: (res) => {
         if (res.statusCode === 200 && res.data) {
@@ -75,7 +76,7 @@ Page({
     const letterToken = uuid()
 
     try {
-      const res = await post('/api/submit', { content, letterToken })
+      const res = await callServer('/api/submit', { content, letterToken })
 
       if (res && res.success) {
         const letters = wx.getStorageSync(SK.TREE_HOLE_LETTERS) || []
@@ -113,7 +114,7 @@ Page({
     const tokens = localLetters.map(l => l.letterToken)
 
     try {
-      const res = await post('/api/query', { letterTokens: tokens })
+      const res = await callServer('/api/query', { letterTokens: tokens })
 
       if (res && res.success) {
         const serverMap = {}
