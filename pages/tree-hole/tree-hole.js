@@ -45,6 +45,8 @@ function callServer(path, data) {
 Page({
   data: {
     letterContent: '',
+    /** WXML 不支持 letterContent.trim() 等写法，用布尔控制按钮可用 */
+    canSubmitLetter: false,
     submitting: false,
     flyAnim: false,
     repliedLetters: [],
@@ -57,7 +59,11 @@ Page({
   },
 
   onInput(e) {
-    this.setData({ letterContent: e.detail.value })
+    const letterContent = e.detail.value || ''
+    this.setData({
+      letterContent,
+      canSubmitLetter: letterContent.trim().length > 0
+    })
   },
 
   async submitLetter() {
@@ -86,7 +92,7 @@ Page({
         const newCount = (daily.date === today ? daily.count : 0) + 1
         wx.setStorageSync(SK.TREE_HOLE_DAILY, { date: today, count: newCount })
 
-        this.setData({ letterContent: '', flyAnim: true })
+        this.setData({ letterContent: '', canSubmitLetter: false, flyAnim: true })
         wx.vibrateShort({ type: 'medium' })
 
         setTimeout(() => {

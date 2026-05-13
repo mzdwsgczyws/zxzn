@@ -29,7 +29,7 @@
       <button
         class="th-submit-btn {{submitting ? 'th-submitting' : ''}}"
         bindtap="submitLetter"
-        disabled="{{submitting || !letterContent.trim()}}"
+        disabled="{{submitting || !canSubmitLetter}}"
       >
         {{submitting ? '投递中...' : '投入树洞'}}
       </button>
