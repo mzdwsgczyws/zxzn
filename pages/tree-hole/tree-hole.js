@@ -1,5 +1,7 @@
 const SK = require('../../utils/storage-keys')
 
+const API_BASE = 'https://YOUR_SERVICE_DOMAIN'
+
 function uuid() {
   return 'xxxxxxxxxxxx4xxxyxxxxxxxxxxxxxxx'.replace(/[xy]/g, c => {
     const r = Math.random() * 16 | 0
@@ -10,6 +12,7 @@ function uuid() {
 function fmtDate(d) {
   if (!d) return ''
   const dt = typeof d === 'string' ? new Date(d) : d
+  if (isNaN(dt.getTime())) return String(d)
   const pad = n => String(n).padStart(2, '0')
   return `${dt.getFullYear()}-${pad(dt.getMonth() + 1)}-${pad(dt.getDate())} ${pad(dt.getHours())}:${pad(dt.getMinutes())}`
 }
@@ -17,6 +20,25 @@ function fmtDate(d) {
 function todayStr() {
   const d = new Date()
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+}
+
+function post(path, data) {
+  return new Promise((resolve, reject) => {
+    wx.request({
+      url: API_BASE + path,
+      method: 'POST',
+      header: { 'content-type': 'application/json' },
+      data,
+      success: (res) => {
+        if (res.statusCode === 200 && res.data) {
+          resolve(res.data)
+        } else {
+          reject(new Error('请求失败'))
+        }
+      },
+      fail: (err) => reject(err)
+    })
+  })
 }
 
 Page({
@@ -53,12 +75,9 @@ Page({
     const letterToken = uuid()
 
     try {
-      const res = await wx.cloud.callFunction({
-        name: 'treehole-submit',
-        data: { content, letterToken }
-      })
+      const res = await post('/api/submit', { content, letterToken })
 
-      if (res.result && res.result.success) {
+      if (res && res.success) {
         const letters = wx.getStorageSync(SK.TREE_HOLE_LETTERS) || []
         letters.unshift({ letterToken, content, createdAt: new Date().toISOString() })
         wx.setStorageSync(SK.TREE_HOLE_LETTERS, letters)
@@ -75,7 +94,7 @@ Page({
           wx.showToast({ title: '已投入树洞', icon: 'success' })
         }, 1200)
       } else {
-        wx.showToast({ title: (res.result && res.result.error) || '投递失败', icon: 'none' })
+        wx.showToast({ title: (res && res.error) || '投递失败', icon: 'none' })
       }
     } catch (err) {
       wx.showToast({ title: '网络异常，请稍后重试', icon: 'none' })
@@ -94,14 +113,11 @@ Page({
     const tokens = localLetters.map(l => l.letterToken)
 
     try {
-      const res = await wx.cloud.callFunction({
-        name: 'treehole-query',
-        data: { letterTokens: tokens }
-      })
+      const res = await post('/api/query', { letterTokens: tokens })
 
-      if (res.result && res.result.success) {
+      if (res && res.success) {
         const serverMap = {}
-        res.result.letters.forEach(l => { serverMap[l.letterToken] = l })
+        res.letters.forEach(l => { serverMap[l.letterToken] = l })
 
         const replied = []
         const pending = []

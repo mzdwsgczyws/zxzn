@@ -23,7 +23,6 @@
     background: var(--bg);
     color: var(--text);
     min-height: 100vh;
-    padding: 0;
   }
   .header {
     text-align: center;
@@ -181,10 +180,10 @@
 </div>
 
 <div class="login-wrap" id="loginWrap">
-  <label>管理密钥</label>
+  <label>服务地址（含 https://）</label>
+  <input type="text" id="urlInput" placeholder="如 https://xxx.ap-shanghai.app.tcloudbase.com">
+  <label style="margin-top:16px;">管理密钥</label>
   <input type="password" id="keyInput" placeholder="输入 ADMIN_KEY">
-  <label style="margin-top:16px;">云环境 ID</label>
-  <input type="text" id="envInput" placeholder="如 dao-xxxx">
   <button onclick="doLogin()">进入后台</button>
 </div>
 
@@ -201,18 +200,18 @@
 
 <script>
 let adminKey = ''
-let envId = ''
+let apiBase = ''
 let currentTab = 'pending'
 
 function doLogin() {
+  apiBase = document.getElementById('urlInput').value.trim().replace(/\/+$/, '')
   adminKey = document.getElementById('keyInput').value.trim()
-  envId = document.getElementById('envInput').value.trim()
-  if (!adminKey || !envId) {
-    setStatus('请填写密钥和环境 ID', true)
+  if (!adminKey || !apiBase) {
+    setStatus('请填写服务地址和密钥', true)
     return
   }
   localStorage.setItem('th_admin_key', adminKey)
-  localStorage.setItem('th_env_id', envId)
+  localStorage.setItem('th_api_base', apiBase)
   document.getElementById('loginWrap').style.display = 'none'
   document.getElementById('mainPanel').style.display = 'block'
   document.getElementById('refreshBtn').style.display = 'block'
@@ -221,12 +220,12 @@ function doLogin() {
 
 window.addEventListener('DOMContentLoaded', () => {
   const savedKey = localStorage.getItem('th_admin_key')
-  const savedEnv = localStorage.getItem('th_env_id')
-  if (savedKey && savedEnv) {
+  const savedUrl = localStorage.getItem('th_api_base')
+  if (savedKey && savedUrl) {
     adminKey = savedKey
-    envId = savedEnv
+    apiBase = savedUrl
     document.getElementById('keyInput').value = savedKey
-    document.getElementById('envInput').value = savedEnv
+    document.getElementById('urlInput').value = savedUrl
     doLogin()
   }
 })
@@ -244,47 +243,21 @@ function switchTab(tab) {
   loadLetters()
 }
 
-async function callCloudFn(fnName, data) {
-  const url = `https://api.weixin.qq.com/tcb/invokecloudfunction?env=${envId}&name=${fnName}`
-  const resp = await fetch('/api/cloud-proxy', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ url, data })
-  }).catch(() => null)
-
-  if (resp && resp.ok) {
-    const json = await resp.json()
-    return json
-  }
-
-  const directResp = await fetch(`https://${envId}.service.tcloudbase.com/${fnName}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data)
-  })
-  return directResp.json()
-}
-
 async function loadLetters() {
   setStatus('加载中...')
   try {
-    const result = await callCloudFn('treehole-admin', {
-      action: 'list',
-      adminKey,
-      status: currentTab
+    const resp = await fetch(apiBase + '/api/admin', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'list', adminKey, status: currentTab })
     })
+    const result = await resp.json()
 
-    if (result && result.resp_data) {
-      const parsed = JSON.parse(result.resp_data)
-      renderLetters(parsed.letters || [])
-      setStatus(`已加载 ${(parsed.letters || []).length} 封信件`)
-    } else if (result && result.letters) {
+    if (result && result.success) {
       renderLetters(result.letters || [])
       setStatus(`已加载 ${(result.letters || []).length} 封信件`)
-    } else if (result && result.success === false) {
-      setStatus(result.error || '请求失败', true)
     } else {
-      setStatus('返回格式异常，请检查云函数部署', true)
+      setStatus((result && result.error) || '请求失败', true)
     }
   } catch (e) {
     setStatus('请求失败: ' + e.message, true)
@@ -309,14 +282,14 @@ function renderLetters(letters) {
     return `
       <div class="letter-card">
         <div class="letter-header">
-          <span class="letter-token">${l.letterToken || '?'}</span>
+          <span class="letter-token">${escHtml(l.letterToken || '?')}</span>
           <span class="letter-time">${fmtDate(l.createdAt)}</span>
         </div>
         <div class="letter-content">${escHtml(l.content || '')}</div>
         ${isPending ? `
           <div class="letter-reply-area">
             <textarea id="reply_${i}" placeholder="写下回信..."></textarea>
-            <button id="btn_${i}" onclick="submitReply('${l.letterToken}', ${i})">回信</button>
+            <button id="btn_${i}" onclick="submitReply('${escHtml(l.letterToken)}', ${i})">回信</button>
           </div>
         ` : `
           <div class="letter-header">
@@ -350,19 +323,18 @@ async function submitReply(token, idx) {
   setStatus('正在提交回信...')
 
   try {
-    const result = await callCloudFn('treehole-admin', {
-      action: 'reply',
-      adminKey,
-      letterToken: token,
-      reply
+    const resp = await fetch(apiBase + '/api/admin', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'reply', adminKey, letterToken: token, reply })
     })
+    const result = await resp.json()
 
-    const parsed = result.resp_data ? JSON.parse(result.resp_data) : result
-    if (parsed && parsed.success) {
+    if (result && result.success) {
       setStatus('回信成功')
       setTimeout(loadLetters, 500)
     } else {
-      setStatus((parsed && parsed.error) || '回信失败', true)
+      setStatus((result && result.error) || '回信失败', true)
       btn.disabled = false
       btn.textContent = '回信'
     }
