@@ -7,9 +7,10 @@
   "mem": 0.5,
   "containerPort": 80,
   "envParams": {
-    "ADMIN_KEY": "CHANGE_ME"
-  },
-  "volumeMounts": {
-    "/data": ""
+    "ADMIN_KEY": "CHANGE_ME",
+    "MYSQL_ADDRESS": "",
+    "MYSQL_USERNAME": "",
+    "MYSQL_PASSWORD": "",
+    "MYSQL_DATABASE": "treehole"
   }
 }

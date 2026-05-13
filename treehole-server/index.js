@@ -1,7 +1,5 @@
 const express = require('express')
-const Database = require('better-sqlite3')
-const path = require('path')
-const crypto = require('crypto')
+const mysql = require('mysql2/promise')
 
 const app = express()
 app.use(express.json())
@@ -14,31 +12,52 @@ app.use((req, res, next) => {
   next()
 })
 
-// --- 数据库 ---
-const DB_PATH = path.join('/data', 'treehole.db')
-const db = new Database(DB_PATH)
-db.pragma('journal_mode = WAL')
-db.exec(`
-  CREATE TABLE IF NOT EXISTS letters (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    letterToken TEXT UNIQUE NOT NULL,
-    content TEXT NOT NULL,
-    status TEXT DEFAULT 'pending',
-    reply TEXT,
-    createdAt TEXT DEFAULT (datetime('now')),
-    repliedAt TEXT
-  )
-`)
-
 const ADMIN_KEY = process.env.ADMIN_KEY || 'CHANGE_ME'
 
-// --- 健康检查（云托管需要） ---
+// --- MySQL 连接池 ---
+const pool = mysql.createPool({
+  host: process.env.MYSQL_ADDRESS ? process.env.MYSQL_ADDRESS.split(':')[0] : process.env.MYSQL_HOST,
+  port: process.env.MYSQL_ADDRESS ? Number(process.env.MYSQL_ADDRESS.split(':')[1] || 3306) : Number(process.env.MYSQL_PORT || 3306),
+  user: process.env.MYSQL_USERNAME || process.env.MYSQL_USER || 'root',
+  password: process.env.MYSQL_PASSWORD || '',
+  database: process.env.MYSQL_DATABASE || 'treehole',
+  waitForConnections: true,
+  connectionLimit: 5,
+  charset: 'utf8mb4'
+})
+
+async function initDb() {
+  const conn = await pool.getConnection()
+  try {
+    await conn.query(`
+      CREATE TABLE IF NOT EXISTS letters (
+        id BIGINT AUTO_INCREMENT PRIMARY KEY,
+        letterToken VARCHAR(64) NOT NULL UNIQUE,
+        content TEXT NOT NULL,
+        status VARCHAR(16) NOT NULL DEFAULT 'pending',
+        reply TEXT,
+        createdAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        repliedAt DATETIME NULL,
+        INDEX idx_status_created (status, createdAt)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+    `)
+    console.log('[treehole] table letters ready')
+  } finally {
+    conn.release()
+  }
+}
+
+initDb().catch(err => {
+  console.error('[treehole] initDb error:', err.message)
+})
+
+// --- 健康检查 ---
 app.get('/', (req, res) => {
   res.json({ status: 'ok', service: 'treehole' })
 })
 
 // --- 用户投信 ---
-app.post('/api/submit', (req, res) => {
+app.post('/api/submit', async (req, res) => {
   const { content, letterToken } = req.body
 
   if (!content || typeof content !== 'string' || content.trim().length === 0) {
@@ -52,18 +71,22 @@ app.post('/api/submit', (req, res) => {
   }
 
   try {
-    db.prepare('INSERT INTO letters (letterToken, content) VALUES (?, ?)').run(letterToken, content.trim())
+    await pool.execute(
+      'INSERT INTO letters (letterToken, content) VALUES (?, ?)',
+      [letterToken, content.trim()]
+    )
     res.json({ success: true })
   } catch (err) {
-    if (err.message.includes('UNIQUE')) {
+    if (err.code === 'ER_DUP_ENTRY') {
       return res.json({ success: false, error: '该信件已提交过' })
     }
+    console.error('[submit] error:', err.message)
     res.json({ success: false, error: '投递失败，请稍后重试' })
   }
 })
 
 // --- 用户查询回信 ---
-app.post('/api/query', (req, res) => {
+app.post('/api/query', async (req, res) => {
   const { letterTokens } = req.body
 
   if (!Array.isArray(letterTokens) || letterTokens.length === 0) {
@@ -78,18 +101,23 @@ app.post('/api/query', (req, res) => {
     return res.json({ success: true, letters: [] })
   }
 
-  const placeholders = safeTokens.map(() => '?').join(',')
-  const rows = db.prepare(
-    `SELECT letterToken, content, status, reply, repliedAt, createdAt
-     FROM letters WHERE letterToken IN (${placeholders})
-     ORDER BY createdAt DESC`
-  ).all(...safeTokens)
-
-  res.json({ success: true, letters: rows })
+  try {
+    const placeholders = safeTokens.map(() => '?').join(',')
+    const [rows] = await pool.query(
+      `SELECT letterToken, content, status, reply, repliedAt, createdAt
+       FROM letters WHERE letterToken IN (${placeholders})
+       ORDER BY createdAt DESC`,
+      safeTokens
+    )
+    res.json({ success: true, letters: rows })
+  } catch (err) {
+    console.error('[query] error:', err.message)
+    res.json({ success: false, error: '查询失败' })
+  }
 })
 
 // --- 管理员操作 ---
-app.post('/api/admin', (req, res) => {
+app.post('/api/admin', async (req, res) => {
   const { action, adminKey } = req.body
 
   if (adminKey !== ADMIN_KEY) {
@@ -98,10 +126,16 @@ app.post('/api/admin', (req, res) => {
 
   if (action === 'list') {
     const statusFilter = req.body.status || 'pending'
-    const rows = db.prepare(
-      'SELECT * FROM letters WHERE status = ? ORDER BY createdAt ASC LIMIT 100'
-    ).all(statusFilter)
-    return res.json({ success: true, letters: rows })
+    try {
+      const [rows] = await pool.execute(
+        'SELECT * FROM letters WHERE status = ? ORDER BY createdAt ASC LIMIT 100',
+        [statusFilter]
+      )
+      return res.json({ success: true, letters: rows })
+    } catch (err) {
+      console.error('[admin list] error:', err.message)
+      return res.json({ success: false, error: '查询失败' })
+    }
   }
 
   if (action === 'reply') {
@@ -109,14 +143,19 @@ app.post('/api/admin', (req, res) => {
     if (!letterToken || !reply || reply.trim().length === 0) {
       return res.json({ success: false, error: '回信内容不能为空' })
     }
-    const row = db.prepare('SELECT id FROM letters WHERE letterToken = ?').get(letterToken)
-    if (!row) {
-      return res.json({ success: false, error: '未找到该信件' })
+    try {
+      const [result] = await pool.execute(
+        "UPDATE letters SET status = 'replied', reply = ?, repliedAt = NOW() WHERE letterToken = ?",
+        [reply.trim(), letterToken]
+      )
+      if (result.affectedRows === 0) {
+        return res.json({ success: false, error: '未找到该信件' })
+      }
+      return res.json({ success: true })
+    } catch (err) {
+      console.error('[admin reply] error:', err.message)
+      return res.json({ success: false, error: '回复失败' })
     }
-    db.prepare(
-      "UPDATE letters SET status = 'replied', reply = ?, repliedAt = datetime('now') WHERE letterToken = ?"
-    ).run(reply.trim(), letterToken)
-    return res.json({ success: true })
   }
 
   res.json({ success: false, error: '未知操作' })
