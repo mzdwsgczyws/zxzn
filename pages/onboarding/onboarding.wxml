@@ -10,9 +10,13 @@
   >
     <swiper-item wx:for="{{slides}}" wx:key="title">
       <view class="ob-slide">
-        <text class="ob-icon">{{item.icon}}</text>
-        <text class="ob-title">{{item.title}}</text>
-        <text class="ob-body">{{item.body}}</text>
+        <view class="ob-card">
+          <view class="ob-icon-ring">
+            <text class="ob-icon">{{item.icon}}</text>
+          </view>
+          <text class="ob-title">{{item.title}}</text>
+          <text class="ob-body">{{item.body}}</text>
+        </view>
       </view>
     </swiper-item>
   </swiper>

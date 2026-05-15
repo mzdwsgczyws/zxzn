@@ -9,6 +9,7 @@
 .ob-swiper {
   flex: 1;
   width: 100%;
+  min-height: 55vh;
 }
 
 .ob-slide {
@@ -16,35 +17,64 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 100rpx 56rpx 40rpx;
+  padding: 80rpx 40rpx 32rpx;
   box-sizing: border-box;
   height: 100%;
+  min-height: 50vh;
+}
+
+/* 浅色卡：避免渐变下半段金字/符号与底同色，安卓上 Unicode 符号也常缺字 */
+.ob-card {
+  width: 100%;
+  max-width: 640rpx;
+  padding: 48rpx 40rpx 44rpx;
+  box-sizing: border-box;
+  background: rgba(255, 254, 248, 0.94);
+  border-radius: 24rpx;
+  border: 1rpx solid var(--dao-border-gold-strong);
+  box-shadow: 0 12rpx 40rpx rgba(26, 16, 40, 0.12);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.ob-icon-ring {
+  width: 144rpx;
+  height: 144rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 36rpx;
+  border: 2rpx solid rgba(212, 175, 55, 0.45);
+  background: linear-gradient(165deg, rgba(255, 248, 230, 0.95) 0%, rgba(232, 212, 168, 0.35) 100%);
+  box-shadow: inset 0 2rpx 8rpx rgba(255, 255, 255, 0.6);
 }
 
 .ob-icon {
-  font-size: 120rpx;
-  color: var(--dao-gold);
-  margin-bottom: 48rpx;
-  opacity: 0.8;
+  font-family: "DaoDisplay", "Songti SC", "STSong", "Noto Serif SC", serif;
+  font-size: 72rpx;
+  font-weight: 700;
+  color: var(--dao-gold-muted);
+  line-height: 1;
 }
 
 .ob-title {
   font-family: var(--dao-font-display);
   font-size: 40rpx;
   font-weight: 700;
-  color: var(--dao-gold-pale);
+  color: var(--dao-purple-deep);
   letter-spacing: 4rpx;
   text-align: center;
-  margin-bottom: 32rpx;
-  text-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.2);
+  margin-bottom: 28rpx;
 }
 
 .ob-body {
   font-size: 28rpx;
-  line-height: 1.7;
+  line-height: 1.75;
   color: var(--dao-ink-body);
   text-align: center;
-  max-width: 580rpx;
+  max-width: 560rpx;
 }
 
 .ob-actions {
