@@ -3,6 +3,9 @@ const KEYS = require('../../utils/storage-keys.js')
 Page({
   data: {
     current: 0,
+    /** 安卓（尤其 MIUI）上 swiper 必须写死高度，flex:1 常得到 0 高度 */
+    swiperHeightPx: 520,
+    statusBarPx: 0,
     slides: [
       {
         icon: '月',
@@ -25,6 +28,37 @@ Page({
         body: '可以先快速体验摇签，也可以先完善个人档案以获得更精准的箴言匹配。'
       }
     ]
+  },
+
+  onLoad() {
+    this._layoutSwiper()
+  },
+
+  onShow() {
+    this._layoutSwiper()
+  },
+
+  onReady() {
+    this._layoutSwiper()
+  },
+
+  _layoutSwiper() {
+    try {
+      const win = wx.getWindowInfo ? wx.getWindowInfo() : wx.getSystemInfoSync()
+      const sb = win.statusBarHeight || 0
+      let safeBottom = 0
+      if (win.safeAreaInsets) safeBottom = win.safeAreaInsets.bottom || 0
+      else if (win.safeArea && win.screenHeight) {
+        safeBottom = Math.max(0, win.screenHeight - win.safeArea.bottom)
+      }
+      const rpx2px = win.windowWidth / 750
+      const bottomBlockPx = 300 * rpx2px
+      const h = Math.floor(win.windowHeight - sb - bottomBlockPx - safeBottom)
+      this.setData({
+        statusBarPx: sb,
+        swiperHeightPx: Math.max(280, h)
+      })
+    } catch (e) {}
   },
 
   onSwiperChange(e) {

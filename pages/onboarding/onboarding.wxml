@@ -1,6 +1,7 @@
-<view class="ob-page">
+<view class="ob-page" style="padding-top: {{statusBarPx}}px;">
   <swiper
     class="ob-swiper"
+    style="height: {{swiperHeightPx}}px;"
     indicator-dots="{{true}}"
     indicator-color="rgba(212, 175, 55, 0.3)"
     indicator-active-color="#d4af37"
@@ -8,7 +9,7 @@
     bindchange="onSwiperChange"
     circular="{{false}}"
   >
-    <swiper-item wx:for="{{slides}}" wx:key="title">
+    <swiper-item wx:for="{{slides}}" wx:key="title" class="ob-swiper-item">
       <view class="ob-slide">
         <view class="ob-card">
           <view class="ob-icon-ring">

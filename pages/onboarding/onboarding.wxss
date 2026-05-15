@@ -1,15 +1,20 @@
 .ob-page {
   min-height: 100vh;
+  box-sizing: border-box;
   background: linear-gradient(165deg, var(--dao-ritual-purple-b) 0%, var(--dao-bg-page) 55%);
   display: flex;
   flex-direction: column;
-  box-sizing: border-box;
+  align-items: stretch;
 }
 
 .ob-swiper {
-  flex: 1;
   width: 100%;
-  min-height: 55vh;
+  flex-shrink: 0;
+}
+
+.ob-swiper-item {
+  height: 100%;
+  box-sizing: border-box;
 }
 
 .ob-slide {
@@ -17,21 +22,23 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 80rpx 40rpx 32rpx;
+  padding: 32rpx 32rpx 24rpx;
   box-sizing: border-box;
   height: 100%;
-  min-height: 50vh;
+  overflow-y: auto;
 }
 
 /* 浅色卡：避免渐变下半段金字/符号与底同色，安卓上 Unicode 符号也常缺字 */
 .ob-card {
+  position: relative;
+  z-index: 1;
   width: 100%;
   max-width: 640rpx;
   padding: 48rpx 40rpx 44rpx;
   box-sizing: border-box;
-  background: rgba(255, 254, 248, 0.94);
+  background: #fffef8;
   border-radius: 24rpx;
-  border: 1rpx solid var(--dao-border-gold-strong);
+  border: 1rpx solid rgba(180, 150, 90, 0.45);
   box-shadow: 0 12rpx 40rpx rgba(26, 16, 40, 0.12);
   display: flex;
   flex-direction: column;
@@ -63,7 +70,7 @@
   font-family: var(--dao-font-display);
   font-size: 40rpx;
   font-weight: 700;
-  color: var(--dao-purple-deep);
+  color: #1a237e;
   letter-spacing: 4rpx;
   text-align: center;
   margin-bottom: 28rpx;
@@ -72,13 +79,15 @@
 .ob-body {
   font-size: 28rpx;
   line-height: 1.75;
-  color: var(--dao-ink-body);
+  color: #3d3428;
   text-align: center;
   max-width: 560rpx;
 }
 
 .ob-actions {
+  flex-shrink: 0;
   padding: 32rpx 48rpx;
+  padding-bottom: calc(32rpx + env(safe-area-inset-bottom));
   min-height: 160rpx;
   display: flex;
   flex-direction: column;
@@ -87,8 +96,8 @@
 
 .ob-skip {
   font-size: 28rpx;
-  color: var(--dao-ink-faint);
+  color: #6d5d4a;
   padding: 20rpx 40rpx;
   text-decoration: underline;
-  text-decoration-color: rgba(212, 175, 55, 0.3);
+  text-decoration-color: rgba(212, 175, 55, 0.35);
 }
