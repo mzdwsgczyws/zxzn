@@ -6,6 +6,29 @@ const pageAnalytics = require('../../behaviors/page-analytics.js')
 const { recordShare } = require('../../utils/usage-analytics.js')
 const checkin = require('../../utils/checkin.js')
 
+/** 今日微行动最多展示条数（去重后截断，避免与箴言条数一一对应显得冗长） */
+const MICRO_ACTION_DISPLAY_MAX = 4
+
+function buildMicroActionsFromStructured(structured) {
+  const list = Array.isArray(structured) ? structured : []
+  const seen = new Set()
+  const out = []
+  for (let i = 0; i < list.length; i++) {
+    const s = list[i]
+    if (!s || !s.microAction) continue
+    const text = String(s.microAction).trim()
+    if (!text || seen.has(text)) continue
+    seen.add(text)
+    out.push({
+      text,
+      reason: String(s.reason || '').trim(),
+      done: false
+    })
+    if (out.length >= MICRO_ACTION_DISPLAY_MAX) break
+  }
+  return out
+}
+
 Page({
   behaviors: [pageAnalytics],
 
@@ -115,18 +138,20 @@ Page({
     try {
       const cache = wx.getStorageSync(KEYS.LOTTERY_TODAY) || {}
       const structured = cache.adviceStructured || []
-      const actions = structured.filter(s => s.microAction).map(s => ({
-        text: s.microAction,
-        reason: s.reason || '',
-        done: false
-      }))
+      const actions = buildMicroActionsFromStructured(structured)
       const state = wx.getStorageSync(KEYS.CHECKIN_STATE) || {}
       const log = state.dayLog || {}
       const d = new Date()
       const today = `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`
       if (log[today] && Array.isArray(log[today].actions)) {
-        log[today].actions.forEach((saved, i) => {
-          if (actions[i]) actions[i].done = !!saved.done
+        const doneByText = {}
+        log[today].actions.forEach((saved) => {
+          if (saved && saved.text) doneByText[String(saved.text).trim()] = !!saved.done
+        })
+        actions.forEach((a) => {
+          if (Object.prototype.hasOwnProperty.call(doneByText, a.text)) {
+            a.done = doneByText[a.text]
+          }
         })
       }
       const yDate = new Date(d.getFullYear(), d.getMonth(), d.getDate() - 1)

@@ -3,7 +3,7 @@
   <view class="ma-list">
     <view
       wx:for="{{actions}}"
-      wx:key="index"
+      wx:key="text"
       class="ma-item {{item.done ? 'ma-item--done' : ''}}"
       data-index="{{index}}"
       bindtap="toggle"
