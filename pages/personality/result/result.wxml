@@ -65,26 +65,28 @@
     <button class="btn-ghost" bindtap="retest">重新测验</button>
   </view>
 
-  <canvas
-    canvas-id="shareCanvas"
-    class="hidden-canvas"
-    style="width: 500px; height: 400px;"
-    width="500"
-    height="400"
-  ></canvas>
-  <canvas
-    type="2d"
-    id="posterCanvas2d"
-    class="hidden-canvas"
-    style="width: 750px; height: {{posterCanvasH}}px;"
-  ></canvas>
-  <canvas
-    canvas-id="posterCanvasLegacy"
-    class="hidden-canvas"
-    style="width: 750px; height: {{posterCanvasH}}px;"
-    width="750"
-    height="{{posterCanvasH}}"
-  ></canvas>
+  <view class="canvas-offscreen">
+    <canvas
+      canvas-id="shareCanvas"
+      class="hidden-canvas"
+      style="width: 500px; height: 400px;"
+      width="500"
+      height="400"
+    ></canvas>
+    <canvas
+      type="2d"
+      id="posterCanvas2d"
+      class="hidden-canvas"
+      style="width: 750px; height: {{posterCanvasH}}px;"
+    ></canvas>
+    <canvas
+      canvas-id="posterCanvasLegacy"
+      class="hidden-canvas"
+      style="width: 750px; height: {{posterCanvasH}}px;"
+      width="750"
+      height="{{posterCanvasH}}"
+    ></canvas>
+  </view>
 </view>
 
 <view class="empty page" wx:else>
