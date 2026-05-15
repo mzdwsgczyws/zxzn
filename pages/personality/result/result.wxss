@@ -236,3 +236,7 @@
   color: var(--dao-ink-faint);
   margin-bottom: 40rpx;
 }
+
+.compat-btn {
+  background: linear-gradient(135deg, #5a3e8c, #7b5ea7) !important;
+}

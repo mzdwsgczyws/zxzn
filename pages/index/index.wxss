@@ -1734,3 +1734,78 @@
   letter-spacing: 1rpx;
   line-height: 1.45;
 }
+
+/* ── 箴言分享卡按钮 ── */
+.poster-btn-row {
+  display: flex;
+  justify-content: center;
+  margin: 20rpx 0 8rpx;
+}
+
+.poster-gen-btn {
+  font-size: 24rpx !important;
+  padding: 14rpx 36rpx !important;
+  margin: 0 !important;
+}
+
+.poster-canvas-offscreen {
+  position: fixed;
+  left: -9999px;
+  top: 0;
+}
+
+/* ── 每周挑战 ── */
+.weekly-challenge {
+  margin: 16rpx 28rpx 8rpx;
+  padding: 20rpx 24rpx;
+  background: rgba(26, 21, 48, 0.05);
+  border: 1rpx solid rgba(201, 162, 39, 0.25);
+  border-radius: 16rpx;
+}
+
+.wc-header {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+  margin-bottom: 8rpx;
+}
+
+.wc-icon {
+  font-size: 28rpx;
+}
+
+.wc-title {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: var(--dao-ink-body, #4a4034);
+  letter-spacing: 1rpx;
+}
+
+.wc-desc {
+  display: block;
+  font-size: 22rpx;
+  color: var(--dao-ink-muted, #8b7355);
+  margin-bottom: 12rpx;
+}
+
+.wc-progress-bar {
+  height: 10rpx;
+  border-radius: 999rpx;
+  background: rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  margin-bottom: 8rpx;
+}
+
+.wc-progress-fill {
+  height: 100%;
+  border-radius: 999rpx;
+  background: linear-gradient(90deg, #c9a227, #e8d4a8);
+  transition: width 0.4s ease;
+}
+
+.wc-progress-text {
+  display: block;
+  font-size: 20rpx;
+  color: var(--dao-ink-caption, #a89888);
+  text-align: right;
+}

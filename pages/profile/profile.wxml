@@ -1,4 +1,18 @@
 <view class="page dao-paper-bg">
+  <view class="card rank-card" wx:if="{{rankInfo}}">
+    <view class="rank-header">
+      <text class="rank-title">{{rankInfo.rank.name}}</text>
+      <text class="rank-score">修行积分 {{rankInfo.score}}</text>
+    </view>
+    <view class="rank-bar-wrap">
+      <view class="rank-bar-bg">
+        <view class="rank-bar-fill" style="width: {{rankInfo.progress}}%;"></view>
+      </view>
+      <text class="rank-bar-label" wx:if="{{rankInfo.nextRank}}">距「{{rankInfo.nextRank.name}}」还需 {{rankInfo.nextRank.threshold - rankInfo.score}} 分</text>
+      <text class="rank-bar-label" wx:else>已臻圆满</text>
+    </view>
+  </view>
+
   <view class="card">
     <view class="pf-header" bindtap="toggleForm">
       <view class="pf-header-left">
@@ -148,6 +162,8 @@
       <button class="btn-ghost hall-link-btn" bindtap="goLotHall">心象展馆</button>
       <button class="btn-ghost hall-link-btn" bindtap="goAchieveHall">成就展馆</button>
       <button class="btn-ghost hall-link-btn" bindtap="goReport">修炼报告</button>
+      <button class="btn-ghost hall-link-btn" bindtap="goAnnualReport">年度报告</button>
+      <button class="btn-ghost hall-link-btn" bindtap="goCompatibility">道性配对</button>
     </view>
   </view>
 

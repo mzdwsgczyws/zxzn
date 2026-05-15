@@ -1,0 +1,80 @@
+<view class="page">
+  <view class="hero">
+    <text class="hero-title">{{year}} 年度修炼报告</text>
+    <text class="hero-sub">道观 Wrapped · 回顾你的修行足迹</text>
+    <view class="year-picker">
+      <text class="year-btn {{year === currentYear ? 'year-active' : ''}}" bindtap="pickYear" data-y="{{currentYear}}">{{currentYear}}</text>
+      <text class="year-btn {{year === currentYear - 1 ? 'year-active' : ''}}" bindtap="pickYear" data-y="{{currentYear - 1}}">{{currentYear - 1}}</text>
+    </view>
+  </view>
+
+  <view class="keyword-banner" wx:if="{{report}}">
+    <text class="keyword-label">年度关键词</text>
+    <text class="keyword-text">{{report.keyword}}</text>
+  </view>
+
+  <block wx:if="{{report}}">
+    <view class="card stat-card">
+      <text class="card-title">心象箴言</text>
+      <view class="stat-row">
+        <view class="stat-item">
+          <text class="stat-num">{{report.totalDraws}}</text>
+          <text class="stat-label">总抽签次数</text>
+        </view>
+        <view class="stat-item">
+          <text class="stat-num">{{report.uniqueLots}}</text>
+          <text class="stat-label">收集种数</text>
+        </view>
+      </view>
+      <view class="tier-row">
+        <view class="tier-item" wx:for="{{tierList}}" wx:key="tier">
+          <text class="tier-name">{{item.tier}}</text>
+          <view class="tier-bar-bg">
+            <view class="tier-bar-fill" style="width: {{item.pct}}%;"></view>
+          </view>
+          <text class="tier-count">{{item.count}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="card stat-card">
+      <text class="card-title">打卡修行</text>
+      <view class="stat-row">
+        <view class="stat-item">
+          <text class="stat-num">{{report.checkinDaysInYear}}</text>
+          <text class="stat-label">打卡天数</text>
+        </view>
+        <view class="stat-item">
+          <text class="stat-num">{{report.bestStreak}}</text>
+          <text class="stat-label">最长连续</text>
+        </view>
+      </view>
+      <view class="mood-row" wx:if="{{report.topMood}}">
+        <text class="mood-label">年度常见心境</text>
+        <text class="mood-emoji">{{report.topMood}}</text>
+      </view>
+    </view>
+
+    <view class="card stat-card">
+      <text class="card-title">自修与成就</text>
+      <view class="stat-row">
+        <view class="stat-item">
+          <text class="stat-num">{{report.recordsInYear}}</text>
+          <text class="stat-label">自修记录</text>
+        </view>
+        <view class="stat-item">
+          <text class="stat-num">{{report.unlockedAchievements}}/{{report.totalAchievements}}</text>
+          <text class="stat-label">成就解锁</text>
+        </view>
+      </view>
+    </view>
+  </block>
+
+  <view class="empty-card" wx:if="{{report && report.totalDraws === 0 && report.checkinDaysInYear === 0}}">
+    <text class="empty-text">该年暂无数据，快去修炼吧</text>
+  </view>
+
+  <view class="footer">
+    <button class="btn-primary share-btn" open-type="share">分享年度报告</button>
+  </view>
+</view>

@@ -12,7 +12,9 @@
     "pages/profile/profile",
     "pages/report/report",
     "pages/onboarding/onboarding",
-    "pages/tree-hole/tree-hole"
+    "pages/tree-hole/tree-hole",
+    "pages/compatibility/compatibility",
+    "pages/annual-report/annual-report"
   ],
   "window": {
     "navigationBarTitleText": "量化自修正念",

@@ -42,6 +42,19 @@
         bind:moodpick="onMoodPick"
       />
 
+      <view class="weekly-challenge" wx:if="{{weeklyChallenge && (phase === 'idle' || phase === 'result')}}">
+        <view class="wc-header">
+          <text class="wc-icon">⚡</text>
+          <text class="wc-title">本周挑战 · {{weeklyChallenge.title}}</text>
+        </view>
+        <text class="wc-desc">{{weeklyChallenge.desc}}</text>
+        <view class="wc-progress-bar">
+          <view class="wc-progress-fill" style="width: {{wcProgressPct}}%;"></view>
+        </view>
+        <text class="wc-progress-text" wx:if="{{weeklyChallenge.completed}}">已完成！获得「{{weeklyChallenge.badge}}」徽章</text>
+        <text class="wc-progress-text" wx:else>已达标 {{wcPassDays}} / {{weeklyChallenge.days}} 天</text>
+      </view>
+
       <!-- 未抽取：居中入口 -->
       <view class="lot-panel lot-idle" wx:if="{{phase === 'idle'}}">
         <view class="idle-warm-wrap">
@@ -187,6 +200,9 @@
             yesterdaySummary="{{yesterdayActionSummary}}"
             bind:change="onMicroActionChange"
           />
+          <view class="poster-btn-row" wx:if="{{revealed}}">
+            <button class="btn-ghost poster-gen-btn" bindtap="generateMaximPoster">生成箴言分享卡</button>
+          </view>
         </block>
 
         <view class="result-highlight" wx:if="{{weekHighlight}}">
@@ -239,6 +255,8 @@
         <text class="hall-whisper-line">展馆首次收录</text>
       </view>
     </view>
+
+    <canvas type="2d" id="poster-canvas" class="poster-canvas-offscreen" style="width:600px;height:900px;position:fixed;left:-9999px;top:0;"></canvas>
 
     <view class="bottom-dock" style="height: {{bottomBarH}}px;">
       <view class="dock-home" hover-class="dock-home-hover" bindtap="goHome">

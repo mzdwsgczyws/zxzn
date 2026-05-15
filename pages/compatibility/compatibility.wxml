@@ -1,0 +1,38 @@
+<view class="page">
+  <view class="hero">
+    <text class="hero-title">道性配对</text>
+    <text class="hero-sub">基于四维向量匹配，看看两人的道性契合度</text>
+  </view>
+
+  <view class="card" wx:if="{{!myScores}}">
+    <text class="empty-text">你还没有完成道性测验</text>
+    <button class="btn-primary" bindtap="goQuiz">前往测验</button>
+  </view>
+
+  <view class="card" wx:elif="{{!peerScores}}">
+    <text class="invite-text">邀请好友完成测验后，可查看配对结果</text>
+    <button class="btn-primary share-btn" open-type="share">邀请好友配对</button>
+  </view>
+
+  <view class="result-area" wx:else>
+    <view class="score-ring">
+      <text class="ring-num">{{result.score}}</text>
+      <text class="ring-label">{{result.label}}</text>
+    </view>
+
+    <view class="card analysis-card">
+      <text class="sec-title">配对分析</text>
+      <text class="analysis-text">{{result.analysis}}</text>
+    </view>
+
+    <view class="card tips-card">
+      <text class="sec-title">相处建议</text>
+      <text class="tip-item" wx:for="{{result.tips}}" wx:key="*this">· {{item}}</text>
+    </view>
+
+    <view class="actions">
+      <button class="btn-primary share-btn" open-type="share">分享配对结果</button>
+      <button class="btn-ghost" bindtap="goQuiz">重新测验</button>
+    </view>
+  </view>
+</view>

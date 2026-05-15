@@ -1,6 +1,9 @@
 const { computeAchievements } = require('../../utils/lottery-history.js')
 
 const pageAnalytics = require('../../behaviors/page-analytics.js')
+const poster = require('../../utils/poster-engine.js')
+const { recordShare } = require('../../utils/usage-analytics.js')
+const { computeSolarBadges } = require('../../utils/solar-badges.js')
 
 Page({
   behaviors: [pageAnalytics],
@@ -11,7 +14,9 @@ Page({
     total: 0,
     progressPct: 0,
     pressVisible: false,
-    pressComment: ''
+    pressComment: '',
+    solarBadges: [],
+    solarCount: 0
   },
 
   onShow() {
@@ -31,6 +36,42 @@ Page({
       total,
       progressPct
     })
+    try {
+      const sb = computeSolarBadges()
+      this.setData({ solarBadges: sb.list, solarCount: sb.count })
+    } catch (e) {}
+  },
+
+  onShareAppMessage() {
+    recordShare('/pages/achieve-hall/achieve-hall')
+    return {
+      title: '我在「道性自察」解锁了 ' + this.data.unlockedCount + ' 项成就',
+      path: '/pages/achieve-hall/achieve-hall'
+    }
+  },
+
+  async shareAchieve(e) {
+    const id = e.currentTarget.dataset.id
+    const item = this._achMap && this._achMap[id]
+    if (!item || !item.unlocked) return
+    wx.showLoading({ title: '生成中…' })
+    try {
+      const path = await poster.generate(
+        this, 'poster-canvas',
+        poster.tplAchieve({
+          achieveName: item.name,
+          achieveDesc: item.subtitle || item.comment || '',
+          unlockedCount: this.data.unlockedCount,
+          total: this.data.total
+        }),
+        600, 800
+      )
+      wx.hideLoading()
+      wx.previewImage({ urls: [path], current: path })
+    } catch (err) {
+      wx.hideLoading()
+      wx.showToast({ title: '生成失败', icon: 'none' })
+    }
   },
 
   onAchPressStart(e) {

@@ -915,6 +915,10 @@ Page({
     return y
   },
 
+  goCompatibility() {
+    wx.navigateTo({ url: '/pages/compatibility/compatibility' })
+  },
+
   saveFile(path) {
     const runSave = () => {
       wx.saveImageToPhotosAlbum({

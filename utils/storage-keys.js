@@ -48,5 +48,9 @@ module.exports = {
   /** 树洞信件 token 列表：[{ letterToken, content, createdAt }] */
   TREE_HOLE_LETTERS: 'treeHoleLetters_v1',
   /** 树洞每日投信计数：{ date: 'YYYY-MM-DD', count: number } */
-  TREE_HOLE_DAILY: 'treeHoleDaily_v1'
+  TREE_HOLE_DAILY: 'treeHoleDaily_v1',
+  /** 每周挑战状态 */
+  WEEKLY_CHALLENGE: 'weeklyChallenge_v1',
+  /** 挑战徽章列表 */
+  CHALLENGE_BADGES: 'challengeBadges_v1'
 }

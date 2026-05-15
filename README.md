@@ -1,6 +1,6 @@
 # 量化自修正念 · 微信小程序
 
-面向「自我观察与文化参考」的工具型小程序：**今日心象箴言**（含配图与建议）、**道性十六型**情景测验、**量化自修记录**与轻量分析、**个人档案**（箴言上下文）；首页提供 **心象日历**（按日抽签记录的月历与层级示意图，仅供自察）、**心象展馆**（每卦首次收录时间）与 **成就展馆**（心象成就与长按趣评）。数据默认**仅存本机**（`wx.setStorage`），未接自有后端业务库。
+面向「自我观察与文化参考」的工具型小程序：**今日心象箴言**（含配图与建议）、**道性十六型**情景测验、**量化自修记录**与轻量分析、**个人档案**（箴言上下文）；首页提供 **心象日历**（按日抽签记录的月历与层级示意图，仅供自察）、**心象展馆**（每卦首次收录时间）、**成就展馆**（心象成就与长按趣评）、**修行段位**、**节气徽章**、**每周挑战**、**道性配对**与**年度修炼报告**。数据默认**仅存本机**（`wx.setStorage`），未接自有后端业务库。
 
 > **重要声明**：所有箴言与人格描述与建议均**仅供文化学习与自我观察**，不构成医疗、心理咨询或命运断言；持续情绪与睡眠困扰请寻求专业帮助。
 
@@ -14,6 +14,12 @@
 | **档案与上下文** | 个人档案补齐箴言上下文项后，抽取时少打扰、建议与释义更贴情境。 |
 | **展馆与日历** | **心象日历**：按自然日展示抽签记录（末次）+ 层级示意图（历史可视化，非前瞻推断）；**心象展馆**：「首获」图鉴；**成就展馆**：趣味解锁条件（按日历日统计抽签），长按看评语。 |
 | **每日打卡** | 首页在「心象」idle/result 时展示连续/累计打卡与「今日打卡」；数据仅存本机，见 `utils/checkin.js` 与 `docs/check-in-system-brief.md`。 |
+| **修行段位** | 个人档案顶部展示十级品阶（初入道门 → 无极大道），综合打卡、抽签、成就、自修等积分实时计算。 |
+| **节气徽章** | 成就展馆底部 24 宫格，在对应节气前后 ±3 天内有抽签即收集该节气徽章；附带 3 个新成就。 |
+| **每周挑战** | 首页打卡条下方展示基于五行短板推荐的每周 5 天连续挑战，完成可获限定徽章。 |
+| **道性配对** | 从道性测验结果页邀请好友配对，基于四维兼容度算法分析两人匹配度与相处建议。 |
+| **年度报告** | 个人档案「展馆与报告」入口，Spotify Wrapped 风格展示全年抽签/打卡/自修/成就数据及年度关键词。 |
+| **分享卡片** | 首页/lottery 结果区可生成箴言海报（poster-engine · tplMaxim），成就展馆已解锁成就可生成分享图（tplAchieve）。 |
 
 ### 近期补充与修复（与代码同步 · 2026-05）
 
@@ -67,7 +73,9 @@ wx_program/
 │   ├── track/
 │   ├── lottery/
 │   ├── theory-intro/
-│   └── profile/
+│   ├── profile/
+│   ├── compatibility/   # 道性配对
+│   └── annual-report/   # 年度修炼报告
 ├── utils/
 │   ├── lottery-core.js / lottery-history.js / lottery-advice.js / lottery-advice-corpus.js
 │   ├── fortune.js / fortune-trend-candles.js / fortune-trend-calendar.js
@@ -76,6 +84,12 @@ wx_program/
 │   ├── lots.js / lots-data.js / almanac.js / weather.js / geocode.js / region-cn.js
 │   ├── analysis.js / cultivation-model.js / five-elements-chart.js
 │   ├── lottery-shake-sensory.js
+│   ├── poster-engine.js          # 海报生成引擎（tplMaxim / tplAchieve / tplPersonality）
+│   ├── cultivation-rank.js       # 十级修行品阶
+│   ├── solar-badges.js           # 24 节气徽章收集
+│   ├── weekly-challenge.js       # 每周挑战系统
+│   ├── compatibility.js          # 道性配对算法
+│   ├── annual-report.js          # 年度报告数据聚合
 │   └── storage-keys.js
 ├── subpackages/portrait-assets/
 └── project.config.json
@@ -93,6 +107,12 @@ wx_program/
 | **道性结果 / 人像** | `pages/personality/result/result.js` · `result.wxml` | `portraitImgBind`、海报导出、`_portraitShowGen`。 |
 | **分包肖像** | `subpackages/portrait-assets/` · `app.json` | 路径与 `personalityPortraitSrc` 一致。 |
 | **摇动反馈** | `lottery-core.js` · `lottery-shake-sensory.js` | 首页 / lottery 卸载时 teardown。 |
+| **分享海报** | `utils/poster-engine.js` | `generate` + 模板（`tplMaxim` / `tplAchieve`）；页面中放离屏 `<canvas type="2d">` 即可。 |
+| **修行段位** | `utils/cultivation-rank.js` | `computeRank()`：综合 6 项数据源 → 10 级品阶 + 进度条。 |
+| **节气徽章** | `utils/solar-badges.js` | `computeSolarBadges()`：扫描抽签历史 × 24 节气日期 ±3 天。 |
+| **每周挑战** | `utils/weekly-challenge.js` | `getCurrentChallenge()` / `updateChallengeProgress()`；基于五行最弱轴推荐。 |
+| **道性配对** | `utils/compatibility.js` · `pages/compatibility/` | 四维兼容度算法；好友分享带 `typeId` 参数。 |
+| **年度报告** | `utils/annual-report.js` · `pages/annual-report/` | `computeAnnualReport(year)`：按年聚合全维度数据 + 年度关键词。 |
 
 ---
 
@@ -177,6 +197,8 @@ wx_program/
 | `TRACK_RECORDS` / `TRACK_PRIORITIES` | 自修与重点 |
 | `CHECKIN_STATE` | 打卡 |
 | `USAGE_STATS` | 本地使用统计 |
+| `WEEKLY_CHALLENGE` | 每周挑战状态 |
+| `CHALLENGE_BADGES` | 挑战徽章列表 |
 
 详见 **`utils/storage-keys.js`**。
 
@@ -198,7 +220,8 @@ wx_program/
 
 ### 8.1 近期主题（2026-05）
 
-成就自然日与末抽口径、按日层级示意图衔接与 Y 轴、iOS Canvas + enhanced 规避、道性人像 `portraitImgBind`、建议避让上一轮、`LOTTERY_ADVICE_RECENT`、抽签叠影修复等。
+- 成就自然日与末抽口径、按日层级示意图衔接与 Y 轴、iOS Canvas + enhanced 规避、道性人像 `portraitImgBind`、建议避让上一轮、`LOTTERY_ADVICE_RECENT`、抽签叠影修复等。
+- **七大新功能**：箴言分享卡、成就分享卡、修行段位系统（10 级品阶）、节气限定徽章（24 节气 + 3 成就）、道性配对（四维兼容度算法）、年度修炼报告（道观 Wrapped）、每周挑战（五行短板自动出题）。
 
 ### 8.2 维护提示
 
@@ -206,6 +229,9 @@ wx_program/
 - 展馆成就：`lottery-history.js`、`ACHIEVEMENT_DEFS`、`buildAchievementState`。
 - 人像 / 海报 / 分包：`pages/personality/result/*`、`app.json`。
 - 打卡：`utils/checkin.js`、`docs/check-in-system-brief.md`。
+- 段位 / 徽章 / 挑战：`cultivation-rank.js`、`solar-badges.js`、`weekly-challenge.js`。
+- 配对 / 年报：`compatibility.js`、`annual-report.js`、对应 `pages/` 目录。
+- 海报引擎：`poster-engine.js`，各页面离屏 `<canvas type="2d" id="poster-canvas">`。
 
 ---
 

@@ -1,5 +1,6 @@
 const KEYS = require('../../utils/storage-keys.js')
 const backup = require('../../utils/data-backup.js')
+const { computeRank } = require('../../utils/cultivation-rank.js')
 const {
   getProvinceLabels,
   getCityLabels,
@@ -100,7 +101,8 @@ Page({
     styleIndex: 0,
     focusChips: buildFocusChips([]),
     focusTagsSelected: [],
-    largeFont: false
+    largeFont: false,
+    rankInfo: null
   },
 
   onLoad(opts) {
@@ -141,6 +143,14 @@ Page({
 
   goTreeHole() {
     wx.navigateTo({ url: '/pages/tree-hole/tree-hole' })
+  },
+
+  goAnnualReport() {
+    wx.navigateTo({ url: '/pages/annual-report/annual-report' })
+  },
+
+  goCompatibility() {
+    wx.navigateTo({ url: '/pages/compatibility/compatibility' })
   },
 
   applyCountryIndex(ci, resetPc) {
@@ -246,6 +256,8 @@ Page({
   },
 
   onShow() {
+    try { this.setData({ rankInfo: computeRank() }) } catch (e) {}
+
     const p = wx.getStorageSync(KEYS.USER_PROFILE) || {}
     let gi = 0
     if (p.gender === 'male') gi = 1

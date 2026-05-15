@@ -1,10 +1,12 @@
 const KEYS = require('../../utils/storage-keys.js')
 const core = require('../../utils/lottery-core.js')
+const poster = require('../../utils/poster-engine.js')
 const { isLotteryProfileComplete } = require('../../utils/profile-lottery.js')
 const { getFirstUnlockListSorted, computeAchievements, getDailyTrendSeries } = require('../../utils/lottery-history.js')
 const pageAnalytics = require('../../behaviors/page-analytics.js')
 const { recordShare } = require('../../utils/usage-analytics.js')
 const checkin = require('../../utils/checkin.js')
+const { getCurrentChallenge } = require('../../utils/weekly-challenge.js')
 
 /** 今日微行动最多展示条数（去重后截断，避免与箴言条数一一对应显得冗长） */
 const MICRO_ACTION_DISPLAY_MAX = 4
@@ -56,7 +58,10 @@ Page({
     seasonalHint: '',
     microActions: [],
     yesterdayActionSummary: '',
-    weekHighlight: ''
+    weekHighlight: '',
+    weeklyChallenge: null,
+    wcProgressPct: 0,
+    wcPassDays: 0
   }),
 
   onLoad() {
@@ -114,6 +119,7 @@ Page({
     this.refreshSeasonalHint()
     this.refreshMicroActions()
     this.refreshWeekHighlight()
+    this.refreshWeeklyChallenge()
   },
 
   refreshCheckIn() {
@@ -372,6 +378,34 @@ Page({
       wx.setStorageSync(KEYS.ADVICE_FEEDBACK, fb)
     } catch (e) {}
     wx.showToast({ title: '已记录', icon: 'none' })
+  },
+
+  async generateMaximPoster() {
+    const { lot } = this.data
+    if (!lot) return
+    wx.showLoading({ title: '生成中…' })
+    try {
+      const cache = wx.getStorageSync(KEYS.LOTTERY_TODAY) || {}
+      const text = (lot.poem || '') + '\n' + (lot.interpret || '')
+      const sourceName = (lot.tierLabel || '') + ' · ' + (lot.name || '')
+      const date = cache.dateStr || ''
+      const path = await poster.generate(this, 'poster-canvas', poster.tplMaxim({ text, sourceName, date }), 600, 900)
+      wx.hideLoading()
+      wx.previewImage({ urls: [path], current: path })
+    } catch (e) {
+      wx.hideLoading()
+      wx.showToast({ title: '生成失败', icon: 'none' })
+    }
+  },
+
+  refreshWeeklyChallenge() {
+    try {
+      const ch = getCurrentChallenge()
+      if (!ch) { this.setData({ weeklyChallenge: null }); return }
+      const passDays = (ch.progress || []).filter(p => p.pass).length
+      const pct = ch.days > 0 ? Math.min(100, Math.round(passDays / ch.days * 100)) : 0
+      this.setData({ weeklyChallenge: ch, wcProgressPct: pct, wcPassDays: passDays })
+    } catch (e) {}
   },
 
   goHome() {

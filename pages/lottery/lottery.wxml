@@ -106,6 +106,8 @@
 
   <view class="footer safe-bottom" wx:if="{{phase === 'result' && revealed}}">
     <button class="btn-primary share-btn" open-type="share">分享给好友</button>
+    <button class="btn-ghost" bindtap="generateMaximPoster">生成箴言分享卡</button>
     <button class="btn-ghost" bindtap="shareHint">分享说明</button>
   </view>
+  <canvas type="2d" id="poster-canvas" class="poster-canvas-offscreen" style="width:600px;height:900px;position:fixed;left:-9999px;top:0;"></canvas>
 </view>

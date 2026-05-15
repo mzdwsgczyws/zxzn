@@ -1,0 +1,210 @@
+.page {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #1a1530 0%, #2a1f4a 35%, #f5f0e8 35.2%);
+  padding-bottom: calc(64rpx + env(safe-area-inset-bottom));
+}
+
+.hero {
+  padding: 32rpx 32rpx 24rpx;
+}
+
+.hero-title {
+  display: block;
+  font-family: "DaoDisplay", "Songti SC", "STSong", serif;
+  font-size: 40rpx;
+  font-weight: 700;
+  color: #e8d4a8;
+  letter-spacing: 4rpx;
+  margin-bottom: 8rpx;
+}
+
+.hero-sub {
+  display: block;
+  font-size: 24rpx;
+  color: rgba(232, 212, 168, 0.7);
+  margin-bottom: 16rpx;
+}
+
+.year-picker {
+  display: flex;
+  gap: 16rpx;
+}
+
+.year-btn {
+  padding: 10rpx 28rpx;
+  font-size: 24rpx;
+  color: rgba(232, 212, 168, 0.6);
+  border: 1rpx solid rgba(232, 212, 168, 0.25);
+  border-radius: 999rpx;
+}
+
+.year-active {
+  color: #e8d4a8;
+  background: rgba(212, 175, 55, 0.2);
+  border-color: rgba(212, 175, 55, 0.5);
+}
+
+.keyword-banner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 32rpx 0;
+}
+
+.keyword-label {
+  font-size: 22rpx;
+  color: rgba(232, 212, 168, 0.6);
+  letter-spacing: 4rpx;
+  margin-bottom: 8rpx;
+}
+
+.keyword-text {
+  font-family: "DaoDisplay", "Songti SC", "STSong", serif;
+  font-size: 64rpx;
+  font-weight: 700;
+  color: #e8d4a8;
+  letter-spacing: 8rpx;
+  text-shadow: 0 0 24rpx rgba(212, 175, 55, 0.3);
+}
+
+.card {
+  margin: 12rpx 24rpx;
+  padding: 24rpx;
+  background: rgba(255, 252, 248, 0.95);
+  border-radius: 20rpx;
+  border: 1rpx solid rgba(212, 175, 55, 0.15);
+}
+
+.card-title {
+  display: block;
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #2a1f15;
+  letter-spacing: 2rpx;
+  margin-bottom: 16rpx;
+}
+
+.stat-row {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 16rpx;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stat-num {
+  font-size: 44rpx;
+  font-weight: 700;
+  color: #3a2e5c;
+}
+
+.stat-label {
+  font-size: 22rpx;
+  color: #8b7355;
+  margin-top: 4rpx;
+}
+
+.tier-row {
+  margin-top: 8rpx;
+}
+
+.tier-item {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  margin-bottom: 8rpx;
+}
+
+.tier-name {
+  width: 56rpx;
+  font-size: 22rpx;
+  color: #4a4034;
+  text-align: right;
+}
+
+.tier-bar-bg {
+  flex: 1;
+  height: 16rpx;
+  border-radius: 999rpx;
+  background: rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+}
+
+.tier-bar-fill {
+  height: 100%;
+  border-radius: 999rpx;
+  background: linear-gradient(90deg, #c9a227, #e8d4a8);
+  transition: width 0.4s ease;
+}
+
+.tier-count {
+  width: 48rpx;
+  font-size: 22rpx;
+  color: #8b7355;
+}
+
+.mood-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12rpx;
+  margin-top: 8rpx;
+}
+
+.mood-label {
+  font-size: 22rpx;
+  color: #8b7355;
+}
+
+.mood-emoji {
+  font-size: 36rpx;
+}
+
+.empty-card {
+  margin: 32rpx 24rpx;
+  padding: 48rpx;
+  text-align: center;
+}
+
+.empty-text {
+  font-size: 28rpx;
+  color: #8b7355;
+}
+
+.footer {
+  padding: 24rpx;
+  display: flex;
+  justify-content: center;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #3a2e5c, #5a3e8c);
+  color: #e8d4a8;
+  border-radius: 999rpx;
+  font-size: 28rpx;
+  padding: 20rpx 48rpx;
+  border: none;
+}
+
+.btn-primary::after { border: none; }
+
+.share-btn {
+  width: 80%;
+}
+
+.stat-card {
+  animation: fadeUp 0.5s ease both;
+}
+
+.stat-card:nth-child(2) { animation-delay: 0.1s; }
+.stat-card:nth-child(3) { animation-delay: 0.2s; }
+.stat-card:nth-child(4) { animation-delay: 0.3s; }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20rpx); }
+  to { opacity: 1; transform: translateY(0); }
+}

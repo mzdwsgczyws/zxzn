@@ -891,3 +891,9 @@
   font-size: 24rpx;
   color: var(--dao-ink-body, #4a4034);
 }
+
+.poster-canvas-offscreen {
+  position: fixed;
+  left: -9999px;
+  top: 0;
+}

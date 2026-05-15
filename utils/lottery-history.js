@@ -422,6 +422,36 @@ const ACHIEVEMENT_DEFS = [
     test: (s) => s.checkinTotal >= 365,
     comment: '一整年的坚持，时间是最好的见证者。',
     commentLocked: '累计打卡 365 天即可解锁。'
+  },
+  {
+    id: 'solar_4',
+    name: '四季初集',
+    subtitle: '集齐任意 4 枚节气徽章',
+    accent: 'green',
+    stars: 2,
+    test: (s) => (s.solarBadgeCount || 0) >= 4,
+    comment: '四个节气都留下了记录——四季交替中自有节律。',
+    commentLocked: '在不同节气期间（前后 3 天）完成抽签，集齐 4 枚节气徽章即可。'
+  },
+  {
+    id: 'solar_12',
+    name: '半历行者',
+    subtitle: '集齐 12 枚节气徽章',
+    accent: 'amber',
+    stars: 3,
+    test: (s) => (s.solarBadgeCount || 0) >= 12,
+    comment: '半数节气都有你的足迹，时间的河流正在带你看更广的风景。',
+    commentLocked: '集齐 12 枚节气徽章即可解锁。'
+  },
+  {
+    id: 'solar_24',
+    name: '廿四节全',
+    subtitle: '集齐全部 24 枚节气徽章',
+    accent: 'gold',
+    stars: 5,
+    test: (s) => (s.solarBadgeCount || 0) >= 24,
+    comment: '二十四节气全部集齐——跨越至少一整年的修行，你已与天地同频。',
+    commentLocked: '在每个节气期间都完成至少一次抽签，集齐全部 24 枚。'
   }
 ]
 
@@ -460,6 +490,12 @@ function computeAchievements() {
   } catch (e) {
     s.checkinStreak = 0
     s.checkinTotal = 0
+  }
+  try {
+    const { computeSolarBadges } = require('./solar-badges.js')
+    s.solarBadgeCount = computeSolarBadges().count || 0
+  } catch (e) {
+    s.solarBadgeCount = 0
   }
   const list = ACHIEVEMENT_DEFS.map((def, idx) => {
     const unlocked = def.test(s)

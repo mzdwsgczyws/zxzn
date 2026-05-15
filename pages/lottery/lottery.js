@@ -3,6 +3,7 @@ const core = require('../../utils/lottery-core.js')
 const { isLotteryProfileComplete } = require('../../utils/profile-lottery.js')
 const pageAnalytics = require('../../behaviors/page-analytics.js')
 const { recordShare } = require('../../utils/usage-analytics.js')
+const poster = require('../../utils/poster-engine.js')
 
 Page({
   behaviors: [pageAnalytics],
@@ -130,5 +131,23 @@ Page({
       wx.setStorageSync(KEYS.ADVICE_FEEDBACK, fb)
     } catch (e) {}
     wx.showToast({ title: '已记录', icon: 'none' })
+  },
+
+  async generateMaximPoster() {
+    const { lot } = this.data
+    if (!lot) return
+    wx.showLoading({ title: '生成中…' })
+    try {
+      const cache = wx.getStorageSync(KEYS.LOTTERY_TODAY) || {}
+      const text = (lot.poem || '') + '\n' + (lot.interpret || '')
+      const sourceName = (lot.tierLabel || '') + ' · ' + (lot.name || '')
+      const date = cache.dateStr || ''
+      const path = await poster.generate(this, 'poster-canvas', poster.tplMaxim({ text, sourceName, date }), 600, 900)
+      wx.hideLoading()
+      wx.previewImage({ urls: [path], current: path })
+    } catch (e) {
+      wx.hideLoading()
+      wx.showToast({ title: '生成失败', icon: 'none' })
+    }
   }
 })

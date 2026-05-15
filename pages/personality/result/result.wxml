@@ -61,6 +61,7 @@
   <view class="actions safe-bottom">
     <button class="btn-primary share-friend" open-type="share">分享给好友（卡片图）</button>
     <button class="btn-primary" bindtap="savePoster">保存高清海报到相册</button>
+    <button class="btn-primary compat-btn" bindtap="goCompatibility">邀请好友配对</button>
     <button class="btn-ghost" bindtap="retest">重新测验</button>
   </view>
 
