@@ -28,7 +28,7 @@
   overflow-y: auto;
 }
 
-/* 浅色卡：避免渐变下半段金字/符号与底同色，安卓上 Unicode 符号也常缺字 */
+/* 浅色卡：避免渐变下半段金字/符号与底同色；部分安卓机型对个别 Unicode 符号可能缺字显示为方框 */
 .ob-card {
   position: relative;
   z-index: 1;
