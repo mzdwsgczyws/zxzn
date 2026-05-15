@@ -241,14 +241,15 @@ function tplMaxim(data) {
       textY += 42
     }
 
-    // ── 来源信息 ──
-    var infoY = Math.max(textY + 40, h - 210)
-    ctx.font = '20px sans-serif'
-    ctx.fillStyle = '#b0a898'
+    // ── 来源信息（居中放大） ──
+    var infoY = Math.max(textY + 50, h - 220)
+    ctx.font = '600 28px serif'
+    ctx.fillStyle = '#d4c8a8'
+    ctx.textAlign = 'center'
     ctx.fillText(data.sourceName || '', w / 2, infoY)
-    ctx.font = '18px sans-serif'
-    ctx.fillStyle = '#908878'
-    ctx.fillText(data.date || '', w / 2, infoY + 30)
+    ctx.font = '22px sans-serif'
+    ctx.fillStyle = '#a09888'
+    ctx.fillText(data.date || '', w / 2, infoY + 38)
 
     // ── 底部分隔线 ──
     ctx.strokeStyle = 'rgba(212, 175, 55, 0.15)'
