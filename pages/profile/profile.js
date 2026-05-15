@@ -113,6 +113,12 @@ Page({
     this.setData({ formExpanded: !this.data.formExpanded })
   },
 
+  _goHomeAfterSave() {
+    setTimeout(() => {
+      wx.reLaunch({ url: '/pages/index/index' })
+    }, 1000)
+  },
+
   goFortuneTrend() {
     wx.navigateTo({ url: '/pages/fortune-trend/fortune-trend' })
   },
@@ -491,6 +497,8 @@ Page({
         recordBiz('profile_save')
         wx.showToast({ title: '已保存' })
         this.setData({ addrSummary: '', hasAddressText: false, geocodeHint: '' })
+        this._refreshSummary(payload)
+        this._goHomeAfterSave()
         return
       }
       payload.addrCountryCode = 'OTHER'
@@ -539,6 +547,8 @@ Page({
         addrSummary: payload.locationName || '',
         hasAddressText: true
       })
+      this._refreshSummary(payload)
+      this._goHomeAfterSave()
     })
   }
 })
