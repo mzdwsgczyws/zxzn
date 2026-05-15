@@ -105,45 +105,196 @@ function wrapText(ctx, text, maxWidth) {
  * data: { text, sourceName, date }
  */
 function tplMaxim(data) {
-  return async function (ctx, w, h) {
-    const gradient = ctx.createLinearGradient(0, 0, 0, h)
-    gradient.addColorStop(0, '#1a1530')
-    gradient.addColorStop(1, '#0d0b14')
-    ctx.fillStyle = gradient
+  return async function (ctx, w, h, dpr, canvas) {
+    // ── 背景渐变 ──
+    const bg = ctx.createLinearGradient(0, 0, w * 0.3, h)
+    bg.addColorStop(0, '#1f1840')
+    bg.addColorStop(0.4, '#17122e')
+    bg.addColorStop(1, '#0d0a18')
+    ctx.fillStyle = bg
     ctx.fillRect(0, 0, w, h)
 
-    ctx.fillStyle = 'rgba(212, 175, 55, 0.06)'
-    drawRoundRect(ctx, 40, 40, w - 80, h - 80, 16)
-    ctx.fill()
+    // ── 装饰：顶部云纹弧线 ──
+    ctx.save()
+    ctx.strokeStyle = 'rgba(212, 175, 55, 0.10)'
+    ctx.lineWidth = 1.5
+    for (var i = 0; i < 5; i++) {
+      ctx.beginPath()
+      ctx.arc(w * 0.15, -60 + i * 18, 160 + i * 30, 0.3, Math.PI * 0.8)
+      ctx.stroke()
+    }
+    for (var j = 0; j < 4; j++) {
+      ctx.beginPath()
+      ctx.arc(w * 0.85, -40 + j * 20, 140 + j * 25, Math.PI * 0.2, Math.PI * 0.7)
+      ctx.stroke()
+    }
+    ctx.restore()
 
-    ctx.strokeStyle = 'rgba(212, 175, 55, 0.25)'
+    // ── 装饰：底部山峦剪影 ──
+    ctx.save()
+    ctx.fillStyle = 'rgba(212, 175, 55, 0.04)'
+    ctx.beginPath()
+    ctx.moveTo(0, h)
+    ctx.lineTo(0, h - 90)
+    ctx.quadraticCurveTo(w * 0.15, h - 150, w * 0.3, h - 110)
+    ctx.quadraticCurveTo(w * 0.45, h - 70, w * 0.55, h - 130)
+    ctx.quadraticCurveTo(w * 0.7, h - 190, w * 0.85, h - 100)
+    ctx.quadraticCurveTo(w * 0.95, h - 60, w, h - 80)
+    ctx.lineTo(w, h)
+    ctx.closePath()
+    ctx.fill()
+    ctx.fillStyle = 'rgba(212, 175, 55, 0.03)'
+    ctx.beginPath()
+    ctx.moveTo(0, h)
+    ctx.lineTo(0, h - 50)
+    ctx.quadraticCurveTo(w * 0.2, h - 100, w * 0.4, h - 70)
+    ctx.quadraticCurveTo(w * 0.6, h - 40, w * 0.8, h - 80)
+    ctx.quadraticCurveTo(w * 0.9, h - 100, w, h - 60)
+    ctx.lineTo(w, h)
+    ctx.closePath()
+    ctx.fill()
+    ctx.restore()
+
+    // ── 装饰：散落光点 ──
+    ctx.save()
+    var dots = [
+      [w * 0.12, h * 0.25, 2.5], [w * 0.88, h * 0.18, 2],
+      [w * 0.08, h * 0.55, 1.8], [w * 0.92, h * 0.45, 2.2],
+      [w * 0.2, h * 0.7, 1.5], [w * 0.78, h * 0.72, 1.8],
+      [w * 0.5, h * 0.12, 2], [w * 0.35, h * 0.85, 1.5],
+      [w * 0.65, h * 0.08, 1.8]
+    ]
+    for (var d = 0; d < dots.length; d++) {
+      var dot = dots[d]
+      var glow = ctx.createRadialGradient(dot[0], dot[1], 0, dot[0], dot[1], dot[2] * 4)
+      glow.addColorStop(0, 'rgba(212, 175, 55, 0.25)')
+      glow.addColorStop(1, 'rgba(212, 175, 55, 0)')
+      ctx.fillStyle = glow
+      ctx.beginPath()
+      ctx.arc(dot[0], dot[1], dot[2] * 4, 0, Math.PI * 2)
+      ctx.fill()
+      ctx.fillStyle = 'rgba(232, 212, 168, 0.6)'
+      ctx.beginPath()
+      ctx.arc(dot[0], dot[1], dot[2], 0, Math.PI * 2)
+      ctx.fill()
+    }
+    ctx.restore()
+
+    // ── 内框 ──
+    ctx.strokeStyle = 'rgba(212, 175, 55, 0.30)'
     ctx.lineWidth = 1
-    drawRoundRect(ctx, 40, 40, w - 80, h - 80, 16)
+    drawRoundRect(ctx, 36, 36, w - 72, h - 72, 18)
+    ctx.stroke()
+    ctx.strokeStyle = 'rgba(212, 175, 55, 0.12)'
+    drawRoundRect(ctx, 42, 42, w - 84, h - 84, 15)
     ctx.stroke()
 
-    ctx.font = '600 36px sans-serif'
+    // ── 顶部角花 ──
+    ctx.save()
+    ctx.strokeStyle = 'rgba(212, 175, 55, 0.25)'
+    ctx.lineWidth = 1.5
+    var cornerSize = 28
+    // 左上
+    ctx.beginPath()
+    ctx.moveTo(36, 36 + cornerSize); ctx.lineTo(36, 36); ctx.lineTo(36 + cornerSize, 36)
+    ctx.stroke()
+    // 右上
+    ctx.beginPath()
+    ctx.moveTo(w - 36 - cornerSize, 36); ctx.lineTo(w - 36, 36); ctx.lineTo(w - 36, 36 + cornerSize)
+    ctx.stroke()
+    // 左下
+    ctx.beginPath()
+    ctx.moveTo(36, h - 36 - cornerSize); ctx.lineTo(36, h - 36); ctx.lineTo(36 + cornerSize, h - 36)
+    ctx.stroke()
+    // 右下
+    ctx.beginPath()
+    ctx.moveTo(w - 36 - cornerSize, h - 36); ctx.lineTo(w - 36, h - 36); ctx.lineTo(w - 36, h - 36 - cornerSize)
+    ctx.stroke()
+    ctx.restore()
+
+    // ── 顶部横纹分隔 ──
+    var titleY = 95
+    ctx.strokeStyle = 'rgba(212, 175, 55, 0.18)'
+    ctx.lineWidth = 0.8
+    ctx.beginPath(); ctx.moveTo(70, titleY + 18); ctx.lineTo(w - 70, titleY + 18); ctx.stroke()
+
+    // ── 标题 ──
+    ctx.font = '600 34px sans-serif'
     ctx.fillStyle = '#d4af37'
     ctx.textAlign = 'center'
-    ctx.fillText('道 性 自 察', w / 2, 100)
+    ctx.fillText('道 性 自 察', w / 2, titleY)
 
-    ctx.font = '28px serif'
-    ctx.fillStyle = '#e0d8cc'
+    // ── 小篆装饰符 ──
+    ctx.font = '16px serif'
+    ctx.fillStyle = 'rgba(212, 175, 55, 0.35)'
+    ctx.fillText('☰', w / 2 - 100, titleY)
+    ctx.fillText('☷', w / 2 + 100, titleY)
+
+    // ── 正文内容 ──
+    ctx.font = '26px serif'
+    ctx.fillStyle = '#e8e0d5'
     ctx.textAlign = 'center'
-    const lines = wrapText(ctx, data.text || '', w - 160)
-    let y = 200
-    for (const line of lines) {
-      ctx.fillText(line, w / 2, y)
-      y += 44
+    var textLines = wrapText(ctx, data.text || '', w - 140)
+    var textY = 170
+    for (var k = 0; k < textLines.length; k++) {
+      ctx.fillText(textLines[k], w / 2, textY)
+      textY += 42
     }
 
-    ctx.font = '22px sans-serif'
-    ctx.fillStyle = '#a09888'
-    ctx.fillText(data.sourceName || '', w / 2, h - 120)
-    ctx.fillText(data.date || '', w / 2, h - 85)
-
+    // ── 来源信息 ──
+    var infoY = Math.max(textY + 40, h - 210)
+    ctx.font = '20px sans-serif'
+    ctx.fillStyle = '#b0a898'
+    ctx.fillText(data.sourceName || '', w / 2, infoY)
     ctx.font = '18px sans-serif'
-    ctx.fillStyle = '#7a6e62'
-    ctx.fillText('来自「道性自察」小程序', w / 2, h - 50)
+    ctx.fillStyle = '#908878'
+    ctx.fillText(data.date || '', w / 2, infoY + 30)
+
+    // ── 底部分隔线 ──
+    ctx.strokeStyle = 'rgba(212, 175, 55, 0.15)'
+    ctx.lineWidth = 0.8
+    ctx.beginPath(); ctx.moveTo(70, h - 145); ctx.lineTo(w - 70, h - 145); ctx.stroke()
+
+    // ── 小程序码 ──
+    var codeSize = 72
+    var codeX = w / 2 - codeSize / 2
+    var codeY = h - 135
+    try {
+      var codeSrcs = [
+        '/subpackages/portrait-assets/images/personality-portraits/index.jpg',
+        '/subpackages/portrait-assets/images/personality-portraits/index.png'
+      ]
+      var codeImg = null
+      for (var s = 0; s < codeSrcs.length; s++) {
+        try { codeImg = await loadImage(canvas, codeSrcs[s]); break } catch (e) {}
+      }
+      if (codeImg) {
+        ctx.save()
+        ctx.beginPath()
+        ctx.arc(codeX + codeSize / 2, codeY + codeSize / 2, codeSize / 2 + 2, 0, Math.PI * 2)
+        ctx.fillStyle = 'rgba(255,255,255,0.9)'
+        ctx.fill()
+        ctx.beginPath()
+        ctx.arc(codeX + codeSize / 2, codeY + codeSize / 2, codeSize / 2, 0, Math.PI * 2)
+        ctx.clip()
+        ctx.drawImage(codeImg, codeX, codeY, codeSize, codeSize)
+        ctx.restore()
+        ctx.font = '14px sans-serif'
+        ctx.fillStyle = '#7a6e62'
+        ctx.textAlign = 'center'
+        ctx.fillText('扫码体验「道性自察」', w / 2, codeY + codeSize + 20)
+      } else {
+        ctx.font = '16px sans-serif'
+        ctx.fillStyle = '#7a6e62'
+        ctx.textAlign = 'center'
+        ctx.fillText('来自「道性自察」小程序', w / 2, h - 55)
+      }
+    } catch (e) {
+      ctx.font = '16px sans-serif'
+      ctx.fillStyle = '#7a6e62'
+      ctx.textAlign = 'center'
+      ctx.fillText('来自「道性自察」小程序', w / 2, h - 55)
+    }
   }
 }
 
@@ -188,36 +339,114 @@ function tplPersonality(data) {
  * data: { achieveName, achieveDesc, unlockedCount, total }
  */
 function tplAchieve(data) {
-  return async function (ctx, w, h) {
-    const gradient = ctx.createLinearGradient(0, 0, 0, h)
-    gradient.addColorStop(0, '#1a1530')
-    gradient.addColorStop(1, '#0d0b14')
-    ctx.fillStyle = gradient
+  return async function (ctx, w, h, dpr, canvas) {
+    // ── 背景 ──
+    var bg = ctx.createLinearGradient(0, 0, w * 0.3, h)
+    bg.addColorStop(0, '#1f1840')
+    bg.addColorStop(0.5, '#17122e')
+    bg.addColorStop(1, '#0d0a18')
+    ctx.fillStyle = bg
     ctx.fillRect(0, 0, w, h)
 
-    ctx.font = '80px sans-serif'
+    // ── 顶部光晕 ──
+    var topGlow = ctx.createRadialGradient(w / 2, 120, 20, w / 2, 120, 200)
+    topGlow.addColorStop(0, 'rgba(212, 175, 55, 0.12)')
+    topGlow.addColorStop(1, 'rgba(212, 175, 55, 0)')
+    ctx.fillStyle = topGlow
+    ctx.fillRect(0, 0, w, 350)
+
+    // ── 双框 ──
+    ctx.strokeStyle = 'rgba(212, 175, 55, 0.28)'
+    ctx.lineWidth = 1
+    drawRoundRect(ctx, 36, 36, w - 72, h - 72, 18)
+    ctx.stroke()
+    ctx.strokeStyle = 'rgba(212, 175, 55, 0.10)'
+    drawRoundRect(ctx, 42, 42, w - 84, h - 84, 15)
+    ctx.stroke()
+
+    // ── 角花 ──
+    ctx.strokeStyle = 'rgba(212, 175, 55, 0.25)'
+    ctx.lineWidth = 1.5
+    var cs = 28
+    ctx.beginPath(); ctx.moveTo(36, 36 + cs); ctx.lineTo(36, 36); ctx.lineTo(36 + cs, 36); ctx.stroke()
+    ctx.beginPath(); ctx.moveTo(w - 36 - cs, 36); ctx.lineTo(w - 36, 36); ctx.lineTo(w - 36, 36 + cs); ctx.stroke()
+    ctx.beginPath(); ctx.moveTo(36, h - 36 - cs); ctx.lineTo(36, h - 36); ctx.lineTo(36 + cs, h - 36); ctx.stroke()
+    ctx.beginPath(); ctx.moveTo(w - 36 - cs, h - 36); ctx.lineTo(w - 36, h - 36); ctx.lineTo(w - 36, h - 36 - cs); ctx.stroke()
+
+    // ── 勋章图标 ──
+    ctx.font = '72px sans-serif'
     ctx.fillStyle = '#d4af37'
     ctx.textAlign = 'center'
-    ctx.fillText('🏆', w / 2, 200)
+    ctx.fillText('🏆', w / 2, 180)
 
-    ctx.font = '600 36px sans-serif'
-    ctx.fillStyle = '#e0d8cc'
-    ctx.fillText(data.achieveName || '', w / 2, 300)
+    // ── 成就标题 ──
+    ctx.font = '600 34px sans-serif'
+    ctx.fillStyle = '#e8d4a8'
+    ctx.fillText(data.achieveName || '', w / 2, 260)
 
-    ctx.font = '24px sans-serif'
-    ctx.fillStyle = '#a09888'
-    const lines = wrapText(ctx, data.achieveDesc || '', w - 140)
-    let y = 370
-    for (const line of lines) {
-      ctx.fillText(line, w / 2, y)
-      y += 38
+    ctx.strokeStyle = 'rgba(212, 175, 55, 0.18)'
+    ctx.lineWidth = 0.8
+    ctx.beginPath(); ctx.moveTo(100, 280); ctx.lineTo(w - 100, 280); ctx.stroke()
+
+    // ── 描述 ──
+    ctx.font = '22px sans-serif'
+    ctx.fillStyle = '#b0a898'
+    var lines = wrapText(ctx, data.achieveDesc || '', w - 140)
+    var y = 330
+    for (var k = 0; k < lines.length; k++) {
+      ctx.fillText(lines[k], w / 2, y)
+      y += 36
     }
 
-    ctx.font = '22px sans-serif'
-    ctx.fillStyle = '#7a6e62'
-    ctx.fillText(`已解锁 ${data.unlockedCount || 0} / ${data.total || 0} 项成就`, w / 2, h - 90)
-    ctx.font = '18px sans-serif'
-    ctx.fillText('来自「道性自察」小程序', w / 2, h - 50)
+    // ── 进度 ──
+    ctx.font = '20px sans-serif'
+    ctx.fillStyle = '#908878'
+    ctx.fillText('已解锁 ' + (data.unlockedCount || 0) + ' / ' + (data.total || 0) + ' 项成就', w / 2, h - 200)
+
+    // ── 底部分隔 ──
+    ctx.strokeStyle = 'rgba(212, 175, 55, 0.15)'
+    ctx.beginPath(); ctx.moveTo(70, h - 145); ctx.lineTo(w - 70, h - 145); ctx.stroke()
+
+    // ── 小程序码 ──
+    var codeSize = 68
+    var codeX = w / 2 - codeSize / 2
+    var codeY = h - 130
+    try {
+      var codeImg = null
+      var srcs = [
+        '/subpackages/portrait-assets/images/personality-portraits/index.jpg',
+        '/subpackages/portrait-assets/images/personality-portraits/index.png'
+      ]
+      for (var s = 0; s < srcs.length; s++) {
+        try { codeImg = await loadImage(canvas, srcs[s]); break } catch (e) {}
+      }
+      if (codeImg) {
+        ctx.save()
+        ctx.beginPath()
+        ctx.arc(codeX + codeSize / 2, codeY + codeSize / 2, codeSize / 2 + 2, 0, Math.PI * 2)
+        ctx.fillStyle = 'rgba(255,255,255,0.9)'
+        ctx.fill()
+        ctx.beginPath()
+        ctx.arc(codeX + codeSize / 2, codeY + codeSize / 2, codeSize / 2, 0, Math.PI * 2)
+        ctx.clip()
+        ctx.drawImage(codeImg, codeX, codeY, codeSize, codeSize)
+        ctx.restore()
+        ctx.font = '14px sans-serif'
+        ctx.fillStyle = '#7a6e62'
+        ctx.textAlign = 'center'
+        ctx.fillText('扫码体验「道性自察」', w / 2, codeY + codeSize + 18)
+      } else {
+        ctx.font = '16px sans-serif'
+        ctx.fillStyle = '#7a6e62'
+        ctx.textAlign = 'center'
+        ctx.fillText('来自「道性自察」小程序', w / 2, h - 55)
+      }
+    } catch (e) {
+      ctx.font = '16px sans-serif'
+      ctx.fillStyle = '#7a6e62'
+      ctx.textAlign = 'center'
+      ctx.fillText('来自「道性自察」小程序', w / 2, h - 55)
+    }
   }
 }
 
