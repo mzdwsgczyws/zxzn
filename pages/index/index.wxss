@@ -82,12 +82,19 @@
   margin-bottom: 48rpx;
 }
 
-.idle-warm-tip {
+.idle-warm-lines {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.idle-warm-line {
   display: block;
   text-align: center;
   font-family: var(--dao-font-display);
   font-size: 26rpx;
-  line-height: 1.7;
+  line-height: 1.55;
   color: var(--dao-gold-muted);
   letter-spacing: 2rpx;
   text-shadow:
@@ -124,13 +131,11 @@
 }
 
 .idle-btn {
-  width: 420rpx;
-  padding: 32rpx 24rpx;
-  line-height: 1.4;
+  width: auto;
+  min-width: 400rpx;
+  max-width: 86%;
+  padding: 26rpx 40rpx;
   font-family: "DaoDisplay", "Songti SC", "STSong", "Noto Serif CJK SC", serif;
-  font-size: 32rpx;
-  font-weight: 600;
-  letter-spacing: 4rpx;
   color: #2a1f15;
   background: linear-gradient(165deg, #f0dfa0 0%, #d4af37 40%, #b8892a 100%);
   border: 1rpx solid rgba(232, 212, 168, 0.6);
@@ -138,6 +143,27 @@
   box-shadow: 0 8rpx 28rpx rgba(166, 124, 31, 0.3), 0 1rpx 0 rgba(255, 248, 220, 0.4) inset;
   animation: daoGlowPulse 2.5s ease-in-out infinite;
   transition: transform 0.15s ease;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+.idle-btn-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6rpx;
+}
+
+.idle-btn-line {
+  font-size: 30rpx;
+  font-weight: 600;
+  letter-spacing: 10rpx;
+  line-height: 1.22;
+  color: #2a1f15;
 }
 
 .idle-btn:active {
@@ -154,17 +180,32 @@
   font-size: 24rpx;
   color: var(--dao-gold-muted);
   letter-spacing: 2rpx;
-  margin-top: 24rpx;
-  margin-bottom: 8rpx;
+  margin-top: 28rpx;
+  margin-bottom: 4rpx;
+  max-width: 620rpx;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.55;
+  padding: 0 32rpx;
+  box-sizing: border-box;
 }
 
-.idle-hint {
-  margin-top: 36rpx;
+.idle-hint-wrap {
+  margin-top: 32rpx;
   padding: 0 40rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6rpx;
+  box-sizing: border-box;
+}
+
+.idle-hint-line {
+  display: block;
   font-size: 24rpx;
   color: #9a8b7a;
   text-align: center;
-  line-height: 1.65;
+  line-height: 1.55;
 }
 
 .idle-theory-link {
@@ -220,11 +261,19 @@
   box-sizing: border-box;
 }
 
+.theory-nudge-lines {
+  display: flex;
+  flex-direction: column;
+  gap: 6rpx;
+  align-items: center;
+}
+
 .theory-nudge-line {
   display: block;
   font-size: 24rpx;
   line-height: 1.55;
   color: #5c4d3d;
+  text-align: center;
 }
 
 .theory-nudge-actions {
@@ -740,15 +789,27 @@
   text-shadow: 0 1rpx 0 rgba(255, 255, 255, 0.6);
 }
 
-.sim-tip {
+.sim-tip-wrap {
   position: relative;
   z-index: 2;
   margin-top: 20rpx;
+  padding: 16rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4rpx;
+}
+
+.sim-tip-line {
   font-size: 24rpx;
   color: #6b7a62;
+  text-align: center;
+  line-height: 1.45;
+}
+
+.sim-tip-line--link {
   text-decoration: underline;
   text-decoration-color: rgba(201, 162, 39, 0.45);
-  padding: 16rpx;
 }
 
 /* —— 运算思考模式 —— */
@@ -763,13 +824,26 @@
   border: 1rpx solid var(--dao-border-gold);
 }
 
+.thinking-hint-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+  margin-bottom: 14rpx;
+}
+
 .thinking-hint {
   display: block;
   font-size: 24rpx;
   line-height: 1.62;
   font-weight: 500;
   color: var(--dao-ink-muted);
-  margin-bottom: 14rpx;
+}
+
+.thinking-sub-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+  margin-bottom: 22rpx;
 }
 
 .thinking-sub {
@@ -777,7 +851,6 @@
   font-size: 24rpx;
   line-height: 1.62;
   color: var(--dao-ink-muted);
-  margin-bottom: 22rpx;
 }
 
 .thinking-cat-list {
@@ -1242,7 +1315,9 @@
 }
 
 .hall-strip--triple .hall-btns {
-  gap: 18rpx;
+  gap: 26rpx;
+  padding: 0 8rpx;
+  box-sizing: border-box;
 }
 
 .hall-strip--triple .hall-circle {
@@ -1256,6 +1331,7 @@
 
 .hall-strip--triple .hall-circle-t {
   font-size: 16rpx;
+  white-space: nowrap;
 }
 
 .hall-strip--triple .hall-meta {
@@ -1279,7 +1355,9 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10rpx;
+  gap: 14rpx;
+  flex: 0 1 auto;
+  min-width: 0;
 }
 
 .hall-col-hover {
@@ -1291,19 +1369,30 @@
   font-weight: 600;
   color: #6d5d4a;
   letter-spacing: 1rpx;
+  line-height: 1.25;
+  text-align: center;
+  white-space: nowrap;
 }
 
-.hall-whisper {
+.hall-whisper-lines {
   position: relative;
   z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4rpx;
+  margin-top: 8rpx;
+  padding: 0 28rpx;
+  pointer-events: none;
+}
+
+.hall-whisper-line {
   display: block;
   text-align: center;
   font-size: 20rpx;
   color: #9a8b7a;
   letter-spacing: 2rpx;
-  margin-top: 4rpx;
-  padding: 0 24rpx;
-  pointer-events: none;
+  line-height: 1.45;
 }
 
 .hall-circle {
@@ -1390,9 +1479,9 @@
 }
 
 .dock-home {
-  flex: 0 0 76rpx;
-  width: 76rpx;
-  min-width: 76rpx;
+  flex: 0 0 84rpx;
+  width: 84rpx;
+  min-width: 84rpx;
   margin: 0;
   padding: 0;
   display: flex;
@@ -1515,10 +1604,10 @@
 }
 
 .dock-btn {
-  flex: 1;
+  flex: 1 1 0;
   min-width: 0;
   margin: 0;
-  padding: 18rpx 10rpx;
+  padding: 16rpx 8rpx;
   background: linear-gradient(165deg, rgba(100, 82, 150, 0.55) 0%, rgba(61, 43, 105, 0.92) 48%, rgba(45, 34, 82, 0.95) 100%);
   border-radius: 18rpx;
   border: 1rpx solid rgba(212, 175, 55, 0.42);
@@ -1534,13 +1623,13 @@
 
 .dock-btn-text {
   font-family: "DaoDisplay", "Songti SC", "STSong", "Noto Serif CJK SC", serif;
-  font-size: 26rpx;
+  font-size: 24rpx;
   font-weight: 600;
   color: #e8d4a8;
   letter-spacing: 1rpx;
-  line-height: 1.38;
+  line-height: 1.35;
   text-align: center;
-  white-space: normal;
+  white-space: nowrap;
   word-break: keep-all;
   text-shadow:
     0 0 18rpx rgba(180, 140, 60, 0.35),
@@ -1631,8 +1720,17 @@
   text-align: center;
 }
 
+.rc-lines {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6rpx;
+}
+
 .rc-text {
+  display: block;
   font-size: 26rpx;
   color: var(--dao-purple-mid);
   letter-spacing: 1rpx;
+  line-height: 1.45;
 }

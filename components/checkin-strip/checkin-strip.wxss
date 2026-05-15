@@ -61,9 +61,10 @@
 }
 
 .cs-btn[disabled] {
-  background: var(--dao-ink-faint);
-  color: var(--dao-bg-page);
-  opacity: 0.6;
+  background: linear-gradient(180deg, rgba(100, 92, 130, 0.55) 0%, rgba(62, 54, 88, 0.92) 100%);
+  color: rgba(255, 252, 245, 0.95);
+  opacity: 1;
+  border: 1rpx solid rgba(212, 175, 55, 0.28);
 }
 
 .cs-btn--flash {

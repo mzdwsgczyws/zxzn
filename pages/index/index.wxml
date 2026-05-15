@@ -21,7 +21,10 @@
       style="height: {{mainScrollH}}px;"
     >
       <view class="theory-nudge" wx:if="{{theoryBannerEligible && (phase === 'idle' || phase === 'result')}}">
-        <text class="theory-nudge-line">将道教文化意象与量化自观察结合，供参照、非说教。</text>
+        <view class="theory-nudge-lines">
+          <text class="theory-nudge-line">将道教文化意象与量化自观察结合，</text>
+          <text class="theory-nudge-line">供参照、非说教。</text>
+        </view>
         <view class="theory-nudge-actions">
           <text class="theory-nudge-go" bindtap="readTheoryIntro">阅读简介</text>
           <text class="theory-nudge-x" bindtap="dismissTheoryBanner">关闭</text>
@@ -42,15 +45,26 @@
       <!-- 未抽取：居中入口 -->
       <view class="lot-panel lot-idle" wx:if="{{phase === 'idle'}}">
         <view class="idle-warm-wrap">
-          <text class="idle-warm-tip">今日还未抽取心象箴言，轻触开始试一试吧。</text>
+          <view class="idle-warm-lines">
+            <text class="idle-warm-line">今日还未抽取心象箴言，</text>
+            <text class="idle-warm-line">轻触开始试一试吧。</text>
+          </view>
         </view>
         <view class="idle-deco">
           <text class="idle-moon">☽</text>
         </view>
         <text class="idle-tag">今日心象箴言</text>
-        <button class="idle-btn" bindtap="tapStartLottery" aria-label="开始摇签抽取心象箴言">轻触开始 · 摇动揭晓</button>
+        <button class="idle-btn" bindtap="tapStartLottery" aria-label="开始摇签抽取心象箴言">
+          <view class="idle-btn-inner">
+            <text class="idle-btn-line">轻触开始</text>
+            <text class="idle-btn-line">摇动揭晓</text>
+          </view>
+        </button>
         <text class="idle-seasonal" wx:if="{{seasonalHint}}">{{seasonalHint}}</text>
-        <text class="idle-hint">点击按钮后感应手机摇动，约 9 次有效晃动后生成当日一条</text>
+        <view class="idle-hint-wrap">
+          <text class="idle-hint-line">点击按钮后感应手机摇动，</text>
+          <text class="idle-hint-line">约 9 次有效晃动后生成当日一条</text>
+        </view>
         <text class="idle-theory-link" bindtap="openTheoryIntro">量化 × 修道 · 理念简介</text>
         <text class="idle-treehole-link" bindtap="goTreeHole">心事寄此 · 匿名树洞</text>
       </view>
@@ -84,13 +98,22 @@
           <view class="bamboo-ground"></view>
         </view>
         <text class="shake-tip">{{shakeHint}}</text>
-        <text class="sim-tip" wx:if="{{phase === 'shake'}}" bindtap="simShake">模拟器无感应？点此完成生成</text>
+        <view class="sim-tip-wrap" wx:if="{{phase === 'shake'}}" bindtap="simShake">
+          <text class="sim-tip-line">模拟器无感应？</text>
+          <text class="sim-tip-line sim-tip-line--link">点此完成生成</text>
+        </view>
       </view>
 
       <!-- 运算思考：展示纳入种子的上下文后再进入箴言卡片 -->
       <view class="lot-panel lot-thinking" wx:if="{{phase === 'thinking'}}">
-        <text class="thinking-hint">正在结合您已填写的档案与当日情境，整理纳入本轮箴言上下文的若干门类…</text>
-        <text class="thinking-sub">下列为当日纳入运算的数据门类（不显细节）。完成后将自动进入箴言卡片。</text>
+        <view class="thinking-hint-wrap">
+          <text class="thinking-hint">正在结合您已填写的档案与当日情境，</text>
+          <text class="thinking-hint">整理纳入本轮箴言上下文的若干门类…</text>
+        </view>
+        <view class="thinking-sub-wrap">
+          <text class="thinking-sub">下列为当日纳入运算的数据门类（不显细节）。</text>
+          <text class="thinking-sub">完成后将自动进入箴言卡片。</text>
+        </view>
         <view class="thinking-cat-list">
           <view
             wx:for="{{thinkingCategories}}"
@@ -171,7 +194,10 @@
         </view>
         <text class="fine-print">仅供自察与行动参考，请勿替代专业帮助。</text>
         <view class="ritual-close" wx:if="{{revealed}}" bindtap="goTrack">
-          <text class="rc-text">记录今日状态，让明日箴言更懂你 →</text>
+          <view class="rc-lines">
+            <text class="rc-text">记录今日状态，</text>
+            <text class="rc-text">让明日箴言更懂你 →</text>
+          </view>
         </view>
       </view>
     </scroll-view>
@@ -208,7 +234,10 @@
           <text class="hall-meta">周/月</text>
         </view>
       </view>
-      <text class="hall-whisper">趋势走势示意 · 长按可看释义 · 展馆首次收录</text>
+      <view class="hall-whisper-lines">
+        <text class="hall-whisper-line">趋势走势示意 · 长按可看释义</text>
+        <text class="hall-whisper-line">展馆首次收录</text>
+      </view>
     </view>
 
     <view class="bottom-dock" style="height: {{bottomBarH}}px;">

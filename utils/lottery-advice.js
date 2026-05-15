@@ -1,6 +1,7 @@
 /**
- * 心象箴言建议决策树：综合等第、节气、建除、天气、年龄、性别、道性四维（可缺省），
- * 从多池候选中用稳定种子抽取 ≥5 条，避免每次完全相同。
+ * 心象箴言建议决策树：综合等第、节气、建除、天气、年龄、性别、道性四维（可缺省）、
+ * 档案「关心领域」等，从多池候选中用稳定种子抽取 5–9 条；若档案勾选关心领域，
+ * 其中至少 3 条为对应领域强相关文案。
  */
 
 const { hashStr } = require('./fortune.js')
@@ -100,10 +101,12 @@ function collectCandidates(ctx, rnd) {
     Object.keys(disliked).forEach(c => { catBoost[c] = (catBoost[c] || 0) - Math.min(disliked[c], 2) })
   } catch (e) {}
 
-  const push = (cat, text, weight = 1) => {
+  /** @param {string} [focusTag] 与档案「关心领域」id 对应时标记，供抽取阶段保证强相关条数 */
+  const push = (cat, text, weight = 1, focusTag = null) => {
     const boost = catBoost[cat] || 0
     const w = Math.max(1, weight + boost)
-    for (let i = 0; i < w; i++) out.push({ cat, text })
+    const base = focusTag ? { cat, text, focusTag } : { cat, text }
+    for (let i = 0; i < w; i++) out.push({ ...base })
   }
 
   /* —— 等第与建除 —— */
@@ -304,25 +307,53 @@ function collectCandidates(ctx, rnd) {
 
   const ft = Array.isArray(focusTags) ? focusTags : []
   if (ft.indexOf('work') >= 0) {
-    push('事业', '列出今日三件要务，先做最费脑的那一件。', 2)
+    push('事业', '列出今日三件要务，先做最费脑的那一件。', 3, 'work')
+    push('事业', '把最重要的一件拆成两个 25 分钟番茄，中间起身喝水。', 3, 'work')
+    push('事业', '今天先拒绝新增「顺手帮忙」的琐事，优先收官已有承诺。', 2, 'work')
+    push('事业', '傍晚前留 15 分钟清空收件箱，只回复真正紧急的。', 2, 'work')
+    push('事业', '对拖了很久的那件事：写下下一步最小动作，今天就完成它。', 2, 'work')
   }
   if (ft.indexOf('relation') >= 0) {
-    push('人际', '有话直说但语气温和，避免让对方猜你的态度。', 2)
+    push('人际', '有话直说但语气温和，避免让对方猜你的态度。', 3, 'relation')
+    push('人际', '今天练习十分钟「只听不打断」，让对方把话说完再回应。', 2, 'relation')
+    push('人际', '有误会别隔夜，用「我听到的是…」开头复述对方一句再表态。', 2, 'relation')
+    push('人际', '选一位近期联系少的人，发一句不带目的的真诚问候。', 2, 'relation')
+    push('人际', '遇到摩擦先在心里问：此刻更需要被听见，还是需要解决方案？', 2, 'relation')
   }
   if (ft.indexOf('health') >= 0) {
-    push('起居', '久坐四十分钟起身一次，喝水别久憋。', 2)
+    push('起居', '久坐四十分钟起身一次，喝水别久憋。', 3, 'health')
+    push('起居', '步数目标可温和下调，但尽量把就寝时间钉在同一窗口。', 2, 'health')
+    push('饮食', '午餐避开最油的那份，下午精神更稳。', 2, 'health')
+    push('起居', '工作间隙做两次肩颈绕环，每次 30 秒就够。', 2, 'health')
+    push('起居', '把水杯放在视线里，看见就喝一口，小口多次。', 2, 'health')
   }
   if (ft.indexOf('study') >= 0) {
-    push('学业', '今日只攻坚一个概念，学完用自己的话复述一遍。', 2)
+    push('学业', '今日只攻坚一个概念，学完用自己的话复述一遍。', 3, 'study')
+    push('学业', '用费曼法：讲给手机录音听一遍，卡壳处就是真漏洞。', 2, 'study')
+    push('学业', '刷题前先订 25 分钟只看书，手机放到另一个房间。', 2, 'study')
+    push('学业', '复习优先错题与讲义空白处，不做全套机械重抄。', 2, 'study')
+    push('学业', '把易错点浓缩成三条「防呆口诀」，写在小卡片上随身看。', 2, 'study')
   }
   if (ft.indexOf('finance') >= 0) {
-    push('事业', '扫一眼近期一笔支出是否可延后，减少冲动消费。', 1)
+    push('事业', '扫一眼近期一笔支出是否可延后，减少冲动消费。', 3, 'finance')
+    push('事业', '今天只记录不评判：写下三笔固定支出和一笔可延后支出。', 2, 'finance')
+    push('事业', '大额非刚需支出，设 24 小时冷静期再决定。', 2, 'finance')
+    push('事业', '把「想要」和「需要」分两列写在便签上，对照后再下单。', 2, 'finance')
+    push('事业', '检查自动续费与订阅，关掉半年未用的那一项。', 2, 'finance')
   }
   if (ft.indexOf('family') >= 0) {
-    push('人际', '给家人一条简短问候，表达在场即可，不必长聊。', 2)
+    push('人际', '给家人一条简短问候，表达在场即可，不必长聊。', 3, 'family')
+    push('人际', '吃饭时收起工作消息 20 分钟，专注听家人一句近况。', 2, 'family')
+    push('人际', '家务挑一件能一起做的，比各自刷手机更像陪伴。', 2, 'family')
+    push('人际', '对孩子或父母：先肯定一件小事，再提建议。', 2, 'family')
+    push('人际', '有对外说法前，先家庭内部小范围对齐口径。', 2, 'family')
   }
   if (ft.indexOf('rest') >= 0) {
-    push('情绪', '留出半小时完全脱离工作消息，纯休息或发呆。', 2)
+    push('情绪', '留出半小时完全脱离工作消息，纯休息或发呆。', 3, 'rest')
+    push('起居', '午后头昏时闭眼听白噪声 10 分钟，也算有效休息。', 2, 'rest')
+    push('行动', '今天的休息 KPI：不看工作群满 45 分钟。', 2, 'rest')
+    push('起居', '选一段走路或洗澡当「脑内静音时间」，不听播客。', 2, 'rest')
+    push('起居', '饭后散步十分钟，往往比第二杯咖啡更回血。', 2, 'rest')
   }
 
   if (lotTitle) {
@@ -473,12 +504,14 @@ function normalizeAvoidTexts(avoidAdviceTexts) {
 
 /**
  * 贪心选取：优先不与上一条同 cat、优先避开上一轮抽签出现过的正文；
- * 候选不足时逐级放宽，保证尽量凑满 need。
+ * 候选不足时逐级放宽，直到凑满 targetCount 或候选耗尽。
+ * @param {{cat:string,text:string,focusTag?:string}[]} [seedRes] 已选条目（会并入结果并参与去重）
  */
-function uniquePick(list, rnd, need, avoidAdviceTexts) {
+function uniquePick(list, rnd, targetCount, avoidAdviceTexts, seedRes) {
   const avoid = normalizeAvoidTexts(avoidAdviceTexts)
   const seen = new Set()
-  const res = []
+  const res = Array.isArray(seedRes) ? seedRes.slice() : []
+  res.forEach((p) => seen.add(p.text))
   const shuffled = list.slice()
   for (let i = shuffled.length - 1; i > 0; i--) {
     const j = Math.floor(rnd() * (i + 1))
@@ -487,7 +520,7 @@ function uniquePick(list, rnd, need, avoidAdviceTexts) {
     shuffled[j] = t
   }
 
-  while (res.length < need) {
+  while (res.length < targetCount) {
     const lastCat = res.length ? res[res.length - 1].cat : null
     const candidates = shuffled.filter((it) => !seen.has(it.text))
     if (!candidates.length) break
@@ -652,25 +685,133 @@ function computeLotteryAdvices(input) {
     userTone
   }
   const pool = collectCandidates(ctx, rnd)
-  const need = 8
-  const allPicked = uniquePick(pool, rnd, need, avoidAdviceTexts)
+  const ftArr = Array.isArray(focusTags) ? focusTags.filter(Boolean) : []
+  /** 5–9 条（含），稳定随机 */
+  const adviceTotal = 5 + Math.floor(rnd() * 5)
+  const focusNeed = ftArr.length ? 3 : 0
+  const focusPool = ftArr.length ? pool.filter((it) => it.focusTag && ftArr.indexOf(it.focusTag) >= 0) : []
 
-  const dataAdvice = buildDataDrivenAdvice(ctx)
-  const topPicked = allPicked.slice(0, 3)
-  if (dataAdvice && topPicked.length >= 2) {
-    topPicked[topPicked.length - 1] = dataAdvice
+  let allPicked = uniquePick(focusPool, rnd, focusNeed, avoidAdviceTexts)
+  allPicked = uniquePick(pool, rnd, adviceTotal, avoidAdviceTexts, allPicked)
+
+  let topPicked = allPicked.slice()
+  const countFocusIn = (arr) =>
+    ftArr.length ? arr.filter((p) => p.focusTag && ftArr.indexOf(p.focusTag) >= 0).length : 0
+  if (ftArr.length) {
+    let fc = countFocusIn(topPicked)
+    if (fc < 3) {
+      const used = new Set(topPicked.map((p) => p.text))
+      const seenTx = new Set()
+      const extras = []
+      const sh = pool.filter((it) => it.focusTag && ftArr.indexOf(it.focusTag) >= 0 && !used.has(it.text))
+      for (let i = sh.length - 1; i > 0; i--) {
+        const j = Math.floor(rnd() * (i + 1))
+        const t = sh[i]
+        sh[i] = sh[j]
+        sh[j] = t
+      }
+      sh.forEach((it) => {
+        if (seenTx.has(it.text)) return
+        seenTx.add(it.text)
+        extras.push(it)
+      })
+      while (fc < 3 && extras.length) {
+        const m = extras.shift()
+        if (used.has(m.text)) continue
+        let rep = topPicked.findIndex((p) => !p.focusTag || ftArr.indexOf(p.focusTag) < 0)
+        if (rep < 0) rep = topPicked.length - 1
+        used.delete(topPicked[rep].text)
+        topPicked[rep] = m
+        used.add(m.text)
+        fc = countFocusIn(topPicked)
+      }
+    }
   }
 
-  const structured = topPicked.map((p, i) => ({
+  const dataAdvice = buildDataDrivenAdvice(ctx)
+  if (dataAdvice && topPicked.length) {
+    const dup = topPicked.some((p) => p.text === dataAdvice.text)
+    if (!dup) {
+      let rep = -1
+      for (let i = topPicked.length - 1; i >= 0; i--) {
+        const p = topPicked[i]
+        if (!p.focusTag || ftArr.indexOf(p.focusTag) < 0) {
+          rep = i
+          break
+        }
+      }
+      if (rep >= 0) {
+        topPicked[rep] = dataAdvice
+      }
+    }
+  }
+
+  if (ftArr.length && countFocusIn(topPicked) < 3) {
+    let fc = countFocusIn(topPicked)
+    const used = new Set(topPicked.map((p) => p.text))
+    const seenTx = new Set()
+    const extras = []
+    const sh = pool.filter((it) => it.focusTag && ftArr.indexOf(it.focusTag) >= 0 && !used.has(it.text))
+    for (let i = sh.length - 1; i > 0; i--) {
+      const j = Math.floor(rnd() * (i + 1))
+      const t = sh[i]
+      sh[i] = sh[j]
+      sh[j] = t
+    }
+    sh.forEach((it) => {
+      if (seenTx.has(it.text)) return
+      seenTx.add(it.text)
+      extras.push(it)
+    })
+    while (fc < 3 && extras.length) {
+      const m = extras.shift()
+      if (used.has(m.text)) continue
+      let rep = topPicked.findIndex((p) => !p.focusTag || ftArr.indexOf(p.focusTag) < 0)
+      if (rep < 0) rep = topPicked.length - 1
+      used.delete(topPicked[rep].text)
+      topPicked[rep] = m
+      used.add(m.text)
+      fc = countFocusIn(topPicked)
+    }
+  }
+
+  const padIfShort = (arr) => {
+    const pads = [
+      { cat: '起居', text: '睡前 30 分钟调暗灯光，减少短视频滑动。' },
+      { cat: '饮食', text: '吃饭七分饱就好，慢慢嚼别着急。' },
+      { cat: '情绪', text: '心里烦时，先写下来，再去做一件最小的事。' },
+      { cat: '人际', text: '发一条真诚感谢给最近帮过你的人，不求回复。' },
+      { cat: '事业', text: '用 25 分钟只处理一件琐事，做完即停。' },
+      { cat: '行动', text: '整理桌面或手机首屏，降低启动阻力。' },
+      { cat: '日常', text: '今日对自己少下结论，多留意当下就好。' }
+    ]
+    const out = arr.slice()
+    let pi = 0
+    while (out.length < 5 && pi < pads.length) {
+      const pl = pads[pi++]
+      if (!out.some((p) => p.text === pl.text)) {
+        out.push({
+          cat: pl.cat,
+          text: pl.text,
+          reason: '',
+          microAction: deriveMicroAction(pl.cat, pl.text, rnd)
+        })
+      }
+    }
+    return out
+  }
+
+  let structured = topPicked.map((p) => ({
     cat: p.cat,
     text: p.text,
     reason: p.reason || '',
-    microAction: p.microAction || deriveMicroAction(p.cat, p.text, rnd),
+    microAction: p.microAction || deriveMicroAction(p.cat, p.text, rnd)
   }))
+  structured = padIfShort(structured)
 
   const lines = structured.map((s, i) => `${i + 1}. ${s.text}`)
   const result = {
-    lines: lines.length >= 2 ? lines : lines.concat(['2. 今日把作息摆在第一位，外事能缓则缓。', '3. 记下一件已经做完的小事，给自己一点认可。']),
+    lines,
     structured
   }
   return result
