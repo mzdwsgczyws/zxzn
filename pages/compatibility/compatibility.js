@@ -13,35 +13,40 @@ Page({
   },
 
   onLoad(opts) {
-    const my = wx.getStorageSync(KEYS.PERSONALITY_RESULT)
-    if (my && my.scores) {
-      this.setData({ myScores: my.scores })
-    }
+    var myScores = null
+    var peerScores = null
+
+    var my = wx.getStorageSync(KEYS.PERSONALITY_RESULT)
+    if (my && my.scores) myScores = my.scores
+
     if (opts && opts.typeId) {
       try {
-        const { PERSONALITY_TYPES } = require('../../utils/personality.js')
-        const peerType = PERSONALITY_TYPES[Number(opts.typeId)]
+        var { PERSONALITY_TYPES } = require('../../utils/personality.js')
+        var peerType = PERSONALITY_TYPES[Number(opts.typeId)]
         if (peerType && peerType.vector) {
-          const v = peerType.vector
-          this.setData({
-            peerScores: {
-              动: Math.round(v[0] * 100),
-              刚: Math.round(v[1] * 100),
-              散: Math.round(v[2] * 100),
-              显: Math.round(v[3] * 100)
-            }
-          })
+          var v = peerType.vector
+          peerScores = {
+            动: Math.round(v[0] * 100),
+            刚: Math.round(v[1] * 100),
+            散: Math.round(v[2] * 100),
+            显: Math.round(v[3] * 100)
+          }
         }
-      } catch (e) {}
+      } catch (e) {
+        console.warn('compatibility: failed to load peer type', e)
+      }
     }
-    this._compute()
+
+    this.setData({ myScores: myScores, peerScores: peerScores })
+    this._compute(myScores, peerScores)
   },
 
-  _compute() {
-    const { myScores, peerScores } = this.data
+  _compute(myScores, peerScores) {
+    myScores = myScores || this.data.myScores
+    peerScores = peerScores || this.data.peerScores
     if (!myScores || !peerScores) return
-    const result = computeCompatibility(myScores, peerScores)
-    this.setData({ result })
+    var result = computeCompatibility(myScores, peerScores)
+    this.setData({ result: result })
   },
 
   onShareAppMessage() {

@@ -10,7 +10,7 @@ Page({
       {
         icon: '☽',
         title: '道性自察 · 量化自修',
-        body: '将道教文化意象与量化自观察结合，以工程诚实面对自己，以道家智慧提醒勿被指标反噬。'
+        body: '将道教文化意象与量化自修结合，以工程诚实面对自己，以道家智慧提醒勿被指标反噬。'
       },
       {
         icon: '◇',
@@ -58,7 +58,7 @@ Page({
         statusBarPx: sb,
         swiperHeightPx: Math.max(280, h)
       })
-    } catch (e) {}
+    } catch (e) { console.warn('onboarding:layoutSwiper', e) }
   },
 
   onSwiperChange(e) {
@@ -83,6 +83,6 @@ Page({
   _markDone() {
     try {
       wx.setStorageSync(KEYS.ONBOARDING_DONE, true)
-    } catch (e) {}
+    } catch (e) { console.warn('onboarding:markDone', e) }
   }
 })

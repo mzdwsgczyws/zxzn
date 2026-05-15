@@ -81,7 +81,7 @@ function computeAnnualReport(year) {
         return String(ds).indexOf(yearStr + '-') === 0
       }).length
     }
-  } catch (e) {}
+  } catch (e) { console.warn('annualReport:trackRecords', e) }
 
   // --- 成就 ---
   var achievements = computeAchievements()

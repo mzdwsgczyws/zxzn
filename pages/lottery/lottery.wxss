@@ -892,6 +892,14 @@
   color: var(--dao-ink-body, #4a4034);
 }
 
+.fine-print {
+  margin: 28rpx 48rpx 0;
+  font-size: 22rpx;
+  color: #a0907c;
+  line-height: 1.5;
+  text-align: center;
+}
+
 .poster-canvas-offscreen {
   position: fixed;
   left: -9999px;

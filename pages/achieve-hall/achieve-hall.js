@@ -39,7 +39,7 @@ Page({
     try {
       const sb = computeSolarBadges()
       this.setData({ solarBadges: sb.list, solarCount: sb.count })
-    } catch (e) {}
+    } catch (e) { console.warn('achieveHall:solarBadges', e) }
   },
 
   onShareAppMessage() {

@@ -12,9 +12,9 @@ Page({
     tierList: []
   },
 
-  onLoad() {
-    const y = new Date().getFullYear()
-    this.setData({ year: y, currentYear: y })
+  onLoad(opts) {
+    const y = (opts && opts.year) ? Number(opts.year) : new Date().getFullYear()
+    this.setData({ year: y, currentYear: new Date().getFullYear() })
     this._refresh(y)
   },
 
@@ -47,7 +47,7 @@ Page({
     const keyword = r ? r.keyword : ''
     return {
       title: '我的 ' + this.data.year + ' 年度修炼关键词：' + keyword,
-      path: '/pages/annual-report/annual-report'
+      path: '/pages/annual-report/annual-report?year=' + this.data.year
     }
   }
 })

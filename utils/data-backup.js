@@ -31,7 +31,7 @@ function exportData() {
         if (val !== '' && val !== undefined && val !== null) {
           payload[key] = val
         }
-      } catch (e) {}
+      } catch (e) { console.warn('exportData:read', e) }
     })
 
     const jsonStr = JSON.stringify(payload, null, 2)
@@ -95,7 +95,7 @@ function importData() {
                   try {
                     wx.setStorageSync(key, data[key])
                     restored++
-                  } catch (e) {}
+                  } catch (e) { console.warn('importData:write', e) }
                 }
               })
               resolve({ ok: true, restored, total: EXPORT_KEYS.length })

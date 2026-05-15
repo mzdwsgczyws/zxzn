@@ -1,5 +1,4 @@
 const usageAnalytics = require('./utils/usage-analytics.js')
-const KEYS = require('./utils/storage-keys.js')
 
 App({
   onLaunch() {

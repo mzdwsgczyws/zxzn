@@ -37,7 +37,7 @@ function loadChallenge() {
 }
 
 function saveChallenge(obj) {
-  try { wx.setStorageSync(WEEKLY_CHALLENGE, obj) } catch (e) {}
+  try { wx.setStorageSync(WEEKLY_CHALLENGE, obj) } catch (e) { console.warn('saveChallenge', e) }
 }
 
 function findWeakestElement() {
@@ -46,7 +46,9 @@ function findWeakestElement() {
     var records = wx.getStorageSync(KEYS.TRACK_RECORDS) || []
     if (!records.length) return null
     var sorted = records.slice().sort(function (a, b) {
-      return (a.dateStr || '').localeCompare(b.dateStr || '')
+      var pa = String(a.dateStr || '0-0-0').split('-').map(Number)
+      var pb = String(b.dateStr || '0-0-0').split('-').map(Number)
+      return new Date(pa[0], pa[1] - 1, pa[2]) - new Date(pb[0], pb[1] - 1, pb[2])
     })
     var fe = computeFiveElements(sorted, null, null)
     if (!fe || !fe.hasData) return null
@@ -138,7 +140,11 @@ function updateChallengeProgress(dateStr, data) {
   if (!saved.completed) {
     var consecutivePasses = 0
     var sorted = saved.progress.slice().sort(function (a, b) {
-      return a.dateStr.localeCompare(b.dateStr)
+      var pa = String(a.dateStr).split('-').map(Number)
+      var pb = String(b.dateStr).split('-').map(Number)
+      var ta = new Date(pa[0], pa[1] - 1, pa[2]).getTime()
+      var tb = new Date(pb[0], pb[1] - 1, pb[2]).getTime()
+      return ta - tb
     })
     for (var i = 0; i < sorted.length; i++) {
       if (sorted[i].pass) {
@@ -166,7 +172,7 @@ function awardBadge(badgeName) {
       badges.push(badgeName)
       wx.setStorageSync(CHALLENGE_BADGES, badges)
     }
-  } catch (e) {}
+  } catch (e) { console.warn('awardBadge', e) }
 }
 
 function getChallengeBadges() {

@@ -11,7 +11,7 @@ function loadHistoryRaw() {
     if (raw && Array.isArray(raw.draws)) {
       return { version: 1, draws: raw.draws }
     }
-  } catch (e) {}
+  } catch (e) { console.warn('loadHistoryRaw', e) }
   return { version: 1, draws: [] }
 }
 
@@ -27,7 +27,7 @@ function appendLotteryDraw(entry) {
       title: String(entry.title || '')
     })
     wx.setStorageSync(KEYS.LOTTERY_HISTORY, raw)
-  } catch (e) {}
+  } catch (e) { console.warn('appendLotteryDraw', e) }
 }
 
 function pad2(n) {
@@ -259,24 +259,24 @@ const ACHIEVEMENT_DEFS = [
     commentLocked: '若连续多日落在低位档，记得对自己温柔一点。'
   },
   {
-    id: 'streak_draw_upper3',
-    name: '连中三元',
-    subtitle: '连续三个日历日的末次抽签均为上或上上',
+    id: 'streak_draw_upper5',
+    name: '连中五元',
+    subtitle: '连续五个日历日的末次抽签均为上或上上',
     accent: 'gold',
-    stars: 2,
-    test: (s) => s.drawUpperStreak >= 3,
-    comment: '三个连续「抽签日」末抽都在高位——趁热把一件小事收尾，别一口气开太多新坑。',
-    commentLocked: '连续三个日历日、每日以最后一次抽签为准，均为「上」或「上上」档即可解锁。'
+    stars: 3,
+    test: (s) => s.drawUpperStreak >= 5,
+    comment: '五天末抽都在高位——手感正热，但别忘了留白给自己，别一口气开太多新坑。',
+    commentLocked: '连续五个日历日、每日以最后一次抽签为准，均为「上」或「上上」档即可解锁。'
   },
   {
-    id: 'streak_draw_lower3',
-    name: '逆风三连',
-    subtitle: '连续三个日历日的末次抽签均为下或下下',
+    id: 'streak_draw_lower5',
+    name: '逆风五连',
+    subtitle: '连续五个日历日的末次抽签均为下或下下',
     accent: 'slate',
-    stars: 2,
-    test: (s) => s.drawLowerStreak >= 3,
-    comment: '三个连续「抽签日」末抽都在低位……出门晒晒太阳、走十分钟，比盯着屏幕反复想更管用。',
-    commentLocked: '（但愿用不上）连续三个日历日末抽均为「下」或「下下」档时出现。'
+    stars: 3,
+    test: (s) => s.drawLowerStreak >= 5,
+    comment: '五天末抽都在低位……出门晒晒太阳、走十分钟，比盯着屏幕反复想更管用。',
+    commentLocked: '（但愿用不上）连续五个日历日末抽均为「下」或「下下」档时出现。'
   },
   {
     id: 'collect_all_shangshang',
@@ -379,7 +379,7 @@ const ACHIEVEMENT_DEFS = [
     subtitle: '连续打卡 7 天',
     accent: 'green',
     stars: 1,
-    test: (s) => s.checkinStreak >= 7 || s.checkinTotal >= 7,
+    test: (s) => s.checkinStreak >= 7,
     comment: '连续七天都来打卡了——习惯的种子已经扎根。',
     commentLocked: '连续打卡 7 天即可解锁。'
   },
@@ -389,7 +389,7 @@ const ACHIEVEMENT_DEFS = [
     subtitle: '连续打卡 21 天',
     accent: 'green',
     stars: 2,
-    test: (s) => s.checkinStreak >= 21 || s.checkinTotal >= 21,
+    test: (s) => s.checkinStreak >= 21,
     comment: '二十一天足以养成一个小习惯——这份坚持已经说明了一切。',
     commentLocked: '连续打卡 21 天即可解锁。'
   },

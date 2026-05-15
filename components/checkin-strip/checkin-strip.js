@@ -12,6 +12,7 @@ Component({
   },
   observers: {
     checkedToday(val) {
+      if (this._collapseTimer) clearTimeout(this._collapseTimer)
       if (val && this.data.expanded) {
         this._collapseTimer = setTimeout(() => {
           this.triggerEvent('toggle', { expanded: false })

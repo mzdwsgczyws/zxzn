@@ -32,10 +32,7 @@
         </view>
       </view>
     </view>
-    <view class="footer-space"></view>
-  </scroll-view>
-
-  <view class="solar-section" wx:if="{{solarBadges.length}}">
+    <view class="solar-section" wx:if="{{solarBadges.length}}">
     <text class="solar-title">节气徽章册 · 已集 {{solarCount}}/24</text>
     <view class="solar-grid">
       <view wx:for="{{solarBadges}}" wx:key="name" class="solar-cell {{item.collected ? 'solar-on' : 'solar-off'}}">
@@ -43,7 +40,9 @@
         <text class="solar-date" wx:if="{{item.collectDate}}">{{item.collectDate}}</text>
       </view>
     </view>
-  </view>
+    </view>
+    <view class="footer-space"></view>
+  </scroll-view>
 
   <view class="press-layer" wx:if="{{pressVisible}}">
     <view class="press-panel">

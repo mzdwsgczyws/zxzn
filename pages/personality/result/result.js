@@ -338,7 +338,7 @@ function paintResultPoster(
   )
   y += 32
   applyTextStyle(ctx, is2d, '#a0907c', 20)
-  ctx.fillText('量化自修正念 · 仅供文化参考', 56, H - 56)
+  ctx.fillText('道性自察 · 仅供文化参考', 56, H - 56)
 }
 
 function getImageInfoPath(src) {

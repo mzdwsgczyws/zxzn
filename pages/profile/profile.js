@@ -17,7 +17,7 @@ const RECENT_VALUES = [null, 'low', 'mid', 'high']
 
 const EMOTION_LABELS = [
   '自动（据近期状态与道性推测）',
-  '偏安抚（心浮气燥时）',
+  '偏安抚（心浮气躁时）',
   '偏鼓励（低落时）',
   '偏同理（易怒好辩时）',
   '仅中性签条（语气均衡）'
@@ -107,6 +107,7 @@ Page({
 
   onLoad(opts) {
     if (opts && opts.expand === '1') {
+      this._fromExpand = true
       this.setData({ formExpanded: true })
     }
   },
@@ -116,9 +117,11 @@ Page({
   },
 
   _goHomeAfterSave() {
-    setTimeout(() => {
-      wx.reLaunch({ url: '/pages/index/index' })
-    }, 1000)
+    if (this._fromExpand) {
+      setTimeout(() => {
+        wx.reLaunch({ url: '/pages/index/index' })
+      }, 1000)
+    }
   },
 
   goFortuneTrend() {
@@ -256,7 +259,7 @@ Page({
   },
 
   onShow() {
-    try { this.setData({ rankInfo: computeRank() }) } catch (e) {}
+    try { this.setData({ rankInfo: computeRank() }) } catch (e) { console.warn('profile:rank', e) }
 
     const p = wx.getStorageSync(KEYS.USER_PROFILE) || {}
     let gi = 0
@@ -351,7 +354,7 @@ Page({
     try {
       const lf = wx.getStorageSync(KEYS.LARGE_FONT)
       this.setData({ largeFont: !!lf })
-    } catch (e) {}
+    } catch (e) { console.warn('profile:largeFont', e) }
 
     this._refreshSummary(p)
   },

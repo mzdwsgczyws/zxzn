@@ -104,6 +104,9 @@
     </block>
   </view>
 
+  <view class="fine-print" wx:if="{{phase === 'result' && revealed}}">
+    <text>箴言与建议仅供自察与行动参考，不构成任何心理或医疗建议。如有困扰，请寻求专业帮助。</text>
+  </view>
   <view class="footer safe-bottom" wx:if="{{phase === 'result' && revealed}}">
     <button class="btn-primary share-btn" open-type="share">分享给好友</button>
     <button class="btn-ghost" bindtap="generateMaximPoster">生成箴言分享卡</button>

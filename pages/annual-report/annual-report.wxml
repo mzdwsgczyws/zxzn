@@ -23,7 +23,7 @@
         </view>
         <view class="stat-item">
           <text class="stat-num">{{report.uniqueLots}}</text>
-          <text class="stat-label">收集种数</text>
+          <text class="stat-label">签文种类</text>
         </view>
       </view>
       <view class="tier-row">

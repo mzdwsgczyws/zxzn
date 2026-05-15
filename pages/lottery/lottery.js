@@ -4,6 +4,7 @@ const { isLotteryProfileComplete } = require('../../utils/profile-lottery.js')
 const pageAnalytics = require('../../behaviors/page-analytics.js')
 const { recordShare } = require('../../utils/usage-analytics.js')
 const poster = require('../../utils/poster-engine.js')
+const adviceFb = require('../../utils/advice-feedback.js')
 
 Page({
   behaviors: [pageAnalytics],
@@ -63,7 +64,7 @@ Page({
     recordShare('/pages/lottery/lottery')
     const { lot } = this.data
     return {
-      title: lot ? `今日心象箴言：${lot.tierLabel} · ${lot.title}` : '今日心象箴言 · 量化自修正念',
+      title: lot ? `今日心象箴言：${lot.tierLabel} · ${lot.title}` : '道性自察 · 每日箴言',
       path: '/pages/lottery/lottery'
     }
   },
@@ -72,7 +73,7 @@ Page({
     recordShare('timeline:lottery')
     const { lot } = this.data
     return {
-      title: lot ? `今日心象箴言 · ${lot.tierLabel} · ${lot.title}` : '今日心象箴言 · 量化自修正念'
+      title: lot ? `今日心象箴言 · ${lot.tierLabel} · ${lot.title}` : '道性自察 · 每日箴言'
     }
   },
 
@@ -93,45 +94,8 @@ Page({
     core.skipThinkingReveal(this)
   },
 
-  tapAdviceLike() {
-    if (this.data.adviceFbDone) return
-    this.setData({ adviceFbDone: true })
-    try {
-      const fb = wx.getStorageSync(KEYS.ADVICE_FEEDBACK) || { liked: {}, dislikedTexts: [], likedCats: {}, dislikedCats: {} }
-      if (!fb.likedCats) fb.likedCats = {}
-      const structured = this.data.adviceStructured || []
-      const list = this.data.adviceList || []
-      structured.forEach((s) => {
-        if (s.cat) fb.likedCats[s.cat] = (fb.likedCats[s.cat] || 0) + 1
-      })
-      list.forEach((line) => {
-        const cat = String(line).replace(/^\d+\.\s*/, '').slice(0, 2)
-        fb.liked[cat] = (fb.liked[cat] || 0) + 1
-      })
-      wx.setStorageSync(KEYS.ADVICE_FEEDBACK, fb)
-    } catch (e) {}
-    wx.showToast({ title: '感谢反馈', icon: 'none' })
-  },
-
-  tapAdviceSkip() {
-    if (this.data.adviceFbDone) return
-    this.setData({ adviceFbDone: true })
-    try {
-      const fb = wx.getStorageSync(KEYS.ADVICE_FEEDBACK) || { liked: {}, dislikedTexts: [], likedCats: {}, dislikedCats: {} }
-      if (!fb.dislikedCats) fb.dislikedCats = {}
-      const structured = this.data.adviceStructured || []
-      const list = this.data.adviceList || []
-      structured.forEach((s) => {
-        if (s.cat) fb.dislikedCats[s.cat] = (fb.dislikedCats[s.cat] || 0) + 1
-      })
-      const texts = list.map((l) => String(l).replace(/^\s*\d+\.\s*/, '').trim()).filter(Boolean)
-      const s = new Set(fb.dislikedTexts || [])
-      texts.forEach((t) => s.add(t))
-      fb.dislikedTexts = Array.from(s).slice(-50)
-      wx.setStorageSync(KEYS.ADVICE_FEEDBACK, fb)
-    } catch (e) {}
-    wx.showToast({ title: '已记录', icon: 'none' })
-  },
+  tapAdviceLike() { adviceFb.handleLike(this) },
+  tapAdviceSkip() { adviceFb.handleSkip(this) },
 
   async generateMaximPoster() {
     const { lot } = this.data

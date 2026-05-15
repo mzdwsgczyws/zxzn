@@ -159,6 +159,7 @@ function restoreToday(page, options) {
         tierColor: TIER_COLORS[lot.tier] || '#1565c0',
         adviceList: cache.adviceList || [],
         adviceStructured: cache.adviceStructured || [],
+        adviceFbDone: !!cache.adviceFbDone,
         thinkingCategories: [],
         thinkingFootnote: '',
         thinkingVisibleCount: 0,
@@ -236,7 +237,7 @@ function startAccel(page) {
 function stopAccel(page) {
   try {
     wx.stopAccelerometer()
-  } catch (e) {}
+  } catch (e) { console.warn('stopAccel', e) }
   wx.offAccelerometerChange()
 }
 
@@ -253,9 +254,10 @@ function drawLot(page) {
   page.setData({ phase: 'anim', shaking: true, shakeHint: '内容生成中，请稍候…' })
   const { lat, lng } = readProfileLatLng()
   if (lat != null && lng != null) {
-    fetchWeather(lat, lng).then((w) => {
-      finalizeDraw(page, lat, lng, w)
-    })
+    var weatherTimeout = new Promise((resolve) => setTimeout(() => resolve(null), 4000))
+    Promise.race([fetchWeather(lat, lng), weatherTimeout])
+      .then((w) => finalizeDraw(page, lat, lng, w))
+      .catch(() => finalizeDraw(page, lat, lng, null))
     return
   }
   finalizeDraw(page, null, null, null)
@@ -305,7 +307,7 @@ function finalizeDraw(page, lat, lng, weather) {
     if (Array.isArray(fb.dislikedTexts)) {
       avoidAdviceTexts = avoidAdviceTexts.concat(fb.dislikedTexts)
     }
-  } catch (e) {}
+  } catch (e) { console.warn('loadAvoidAdvice', e) }
 
   const adviceResult = computeLotteryAdvices({
     dateStr: meta.dateStr,
@@ -331,7 +333,7 @@ function finalizeDraw(page, lat, lng, weather) {
   try {
     const texts = (Array.isArray(adviceList) ? adviceList : []).map(stripAdvicePlainLine).filter(Boolean)
     wx.setStorageSync(KEYS.LOTTERY_ADVICE_RECENT, { texts, ts: now.getTime() })
-  } catch (e) {}
+  } catch (e) { console.warn('saveAdviceRecent', e) }
 
   const drawVer = ++gLotDrawVer
   const payload = {
@@ -430,7 +432,7 @@ function clearLotCanvas(page) {
     const ctx = wx.createCanvasContext(getCanvasId(page), page)
     ctx.clearRect(0, 0, w, h)
     ctx.draw(false)
-  } catch (e) {}
+  } catch (e) { console.warn('clearLotCanvas', e) }
 }
 
 function paintLotToCanvas(page, w, h, lot) {

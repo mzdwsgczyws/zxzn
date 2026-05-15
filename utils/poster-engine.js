@@ -304,12 +304,26 @@ function tplMaxim(data) {
  * data: { typeName, typeCode, description }
  */
 function tplPersonality(data) {
-  return async function (ctx, w, h) {
-    const gradient = ctx.createLinearGradient(0, 0, 0, h)
-    gradient.addColorStop(0, '#1a1530')
-    gradient.addColorStop(1, '#0d0b14')
-    ctx.fillStyle = gradient
+  return async function (ctx, w, h, dpr, canvas) {
+    var bg = ctx.createLinearGradient(0, 0, w * 0.3, h)
+    bg.addColorStop(0, '#1f1840')
+    bg.addColorStop(0.4, '#17122e')
+    bg.addColorStop(1, '#0d0a18')
+    ctx.fillStyle = bg
     ctx.fillRect(0, 0, w, h)
+
+    ctx.strokeStyle = 'rgba(212, 175, 55, 0.28)'
+    ctx.lineWidth = 1
+    drawRoundRect(ctx, 36, 36, w - 72, h - 72, 18)
+    ctx.stroke()
+
+    var cs = 28
+    ctx.strokeStyle = 'rgba(212, 175, 55, 0.25)'
+    ctx.lineWidth = 1.5
+    ctx.beginPath(); ctx.moveTo(36, 36 + cs); ctx.lineTo(36, 36); ctx.lineTo(36 + cs, 36); ctx.stroke()
+    ctx.beginPath(); ctx.moveTo(w - 36 - cs, 36); ctx.lineTo(w - 36, 36); ctx.lineTo(w - 36, 36 + cs); ctx.stroke()
+    ctx.beginPath(); ctx.moveTo(36, h - 36 - cs); ctx.lineTo(36, h - 36); ctx.lineTo(36 + cs, h - 36); ctx.stroke()
+    ctx.beginPath(); ctx.moveTo(w - 36 - cs, h - 36); ctx.lineTo(w - 36, h - 36); ctx.lineTo(w - 36, h - 36 - cs); ctx.stroke()
 
     ctx.font = 'bold 72px sans-serif'
     ctx.fillStyle = 'rgba(212, 175, 55, 0.1)'
@@ -320,18 +334,61 @@ function tplPersonality(data) {
     ctx.fillStyle = '#d4af37'
     ctx.fillText(data.typeName || '', w / 2, 300)
 
+    ctx.strokeStyle = 'rgba(212, 175, 55, 0.18)'
+    ctx.lineWidth = 0.8
+    ctx.beginPath(); ctx.moveTo(100, 320); ctx.lineTo(w - 100, 320); ctx.stroke()
+
     ctx.font = '24px sans-serif'
     ctx.fillStyle = '#c4b8a8'
-    const lines = wrapText(ctx, data.description || '', w - 140)
-    let y = 380
-    for (const line of lines) {
-      ctx.fillText(line, w / 2, y)
+    var lines = wrapText(ctx, data.description || '', w - 140)
+    var y = 370
+    for (var k = 0; k < lines.length; k++) {
+      ctx.fillText(lines[k], w / 2, y)
       y += 38
     }
 
-    ctx.font = '18px sans-serif'
-    ctx.fillStyle = '#7a6e62'
-    ctx.fillText('来自「道性自察」小程序', w / 2, h - 50)
+    ctx.strokeStyle = 'rgba(212, 175, 55, 0.15)'
+    ctx.beginPath(); ctx.moveTo(70, h - 145); ctx.lineTo(w - 70, h - 145); ctx.stroke()
+
+    var codeSize = 68
+    var codeX = w / 2 - codeSize / 2
+    var codeY = h - 130
+    try {
+      var codeImg = null
+      var srcs = [
+        '/subpackages/portrait-assets/images/personality-portraits/index.jpg',
+        '/subpackages/portrait-assets/images/personality-portraits/index.png'
+      ]
+      for (var s = 0; s < srcs.length; s++) {
+        try { codeImg = await loadImage(canvas, srcs[s]); break } catch (e) {}
+      }
+      if (codeImg) {
+        ctx.save()
+        ctx.beginPath()
+        ctx.arc(codeX + codeSize / 2, codeY + codeSize / 2, codeSize / 2 + 2, 0, Math.PI * 2)
+        ctx.fillStyle = 'rgba(255,255,255,0.9)'
+        ctx.fill()
+        ctx.beginPath()
+        ctx.arc(codeX + codeSize / 2, codeY + codeSize / 2, codeSize / 2, 0, Math.PI * 2)
+        ctx.clip()
+        ctx.drawImage(codeImg, codeX, codeY, codeSize, codeSize)
+        ctx.restore()
+        ctx.font = '14px sans-serif'
+        ctx.fillStyle = '#7a6e62'
+        ctx.textAlign = 'center'
+        ctx.fillText('扫码体验「道性自察」', w / 2, codeY + codeSize + 18)
+      } else {
+        ctx.font = '16px sans-serif'
+        ctx.fillStyle = '#7a6e62'
+        ctx.textAlign = 'center'
+        ctx.fillText('来自「道性自察」小程序', w / 2, h - 55)
+      }
+    } catch (e) {
+      ctx.font = '16px sans-serif'
+      ctx.fillStyle = '#7a6e62'
+      ctx.textAlign = 'center'
+      ctx.fillText('来自「道性自察」小程序', w / 2, h - 55)
+    }
   }
 }
 

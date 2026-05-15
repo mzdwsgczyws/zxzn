@@ -25,7 +25,7 @@ function computeRankScore() {
   try {
     const checkinState = wx.getStorageSync(KEYS.CHECKIN_STATE) || {}
     score += (checkinState.totalDays || 0) * 3
-  } catch (e) {}
+  } catch (e) { console.warn('rankScore:checkin', e) }
 
   try {
     const raw = loadHistoryRaw()
@@ -34,17 +34,17 @@ function computeRankScore() {
       if (d.dateStr) uniqueDates[d.dateStr] = true
     })
     score += Object.keys(uniqueDates).length * 2
-  } catch (e) {}
+  } catch (e) { console.warn('rankScore:lottery', e) }
 
   try {
     const ach = computeAchievements()
     score += (ach.unlockedCount || 0) * 15
-  } catch (e) {}
+  } catch (e) { console.warn('rankScore:achievements', e) }
 
   try {
     const records = wx.getStorageSync(KEYS.TRACK_RECORDS) || []
     score += records.length * 2
-  } catch (e) {}
+  } catch (e) { console.warn('rankScore:trackRecords', e) }
 
   try {
     const checkinState = wx.getStorageSync(KEYS.CHECKIN_STATE) || {}
@@ -53,11 +53,11 @@ function computeRankScore() {
       var entry = dayLog[key]
       if (entry && entry.mood) score += 2
     })
-  } catch (e) {}
+  } catch (e) { console.warn('rankScore:mood', e) }
 
   try {
     score += getFirstUnlockListSorted().length * 1
-  } catch (e) {}
+  } catch (e) { console.warn('rankScore:unlockList', e) }
 
   return score
 }

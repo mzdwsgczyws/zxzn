@@ -17,7 +17,7 @@
     "pages/annual-report/annual-report"
   ],
   "window": {
-    "navigationBarTitleText": "量化自修正念",
+    "navigationBarTitleText": "道性自察",
     "navigationBarBackgroundColor": "@navBgColor",
     "navigationBarTextStyle": "@navTextStyle",
     "backgroundColor": "@bgColor",

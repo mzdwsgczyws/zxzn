@@ -48,7 +48,7 @@ function loadState() {
 function saveState(s) {
   try {
     wx.setStorageSync(KEYS.CHECKIN_STATE, s)
-  } catch (e) {}
+  } catch (e) { console.warn('checkin:saveState', e) }
 }
 
 function getCheckInSummary() {

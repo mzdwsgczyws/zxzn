@@ -1,6 +1,7 @@
 const KEYS = require('../../utils/storage-keys.js')
 const core = require('../../utils/lottery-core.js')
 const poster = require('../../utils/poster-engine.js')
+const adviceFb = require('../../utils/advice-feedback.js')
 const { isLotteryProfileComplete } = require('../../utils/profile-lottery.js')
 const { getFirstUnlockListSorted, computeAchievements, getDailyTrendSeries } = require('../../utils/lottery-history.js')
 const pageAnalytics = require('../../behaviors/page-analytics.js')
@@ -70,7 +71,7 @@ Page({
         wx.redirectTo({ url: '/pages/onboarding/onboarding' })
         return
       }
-    } catch (e) {}
+    } catch (e) { console.warn('index:onLoad', e) }
     this.shakeAccum = 0
     this.lastShake = 0
     const win = wx.getWindowInfo ? wx.getWindowInfo() : wx.getSystemInfoSync()
@@ -108,7 +109,7 @@ Page({
         hallAchTotal: total,
         hallTrendDays: trendDays
       })
-    } catch (e) {}
+    } catch (e) { console.warn('index:hallStrip', e) }
   },
 
   onShow() {
@@ -137,7 +138,7 @@ Page({
       const { getSeasonalContext } = require('../../utils/seasonal.js')
       const ctx = getSeasonalContext()
       this.setData({ seasonalHint: ctx.idleHint || '' })
-    } catch (e) {}
+    } catch (e) { console.warn('index:seasonalHint', e) }
   },
 
   refreshMicroActions() {
@@ -171,7 +172,7 @@ Page({
         }
       }
       this.setData({ microActions: actions, yesterdayActionSummary: yesterdaySummary })
-    } catch (e) {}
+    } catch (e) { console.warn('index:microActions', e) }
   },
 
   onMicroActionChange(e) {
@@ -257,14 +258,14 @@ Page({
     let dismissed = false
     try {
       dismissed = !!wx.getStorageSync(KEYS.THEORY_INTRO_BANNER_DISMISSED)
-    } catch (e) {}
+    } catch (e) { console.warn('index:theoryBanner', e) }
     this.setData({ theoryBannerEligible: !dismissed })
   },
 
   dismissTheoryBanner() {
     try {
       wx.setStorageSync(KEYS.THEORY_INTRO_BANNER_DISMISSED, true)
-    } catch (e) {}
+    } catch (e) { console.warn('index:dismissBanner', e) }
     this.setData({ theoryBannerEligible: false })
   },
 
@@ -292,7 +293,7 @@ Page({
     recordShare('/pages/index/index')
     const { lot } = this.data
     return {
-      title: lot ? `今日心象箴言：${lot.tierLabel} · ${lot.title}` : '量化自修正念',
+      title: lot ? `今日心象箴言：${lot.tierLabel} · ${lot.title}` : '道性自察 · 每日箴言',
       path: '/pages/index/index'
     }
   },
@@ -341,45 +342,8 @@ Page({
     core.clearTodayAndReset(this, 'idle')
   },
 
-  tapAdviceLike() {
-    if (this.data.adviceFbDone) return
-    this.setData({ adviceFbDone: true })
-    try {
-      const fb = wx.getStorageSync(KEYS.ADVICE_FEEDBACK) || { liked: {}, dislikedTexts: [], likedCats: {}, dislikedCats: {} }
-      if (!fb.likedCats) fb.likedCats = {}
-      const structured = this.data.adviceStructured || []
-      const list = this.data.adviceList || []
-      structured.forEach((s) => {
-        if (s.cat) fb.likedCats[s.cat] = (fb.likedCats[s.cat] || 0) + 1
-      })
-      list.forEach((line) => {
-        const cat = String(line).replace(/^\d+\.\s*/, '').slice(0, 2)
-        fb.liked[cat] = (fb.liked[cat] || 0) + 1
-      })
-      wx.setStorageSync(KEYS.ADVICE_FEEDBACK, fb)
-    } catch (e) {}
-    wx.showToast({ title: '感谢反馈', icon: 'none' })
-  },
-
-  tapAdviceSkip() {
-    if (this.data.adviceFbDone) return
-    this.setData({ adviceFbDone: true })
-    try {
-      const fb = wx.getStorageSync(KEYS.ADVICE_FEEDBACK) || { liked: {}, dislikedTexts: [], likedCats: {}, dislikedCats: {} }
-      if (!fb.dislikedCats) fb.dislikedCats = {}
-      const structured = this.data.adviceStructured || []
-      const list = this.data.adviceList || []
-      structured.forEach((s) => {
-        if (s.cat) fb.dislikedCats[s.cat] = (fb.dislikedCats[s.cat] || 0) + 1
-      })
-      const texts = list.map((l) => String(l).replace(/^\s*\d+\.\s*/, '').trim()).filter(Boolean)
-      const s = new Set(fb.dislikedTexts || [])
-      texts.forEach((t) => s.add(t))
-      fb.dislikedTexts = Array.from(s).slice(-50)
-      wx.setStorageSync(KEYS.ADVICE_FEEDBACK, fb)
-    } catch (e) {}
-    wx.showToast({ title: '已记录', icon: 'none' })
-  },
+  tapAdviceLike() { adviceFb.handleLike(this) },
+  tapAdviceSkip() { adviceFb.handleSkip(this) },
 
   async generateMaximPoster() {
     const { lot } = this.data
@@ -406,7 +370,7 @@ Page({
       const passDays = (ch.progress || []).filter(p => p.pass).length
       const pct = ch.days > 0 ? Math.min(100, Math.round(passDays / ch.days * 100)) : 0
       this.setData({ weeklyChallenge: ch, wcProgressPct: pct, wcPassDays: passDays })
-    } catch (e) {}
+    } catch (e) { console.warn('index:weeklyChallenge', e) }
   },
 
   goHome() {

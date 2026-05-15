@@ -27,7 +27,7 @@ Component({
         if (!state.dayLog[t]) state.dayLog[t] = {}
         state.dayLog[t].actions = actions.map(a => ({ text: a.text, done: !!a.done }))
         wx.setStorageSync(KEYS.CHECKIN_STATE, state)
-      } catch (e) {}
+      } catch (e) { console.warn('microAction:persist', e) }
     }
   }
 })
