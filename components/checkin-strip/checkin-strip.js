@@ -10,7 +10,24 @@ Component({
     checkinFlash: false,
     moodOptions: ['😌', '😊', '😐', '😢', '😤']
   },
+  observers: {
+    checkedToday(val) {
+      if (val && this.data.expanded) {
+        this._collapseTimer = setTimeout(() => {
+          this.triggerEvent('toggle', { expanded: false })
+        }, 1200)
+      }
+    }
+  },
+  lifetimes: {
+    detached() {
+      if (this._collapseTimer) clearTimeout(this._collapseTimer)
+    }
+  },
   methods: {
+    onTapToggle() {
+      this.triggerEvent('toggle', { expanded: !this.data.expanded })
+    },
     onTapCheckin() {
       if (this.data.checkedToday) return
       this.setData({ checkinFlash: true })

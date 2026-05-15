@@ -40,6 +40,7 @@
         selectedMood="{{checkinMood}}"
         bind:checkin="tapCheckIn"
         bind:moodpick="onMoodPick"
+        bind:toggle="onCheckinToggle"
       />
 
       <view class="weekly-challenge" wx:if="{{weeklyChallenge && (phase === 'idle' || phase === 'result')}}">

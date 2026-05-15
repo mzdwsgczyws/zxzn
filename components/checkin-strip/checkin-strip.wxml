@@ -1,23 +1,13 @@
 <view class="cs-root {{expanded ? 'cs-root--open' : ''}}">
-  <view class="cs-main">
+  <view class="cs-main" catchtap="onTapToggle">
     <view class="cs-left">
       <text class="cs-streak">已连续 {{streak}} 天</text>
-      <text class="cs-sub">累计 {{totalDays}} 天 · {{checkedToday ? '今日已记' : '点右侧完成今日一记'}}</text>
+      <text class="cs-sub">累计 {{totalDays}} 天 · {{checkedToday ? '今日已记' : expanded ? '选好心境后点下方打卡' : '轻触展开打卡'}}</text>
     </view>
-    <button
-      class="cs-btn {{checkinFlash ? 'cs-btn--flash' : ''}}"
-      size="mini"
-      catchtap="onTapCheckin"
-      disabled="{{checkedToday}}"
-      hover-class="cs-btn-hover"
-      aria-label="{{checkedToday ? '今日已打卡' : '今日打卡'}}"
-      aria-role="button"
-    >
-      {{checkedToday ? '✓ 已打卡' : '今日打卡'}}
-    </button>
+    <text class="cs-toggle">{{expanded ? '收起' : checkedToday ? '展开' : '打卡 ›'}}</text>
   </view>
   <view class="cs-expand" wx:if="{{expanded}}">
-    <text class="cs-expand-title">今日心境（选填）</text>
+    <text class="cs-expand-title">{{checkedToday ? '今日心境' : '今日心境（选填）'}}</text>
     <view class="cs-moods">
       <view
         wx:for="{{moodOptions}}"
@@ -29,5 +19,14 @@
         aria-label="心境 {{item}}"
       >{{item}}</view>
     </view>
+    <button
+      wx:if="{{!checkedToday}}"
+      class="cs-btn cs-btn-confirm {{checkinFlash ? 'cs-btn--flash' : ''}}"
+      size="mini"
+      catchtap="onTapCheckin"
+      hover-class="cs-btn-hover"
+      aria-label="确认打卡"
+      aria-role="button"
+    >✓ 确认打卡</button>
   </view>
 </view>

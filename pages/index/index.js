@@ -231,14 +231,11 @@ Page({
   tapCheckIn() {
     const r = checkin.recordCheckIn()
     this.refreshCheckIn()
-    if (!r.already) {
-      try { wx.vibrateShort({ type: 'medium' }) } catch (e) {}
-    }
     if (r.already) {
       wx.showToast({ title: '今日已打卡', icon: 'none' })
       return
     }
-    this.setData({ checkinExpanded: true })
+    try { wx.vibrateShort({ type: 'medium' }) } catch (e) {}
     if (r.milestone) {
       this.setData({ milestoneText: r.milestone, milestoneStreak: r.streak, showMilestone: true })
     } else {
@@ -250,6 +247,10 @@ Page({
     const mood = e.detail.mood
     checkin.updateMood(mood)
     this.setData({ checkinMood: mood })
+  },
+
+  onCheckinToggle(e) {
+    this.setData({ checkinExpanded: !!e.detail.expanded })
   },
 
   refreshTheoryBannerFlag() {

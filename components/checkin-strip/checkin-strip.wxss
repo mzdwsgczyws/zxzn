@@ -60,6 +60,14 @@
   opacity: 0.92;
 }
 
+.cs-toggle {
+  flex-shrink: 0;
+  font-size: 24rpx;
+  color: var(--dao-purple-mid);
+  padding: 8rpx 16rpx;
+  font-weight: 500;
+}
+
 .cs-btn[disabled] {
   background: linear-gradient(180deg, rgba(100, 92, 130, 0.55) 0%, rgba(62, 54, 88, 0.92) 100%);
   color: rgba(255, 252, 245, 0.95);
@@ -81,6 +89,15 @@
 .cs-expand {
   padding: 0 22rpx 18rpx;
   animation: csSlideDown 0.25s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14rpx;
+}
+
+.cs-btn-confirm {
+  align-self: flex-end;
+  margin-top: 4rpx;
 }
 
 @keyframes csSlideDown {
