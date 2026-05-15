@@ -11,15 +11,8 @@
  */
 const KEYS = require('./storage-keys.js')
 
-const EXPORT_KEYS = [
-  KEYS.CHECKIN_STATE,
-  KEYS.LOT_ROWS,
-  KEYS.LOT_HALL,
-  KEYS.PROFILE,
-  KEYS.QUIZ_RESULT,
-  KEYS.ACHIEVE_STATE,
-  KEYS.USAGE_STATE
-]
+/** 与 storage-keys 中全部「物理键」一致（去重：PROFILE/USER_PROFILE、QUIZ_RESULT/PERSONALITY_RESULT 等同键只出现一次） */
+const EXPORT_KEYS = [...new Set(Object.values(KEYS))]
 
 function canShare() {
   return typeof wx.shareFileMessage === 'function'
@@ -31,7 +24,7 @@ function canChooseFile() {
 
 function exportData() {
   return new Promise((resolve, reject) => {
-    const payload = { _version: 1, _exportedAt: Date.now() }
+    const payload = { _version: 2, _exportedAt: Date.now() }
     EXPORT_KEYS.forEach(key => {
       try {
         const val = wx.getStorageSync(key)
