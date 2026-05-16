@@ -78,8 +78,23 @@
       </picker>
     </view>
     <view class="field">
+      <text class="label">出生公历年</text>
+      <input class="input" type="number" placeholder="如 1995（用于梅花易数与紫微排盘）" value="{{birthYear}}" bindinput="onBirthYear" />
+    </view>
+    <view class="field">
       <text class="label">出生公历月份（1–12）</text>
-      <input class="input" type="number" placeholder="用于简化斗数宫位映射" value="{{birthMonth}}" bindinput="onBirthMonth" />
+      <input class="input" type="number" placeholder="用于紫微斗数宫位排盘" value="{{birthMonth}}" bindinput="onBirthMonth" />
+    </view>
+    <view class="field">
+      <text class="label">出生公历日（1–31）</text>
+      <input class="input" type="number" placeholder="如 15（用于梅花起卦与紫微排盘）" value="{{birthDay}}" bindinput="onBirthDay" />
+    </view>
+    <view class="field">
+      <text class="label">出生时辰</text>
+      <text class="loc-hint">十二时辰用于梅花易数起卦与紫微斗数命宫安置，不详可跳过。</text>
+      <picker mode="selector" range="{{shichenLabels}}" value="{{birthHourIndex}}" bindchange="onBirthHourPick">
+        <view class="picker-val">{{shichenLabels[birthHourIndex]}}</view>
+      </picker>
     </view>
 
     <view class="field section-gap">

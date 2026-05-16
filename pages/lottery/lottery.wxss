@@ -892,6 +892,18 @@
   color: var(--dao-ink-body, #4a4034);
 }
 
+.fortune-blurb-block {
+  border-top: 1rpx solid rgba(160, 144, 124, 0.15);
+  padding-top: 20rpx;
+  margin-top: 12rpx;
+}
+
+.fortune-blurb {
+  font-size: 24rpx;
+  color: #8a7a6c;
+  line-height: 1.7;
+}
+
 .fine-print {
   margin: 28rpx 48rpx 0;
   font-size: 22rpx;

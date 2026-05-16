@@ -1,100 +1,176 @@
 /**
- * 综合今日心象箴言种子：日期、人格（可缺省）、年龄、性别、节气、天气码、干支、方位等。
- * 同机同日复测结果稳定；仅供文化娱乐与自我提醒。
+ * 综合今日心象签号种子。
+ *
+ * 签号决策优先级：
+ *   1. 有完整出生数据 → 梅花易数起卦，卦象直接映射 lotId（周易卦序）
+ *   2. 出生数据不全   → hashStr fallback（向后兼容）
+ *
+ * 返回值新增 meihua（梅花卦象）、ziwei（紫微命宫）、guaQi（卦气旺衰）。
  */
 
+var meihuaEngine = require('./meihua-yishu.js')
+var ziweiEngine = require('./ziwei-lite.js')
+var yijingEngine = require('./yijing-hexagram.js')
+
 function hashStr(s) {
-  let h = 2166136261
-  for (let i = 0; i < s.length; i++) {
+  var h = 2166136261
+  for (var i = 0; i < s.length; i++) {
     h ^= s.charCodeAt(i)
     h = Math.imul(h, 16777619)
   }
   return h >>> 0
 }
 
+/**
+ * 日干支推算。基准：2000-01-01 = 甲辰日（天干偏移 0，地支偏移 4）。
+ */
 function getGanZhiDaySeed(y, m, d) {
-  const base = new Date(2000, 0, 1)
-  const cur = new Date(y, m - 1, d)
-  const days = Math.floor((cur - base) / 86400000)
-  const gan = ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸']
-  const zhi = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥']
-  const wx = ['木', '木', '火', '火', '土', '土', '金', '金', '水', '水']
-  const ig = ((days % 10) + 10) % 10
-  const iz = ((days % 12) + 12) % 12
-  return {
-    gz: gan[ig] + zhi[iz],
-    wxDay: wx[ig]
-  }
+  var base = new Date(2000, 0, 1)
+  var cur = new Date(y, m - 1, d)
+  var days = Math.floor((cur - base) / 86400000)
+  var gan = ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸']
+  var zhi = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥']
+  var wx = ['木', '木', '火', '火', '土', '土', '金', '金', '水', '水']
+  var ig = (((days % 10) + 10) % 10)
+  var iz = (((days + 4) % 12) + 12) % 12
+  return { gz: gan[ig] + zhi[iz], wxDay: wx[ig], ganIdx: ig, zhiIdx: iz }
 }
 
 /**
  * @param {object} options
- * @param {boolean} [options.hasPersonality] 是否已测验
- * @param {string} [options.gender] male | female | unknown
- * @param {string} [options.jieqi] 节气名
- * @param {string} [options.jianchu] 建除
- * @param {number|null} [options.weatherCode] WMO
+ * @param {boolean} [options.hasPersonality]
+ * @param {string} [options.gender]
+ * @param {string} [options.jieqi]
+ * @param {string} [options.jianchu]
+ * @param {number|null} [options.weatherCode]
+ * @param {number} [options.birthYear]
+ * @param {number} [options.birthMonth]
+ * @param {number} [options.birthDay]
+ * @param {number|null} [options.birthHour] 0-11 时辰
  */
 function buildFortuneMeta(options) {
-  const now = options.now || new Date()
-  const y = now.getFullYear()
-  const mo = now.getMonth() + 1
-  const d = now.getDate()
-  const dateStr = `${y}-${mo}-${d}`
-  const { gz, wxDay } = getGanZhiDaySeed(y, mo, d)
+  var now = options.now || new Date()
+  var y = now.getFullYear()
+  var mo = now.getMonth() + 1
+  var d = now.getDate()
+  var dateStr = y + '-' + mo + '-' + d
+  var dayGZ = getGanZhiDaySeed(y, mo, d)
+  var gz = dayGZ.gz
+  var wxDay = dayGZ.wxDay
 
-  const hasPersonality = !!options.hasPersonality
-  const typeId = hasPersonality && options.personalityTypeId != null ? options.personalityTypeId : 'na'
-  const age = options.age != null && !Number.isNaN(Number(options.age)) ? Number(options.age) : 'na'
-  const bmNum = Number(options.birthMonth)
-  const birthMonth = options.birthMonth != null && !Number.isNaN(bmNum) ? bmNum : 'na'
-  const lat = options.lat != null ? Math.round(options.lat * 1000) : 0
-  const lng = options.lng != null ? Math.round(options.lng * 1000) : 0
-  const gender = options.gender === 'male' || options.gender === 'female' ? options.gender : 'na'
-  const jieqi = options.jieqi != null ? String(options.jieqi) : ''
-  const jianchu = options.jianchu != null ? String(options.jianchu) : ''
-  const weatherCode = options.weatherCode != null && options.weatherCode !== '' ? options.weatherCode : 'na'
+  var hasPersonality = !!options.hasPersonality
+  var typeId = hasPersonality && options.personalityTypeId != null ? options.personalityTypeId : 'na'
+  var age = options.age != null && !Number.isNaN(Number(options.age)) ? Number(options.age) : 'na'
+  var bmNum = Number(options.birthMonth)
+  var birthMonth = options.birthMonth != null && !Number.isNaN(bmNum) ? bmNum : 'na'
+  var lat = options.lat != null ? Math.round(options.lat * 100) : 0
+  var lng = options.lng != null ? Math.round(options.lng * 100) : 0
+  var gender = options.gender === 'male' || options.gender === 'female' ? options.gender : 'na'
+  var jieqi = options.jieqi != null ? String(options.jieqi) : ''
+  var jianchu = options.jianchu != null ? String(options.jianchu) : ''
 
-  const recentState = options.recentState != null ? String(options.recentState) : 'na'
-  const rhythmType = options.rhythmType != null ? String(options.rhythmType) : 'na'
-  const focusJoined =
-    Array.isArray(options.focusTags) && options.focusTags.length
-      ? options.focusTags
-          .slice()
-          .sort()
-          .join(',')
-      : 'na'
-  const lotStylePref = options.lotStylePref != null ? String(options.lotStylePref) : 'na'
+  var recentState = options.recentState != null ? String(options.recentState) : 'na'
+  var rhythmType = options.rhythmType != null ? String(options.rhythmType) : 'na'
+  var focusJoined = Array.isArray(options.focusTags) && options.focusTags.length
+    ? options.focusTags.slice().sort().join(',') : 'na'
 
-  const ziweiHint = typeof birthMonth === 'number' ? (birthMonth + mo) % 12 : mo % 12
-  const palaces = ['命宫', '兄弟', '夫妻', '子女', '财帛', '疾厄', '迁移', '交友', '官禄', '田宅', '福德', '父母']
-  const bagua = ['乾', '兑', '离', '震', '巽', '坎', '艮', '坤'][((typeof typeId === 'number' ? typeId : gz.charCodeAt(0)) + d) % 8]
+  var birthYear = options.birthYear != null ? Number(options.birthYear) : null
+  var birthDay = options.birthDay != null ? Number(options.birthDay) : null
+  var birthHour = options.birthHour != null ? Number(options.birthHour) : null
 
-  const seed = hashStr(
-    `${dateStr}|t${typeId}|p${hasPersonality ? 1 : 0}|g${gender}|a${age}|bm${birthMonth}|jq${jieqi}|jc${jianchu}|wc${weatherCode}|zw${ziweiHint}|bg${bagua}|wx${wxDay}|${lat},${lng}|rs${recentState}|rh${rhythmType}|ft${focusJoined}|sp${lotStylePref}`
-  )
-  const lotId = seed % 64
+  var hasBirthFull = birthYear && birthMonth !== 'na' && birthDay
+  var meihua = null
+  var ziwei = null
+  var guaQi = null
+  var lotId
 
-  const palaceName = palaces[ziweiHint]
-  const blurb = `今日干支 ${gz}，日五行偏「${wxDay}」；节气参考「${jieqi || '表外'}」；建除「${jianchu || '—'}」；卦象参考 ${bagua}；斗数宫位提示「${palaceName}」（娱乐映射）。${
-    options.weatherCode != null && options.weatherCode !== '' ? `天气码 ${options.weatherCode}。` : ''
-  }`
+  if (hasBirthFull) {
+    meihua = meihuaEngine.castMeihua(now, {
+      birthYear: birthYear,
+      birthMonth: typeof birthMonth === 'number' ? birthMonth : bmNum,
+      birthDay: birthDay,
+      birthHour: birthHour
+    })
+
+    var hexIdx = yijingEngine.hexagramIdFromGua(meihua.upperGua, meihua.lowerGua)
+    lotId = hexIdx
+
+    guaQi = yijingEngine.getGuaQi(hexIdx, jieqi)
+
+    ziwei = ziweiEngine.getZiweiBasic(
+      birthYear,
+      typeof birthMonth === 'number' ? birthMonth : bmNum,
+      birthDay,
+      birthHour,
+      gender
+    )
+  } else {
+    var seed = hashStr(
+      dateStr + '|t' + typeId + '|p' + (hasPersonality ? 1 : 0) + '|g' + gender +
+      '|a' + age + '|bm' + birthMonth + '|jq' + jieqi + '|jc' + jianchu +
+      '|wx' + wxDay + '|' + lat + ',' + lng + '|rs' + recentState + '|rh' + rhythmType + '|ft' + focusJoined
+    )
+    lotId = seed % 64
+
+    guaQi = yijingEngine.getGuaQi(lotId, jieqi)
+  }
+
+  var ziweiPalace = '命宫'
+  var todayPalaceInfo = null
+  if (ziwei) {
+    todayPalaceInfo = ziweiEngine.getTodayPalace(ziwei.mingGongZhi, now)
+    ziweiPalace = todayPalaceInfo.palaceName
+  }
+
+  var blurb = buildBlurb(gz, wxDay, jieqi, jianchu, meihua, ziwei, guaQi, todayPalaceInfo, options.weatherCode)
 
   return {
-    dateStr,
-    lotId,
-    gz,
-    wxDay,
-    bagua,
-    ziweiPalace: palaceName,
-    blurb,
-    hasPersonality,
-    gender,
-    jieqi,
-    jianchu,
+    dateStr: dateStr,
+    lotId: lotId,
+    gz: gz,
+    wxDay: wxDay,
+    bagua: meihua ? meihua.upperGuaName : '',
+    ziweiPalace: ziweiPalace,
+    blurb: blurb,
+    hasPersonality: hasPersonality,
+    gender: gender,
+    jieqi: jieqi,
+    jianchu: jianchu,
     weatherCode: options.weatherCode != null ? options.weatherCode : null,
-    weatherText: options.weatherText || ''
+    weatherText: options.weatherText || '',
+    meihua: meihua,
+    ziwei: ziwei,
+    guaQi: guaQi,
+    todayPalace: todayPalaceInfo,
+    usedMeihua: !!hasBirthFull
   }
 }
 
-module.exports = { buildFortuneMeta, hashStr, getGanZhiDaySeed }
+function buildBlurb(gz, wxDay, jieqi, jianchu, meihua, ziwei, guaQi, todayPalace, weatherCode) {
+  var parts = []
+  parts.push('今日干支 ' + gz + '，日五行偏「' + wxDay + '」')
+
+  if (meihua) {
+    var hexMeta = yijingEngine.HEXAGRAM_META[yijingEngine.hexagramIdFromGua(meihua.upperGua, meihua.lowerGua)]
+    var hexName = hexMeta ? hexMeta.name : meihua.guaFullName
+    parts.push('梅花卦象「' + hexName + '」（' + meihua.upperGuaName + '上' + meihua.lowerGuaName + '下）')
+    parts.push('体卦' + meihua.tiGuaName + meihua.tiWuxing + '、用卦' + meihua.yongGuaName + meihua.yongWuxing + '，' + meihua.label)
+    parts.push('变卦「' + meihua.bianGuaName + '」、互卦「' + meihua.huGuaName + '」')
+  }
+
+  if (guaQi) {
+    parts.push('卦气' + guaQi.label)
+  }
+
+  if (ziwei && todayPalace) {
+    parts.push('紫微' + ziwei.wuxingJuName + '，命宫' + ziwei.mingGongGanZhi + '，今日流日落「' + todayPalace.palaceName + '」')
+  }
+
+  if (jieqi) parts.push('节气「' + jieqi + '」')
+  if (jianchu) parts.push('建除「' + jianchu + '」')
+  if (weatherCode != null && weatherCode !== '') parts.push('天气码 ' + weatherCode)
+
+  return parts.join('；') + '。'
+}
+
+module.exports = { buildFortuneMeta: buildFortuneMeta, hashStr: hashStr, getGanZhiDaySeed: getGanZhiDaySeed }

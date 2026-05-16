@@ -30,6 +30,23 @@ const RHYTHM_VALUES = [null, 'regular', 'late_early', 'early', 'night', 'irregul
 const STYLE_LABELS = ['-', '简练', '详尽', '略偏文言感', '白话分行（易读）']
 const STYLE_VALUES = [null, 'brief', 'rich', 'classical', 'plain']
 
+const SHICHEN_LABELS = [
+  '不详',
+  '子时 (23:00–01:00)',
+  '丑时 (01:00–03:00)',
+  '寅时 (03:00–05:00)',
+  '卯时 (05:00–07:00)',
+  '辰时 (07:00–09:00)',
+  '巳时 (09:00–11:00)',
+  '午时 (11:00–13:00)',
+  '未时 (13:00–15:00)',
+  '申时 (15:00–17:00)',
+  '酉时 (17:00–19:00)',
+  '戌时 (19:00–21:00)',
+  '亥时 (21:00–23:00)'
+]
+const SHICHEN_VALUES = [null, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+
 const FOCUS_OPTIONS = [
   { id: 'work', label: '工作' },
   { id: 'relation', label: '人际' },
@@ -77,7 +94,11 @@ Page({
     formExpanded: false,
     profileSummary: '',
     age: '',
+    birthYear: '',
     birthMonth: '',
+    birthDay: '',
+    birthHourIndex: 0,
+    shichenLabels: SHICHEN_LABELS,
     genderIndex: 0,
     genderLabels: GENDER_LABELS,
     countryLabels: getCountryLabels(),
@@ -317,7 +338,10 @@ Page({
 
     this.setData({
       age: p.age != null && p.age !== '' ? String(p.age) : '',
+      birthYear: p.birthYear != null && p.birthYear !== '' ? String(p.birthYear) : '',
       birthMonth: p.birthMonth != null && p.birthMonth !== '' ? String(p.birthMonth) : '',
+      birthDay: p.birthDay != null && p.birthDay !== '' ? String(p.birthDay) : '',
+      birthHourIndex: indexFromValue(SHICHEN_VALUES, p.birthHour != null ? p.birthHour : null),
       genderIndex: gi,
       countryLabels,
       countryIndex,
@@ -374,8 +398,17 @@ Page({
   onAge(e) {
     this.setData({ age: e.detail.value })
   },
+  onBirthYear(e) {
+    this.setData({ birthYear: e.detail.value })
+  },
   onBirthMonth(e) {
     this.setData({ birthMonth: e.detail.value })
+  },
+  onBirthDay(e) {
+    this.setData({ birthDay: e.detail.value })
+  },
+  onBirthHourPick(e) {
+    this.setData({ birthHourIndex: Number(e.detail.value) || 0 })
   },
   onGenderPick(e) {
     this.setData({ genderIndex: Number(e.detail.value) || 0 })
@@ -453,15 +486,25 @@ Page({
 
   save() {
     const ageRaw = this.data.age.trim()
+    const byRaw = this.data.birthYear.trim()
     const bmRaw = this.data.birthMonth.trim()
-    let age
-    let birthMonth
+    const bdRaw = this.data.birthDay.trim()
+    let age, birthYear, birthMonth, birthDay
     if (ageRaw === '') {
       age = undefined
     } else {
       age = parseInt(ageRaw, 10)
       if (Number.isNaN(age) || age < 1 || age > 120) {
         wx.showToast({ title: '年龄范围 1–120 或留空', icon: 'none' })
+        return
+      }
+    }
+    if (byRaw === '') {
+      birthYear = undefined
+    } else {
+      birthYear = parseInt(byRaw, 10)
+      if (Number.isNaN(birthYear) || birthYear < 1900 || birthYear > 2100) {
+        wx.showToast({ title: '出生年范围 1900–2100 或留空', icon: 'none' })
         return
       }
     }
@@ -474,9 +517,21 @@ Page({
         return
       }
     }
+    if (bdRaw === '') {
+      birthDay = undefined
+    } else {
+      birthDay = parseInt(bdRaw, 10)
+      if (Number.isNaN(birthDay) || birthDay < 1 || birthDay > 31) {
+        wx.showToast({ title: '日期 1–31 或留空', icon: 'none' })
+        return
+      }
+    }
+    const birthHour = SHICHEN_VALUES[this.data.birthHourIndex]
     const gender = GENDER_KEYS[this.data.genderIndex] || 'unknown'
     const prev = wx.getStorageSync(KEYS.USER_PROFILE) || {}
-    const payload = { ...prev, age, birthMonth, gender }
+    const payload = { ...prev, age, birthYear, birthMonth, birthDay, gender }
+    if (birthHour != null) payload.birthHour = birthHour
+    else delete payload.birthHour
 
     const rs = RECENT_VALUES[this.data.recentIndex]
     const em = EMOTION_VALUES[this.data.emotionIndex]

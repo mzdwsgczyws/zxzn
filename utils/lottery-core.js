@@ -130,6 +130,7 @@ function lotteryDataDefaults() {
     tierColor: '#1565c0',
     adviceList: [],
     adviceStructured: [],
+    fortuneBlurb: '',
     thinkingCategories: [],
     thinkingFootnote: '',
     thinkingVisibleCount: 0,
@@ -160,6 +161,7 @@ function restoreToday(page, options) {
         adviceList: cache.adviceList || [],
         adviceStructured: cache.adviceStructured || [],
         adviceFbDone: !!cache.adviceFbDone,
+        fortuneBlurb: cache.fortuneBlurb || '',
         thinkingCategories: [],
         thinkingFootnote: '',
         thinkingVisibleCount: 0,
@@ -185,6 +187,7 @@ function restoreToday(page, options) {
       revealed: false,
       adviceList: [],
       adviceStructured: [],
+      fortuneBlurb: '',
       thinkingCategories: [],
       thinkingFootnote: '',
       thinkingVisibleCount: 0,
@@ -282,7 +285,10 @@ function finalizeDraw(page, lat, lng, weather) {
     personalityTypeId: hasPersonality ? pers.typeId : null,
     age: profile.age,
     gender,
+    birthYear: profile.birthYear,
     birthMonth: profile.birthMonth,
+    birthDay: profile.birthDay,
+    birthHour: profile.birthHour != null ? profile.birthHour : null,
     lat,
     lng,
     jieqi: almanac.jieqi,
@@ -291,8 +297,7 @@ function finalizeDraw(page, lat, lng, weather) {
     weatherText: weather ? weather.text : '',
     recentState: profile.recentState,
     rhythmType: profile.rhythmType,
-    focusTags: profile.focusTags,
-    lotStylePref: profile.lotStylePref
+    focusTags: profile.focusTags
   })
 
   const rawLot = getLotById(meta.lotId)
@@ -302,7 +307,13 @@ function finalizeDraw(page, lat, lng, weather) {
   let avoidAdviceTexts = []
   try {
     const prev = wx.getStorageSync(KEYS.LOTTERY_ADVICE_RECENT) || {}
-    avoidAdviceTexts = Array.isArray(prev.texts) ? prev.texts : []
+    const rounds = Array.isArray(prev.rounds) ? prev.rounds : []
+    rounds.forEach(function (r) {
+      if (Array.isArray(r)) avoidAdviceTexts = avoidAdviceTexts.concat(r)
+    })
+    if (!rounds.length && Array.isArray(prev.texts)) {
+      avoidAdviceTexts = prev.texts.slice()
+    }
     const fb = wx.getStorageSync(KEYS.ADVICE_FEEDBACK) || {}
     if (Array.isArray(fb.dislikedTexts)) {
       avoidAdviceTexts = avoidAdviceTexts.concat(fb.dislikedTexts)
@@ -325,14 +336,21 @@ function finalizeDraw(page, lat, lng, weather) {
     recentState: profile.recentState,
     rhythmType: profile.rhythmType,
     focusTags: profile.focusTags,
-    avoidAdviceTexts
+    avoidAdviceTexts,
+    meihua: meta.meihua,
+    ziwei: meta.ziwei,
+    guaQi: meta.guaQi,
+    todayPalace: meta.todayPalace
   })
   const adviceList = adviceResult.lines || adviceResult
   const adviceStructured = adviceResult.structured || []
 
   try {
     const texts = (Array.isArray(adviceList) ? adviceList : []).map(stripAdvicePlainLine).filter(Boolean)
-    wx.setStorageSync(KEYS.LOTTERY_ADVICE_RECENT, { texts, ts: now.getTime() })
+    const prevRecent = wx.getStorageSync(KEYS.LOTTERY_ADVICE_RECENT) || {}
+    const prevRounds = Array.isArray(prevRecent.rounds) ? prevRecent.rounds : (Array.isArray(prevRecent.texts) ? [prevRecent.texts] : [])
+    const rounds = [texts].concat(prevRounds).slice(0, 3)
+    wx.setStorageSync(KEYS.LOTTERY_ADVICE_RECENT, { rounds, ts: now.getTime() })
   } catch (e) { console.warn('saveAdviceRecent', e) }
 
   const drawVer = ++gLotDrawVer
@@ -343,6 +361,7 @@ function finalizeDraw(page, lat, lng, weather) {
     adviceList,
     adviceStructured,
     lotStylePref: stylePref,
+    fortuneBlurb: meta.blurb || '',
     _drawVer: drawVer
   }
   wx.setStorageSync(KEYS.LOTTERY_TODAY, payload)
@@ -354,9 +373,6 @@ function finalizeDraw(page, lat, lng, weather) {
     title: rawLot.title
   })
   recordBiz('lot_draw', String(meta.lotId))
-
-  const seasonal = require('./seasonal.js')
-  const seasonCtx = seasonal.getSeasonalContext(now)
 
   const thinking = buildLotteryThinkingBrief()
 
@@ -376,7 +392,8 @@ function finalizeDraw(page, lat, lng, weather) {
         revealed: false,
         tierColor: TIER_COLORS[lot.tier] || '#1565c0',
         adviceList,
-        adviceStructured
+        adviceStructured,
+        fortuneBlurb: meta.blurb || ''
       },
       () => startThinkingReveal(page)
     )

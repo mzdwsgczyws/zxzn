@@ -1,6 +1,6 @@
-# 量化自修正念 · 微信小程序
+# 道性自察 · 微信小程序
 
-面向「自我观察与文化参考」的工具型小程序：**今日心象箴言**（含配图与建议）、**道性十六型**情景测验、**量化自修记录**与轻量分析、**个人档案**（箴言上下文）；首页提供 **心象日历**（按日抽签记录的月历与层级示意图，仅供自察）、**心象展馆**（每卦首次收录时间）、**成就展馆**（心象成就与长按趣评）、**修行段位**、**节气徽章**、**每周挑战**、**道性配对**与**年度修炼报告**。数据默认**仅存本机**（`wx.setStorage`），未接自有后端业务库。
+面向「自我观察与文化参考」的工具型小程序：**今日心象箴言**（含配图与建议）、**道性十六型**情景测验、**量化自修记录**与轻量分析、**个人档案**（箴言上下文）；首页提供 **心象日历**（按日抽签记录的月历与层级示意图，仅供自察）、**心象展馆**（每卦首次收录时间）、**成就展馆**（心象成就与长按趣评）、**修行段位**、**节气徽章**、**每周挑战**、**道性配对**与**年度修炼报告**。算法层深度集成**梅花易数起卦**、**紫微斗数命宫**、**六十四卦卦气旺衰**三大传统体系。数据默认**仅存本机**（`wx.setStorage`），未接自有后端业务库。
 
 > **重要声明**：所有箴言与人格描述与建议均**仅供文化学习与自我观察**，不构成医疗、心理咨询或命运断言；持续情绪与睡眠困扰请寻求专业帮助。
 
@@ -20,6 +20,24 @@
 | **道性配对** | 从道性测验结果页邀请好友配对，基于四维兼容度算法分析两人匹配度与相处建议。 |
 | **年度报告** | 个人档案「展馆与报告」入口，Spotify Wrapped 风格展示全年抽签/打卡/自修/成就数据及年度关键词。 |
 | **分享卡片** | 首页/lottery 结果区可生成箴言海报（poster-engine · tplMaxim），成就展馆已解锁成就可生成分享图（tplAchieve）。 |
+
+### 玄学算法引擎（与代码同步 · 2026-05）
+
+签号与箴言的核心决策链路深度集成三大传统体系，用户填写完整出生数据后自动切换至梅花易数起卦路径：
+
+- **梅花易数起卦**（`utils/meihua-yishu.js`）
+  - 「时间 + 命数」混合起卦法：融合当前农历时间（天时）与用户出生命数（人命），使同一时刻不同人得不同卦。
+  - 先天八卦数映射、体用判断（动爻位置决定体卦与用卦）、五行生克吉凶评分（-3 ~ +3）。
+  - 变卦计算（动爻阴阳互变）、互卦计算（2-4 爻/3-5 爻），用于辅助趋势判断。
+  - 签号直接由梅花本卦的上下卦组合映射到周易六十四卦序（`lots-data.js` 索引）。
+- **紫微斗数简排**（`utils/ziwei-lite.js`）
+  - 命宫安置（顺月逆时）、身宫安置、五虎遁推宫干、纳音五行局（水二/木三/金四/土五/火六）。
+  - 十二宫排列 + 今日流日宫位 → 映射箴言领域权重（财帛→finance、官禄→work、疾厄→health 等）。
+- **六十四卦卦气旺衰**（`utils/yijing-hexagram.js`）
+  - 64 卦八宫归属与五行属性；按当前节气季节判断卦气：旺(+2)/相(+1)/休(0)/囚(-1)/死(-2)。
+  - 卦气影响箴言整体语气：旺相 → 鼓励行动；囚死 → 提醒内省、韬光养晦。
+- **农历转换**（`utils/lunar-calendar.js`）：1900-2100 年压缩查表法，公历↔农历精确转换。
+- **向后兼容**：出生数据不全时自动回退到 hashStr fallback 路径，老用户体验不退化。
 
 ### 近期补充与修复（与代码同步 · 2026-05）
 
@@ -82,6 +100,10 @@ wx_program/
 │   ├── lot-art.js / lot-display.js / profile-lottery.js
 │   ├── personality.js / checkin.js / usage-analytics.js
 │   ├── lots.js / lots-data.js / almanac.js / weather.js / geocode.js / region-cn.js
+│   ├── lunar-calendar.js          # 公历↔农历转换（1900-2100 查表法）
+│   ├── meihua-yishu.js            # 梅花易数起卦引擎（体用生克、变卦互卦）
+│   ├── ziwei-lite.js              # 紫微斗数简排（命宫、五行局、流日宫位）
+│   ├── yijing-hexagram.js         # 64 卦元数据（八宫归属、卦气旺衰）
 │   ├── analysis.js / cultivation-model.js / five-elements-chart.js
 │   ├── lottery-shake-sensory.js
 │   ├── poster-engine.js          # 海报生成引擎（tplMaxim / tplAchieve / tplPersonality）
@@ -102,7 +124,11 @@ wx_program/
 | **首页心象** | `pages/index/index.*` | 调用 `lottery-core`；`scroll-view` 勿启用 **enhanced**（iOS 签图画布错位）。 |
 | **签图 Canvas** | `utils/lottery-core.js` · `lot-art.js` | `canvas-id`；`renderLotArt` / `paintLotToCanvas`。 |
 | **历史 / 成就 / 按日序列** | `utils/lottery-history.js` | `appendLotteryDraw`、`getDailyTrendSeries`、`buildAchievementState`、`ACHIEVEMENT_DEFS`。 |
-| **建议列表** | `utils/lottery-advice.js` · `lottery-advice-corpus.js` | `computeLotteryAdvices`；避让上一轮见 **`LOTTERY_ADVICE_RECENT`**。 |
+| **建议列表** | `utils/lottery-advice.js` · `lottery-advice-corpus.js` | `computeLotteryAdvices`；轮盘赌加权 + 梅花/紫微/卦气权重；最近 3 轮去重。 |
+| **梅花易数** | `utils/meihua-yishu.js` | `castMeihua(now, birthData)`：时间+命数混合起卦，返回体用生克分数。 |
+| **紫微简排** | `utils/ziwei-lite.js` | `getZiweiBasic` / `getTodayPalace`：命宫安置、五行局、今日流日宫位。 |
+| **卦气旺衰** | `utils/yijing-hexagram.js` | `getGuaQi` / `hexagramIdFromGua`：64 卦八宫五行 + 季节旺衰。 |
+| **农历转换** | `utils/lunar-calendar.js` | `solarToLunar`：1900-2100 压缩查表法。 |
 | **按日示意图绘制** | `utils/fortune-trend-candles.js` | 层级示意衔接、Y 轴缩放、刻度。 |
 | **道性结果 / 人像** | `pages/personality/result/result.js` · `result.wxml` | `portraitImgBind`、海报导出、`_portraitShowGen`。 |
 | **分包肖像** | `subpackages/portrait-assets/` · `app.json` | 路径与 `personalityPortraitSrc` 一致。 |
@@ -162,9 +188,9 @@ wx_program/
 
 ## 三、今日心象箴言（摘要）
 
-- **种子与条目**：`utils/fortune.js` **`buildFortuneMeta`**（日期、档案、天气、黄历、人格等哈希 → `lotId`）。
+- **签号决策**：`utils/fortune.js` **`buildFortuneMeta`**（有完整出生数据时由梅花易数起卦决定 `lotId`，否则 fallback 到 hashStr；返回梅花卦象、紫微命宫、卦气旺衰详情）。
 - **文案与等第**：`lots-data.js` · **`lots.js`** `TIERS_BY_LOT_ID`。
-- **建议**：`lottery-advice.js`（多池 + 种子抽样；避让上一轮正文）。
+- **建议**：`lottery-advice.js`（多池 + 轮盘赌加权抽样；梅花体用生克→语气权重、紫微宫位→领域权重、卦气→整体语气调整；最近 3 轮去重）。
 - **配图**：`lot-art.js` + 旧版 Canvas。
 - **展馆 / 成就**
   - 历史：**`lotteryHistory_v1`**。
@@ -181,7 +207,7 @@ wx_program/
 
 ## 五、个人档案（摘要）
 
-键 **`userProfile_v2`**；参与箴言种子与建议池；档案完整性 **`profile-lottery.js`**。
+键 **`userProfile_v2`**；参与箴言种子与建议池；档案完整性 **`profile-lottery.js`**。档案页可填写 **出生公历年/月/日 + 出生时辰**（12 时辰 picker），用于梅花易数起卦与紫微斗数命宫排盘。
 
 ---
 
@@ -222,10 +248,13 @@ wx_program/
 
 - 成就自然日与末抽口径、按日层级示意图衔接与 Y 轴、iOS Canvas + enhanced 规避、道性人像 `portraitImgBind`、建议避让上一轮、`LOTTERY_ADVICE_RECENT`、抽签叠影修复等。
 - **七大新功能**：箴言分享卡、成就分享卡、修行段位系统（10 级品阶）、节气限定徽章（24 节气 + 3 成就）、道性配对（四维兼容度算法）、年度修炼报告（道观 Wrapped）、每周挑战（五行短板自动出题）。
+- **抽签算法精度优化**：天气码/展示偏好移出签号种子、日干支基准修正（甲辰）、seasonal.js 死代码清理、箴言池浮点权重轮盘赌、catBoost 上限提升（+5/-4）、数据驱动箴言扩展至 3 条、最近 3 轮去重、经纬度精度降级（~1km）。
+- **周易玄学算法深度集成**：新增梅花易数起卦引擎（`meihua-yishu.js`）、紫微斗数简排（`ziwei-lite.js`）、64 卦元数据与卦气旺衰（`yijing-hexagram.js`）、公历↔农历转换（`lunar-calendar.js`）；档案页新增出生年/日/时辰字段；签号由梅花本卦直接映射、箴言权重受体用生克+紫微宫位+卦气三重调节。
 
 ### 8.2 维护提示
 
 - 卦爻 / 等第 / 种子逻辑：`lots-*`、`fortune.js`、`lottery-advice*`。
+- 玄学引擎：`meihua-yishu.js`（梅花起卦）、`ziwei-lite.js`（紫微简排）、`yijing-hexagram.js`（卦气旺衰）、`lunar-calendar.js`（农历转换）。
 - 展馆成就：`lottery-history.js`、`ACHIEVEMENT_DEFS`、`buildAchievementState`。
 - 人像 / 海报 / 分包：`pages/personality/result/*`、`app.json`。
 - 打卡：`utils/checkin.js`、`docs/check-in-system-brief.md`。

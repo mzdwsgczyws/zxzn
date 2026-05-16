@@ -87,6 +87,10 @@
         <text class="b-title">释义</text>
         <text class="b-body">{{lot.interpret}}</text>
       </view>
+      <view class="block fortune-blurb-block" wx:if="{{fortuneBlurb}}">
+        <text class="b-title">卦象参考</text>
+        <text class="b-body fortune-blurb">{{fortuneBlurb}}</text>
+      </view>
       <view class="block">
         <text class="b-title">建议</text>
         <text class="adv-line" wx:for="{{adviceList}}" wx:key="*this">{{item}}</text>

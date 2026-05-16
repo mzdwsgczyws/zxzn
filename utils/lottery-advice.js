@@ -97,16 +97,16 @@ function collectCandidates(ctx, rnd) {
     const fb = wx.getStorageSync(KEYS.ADVICE_FEEDBACK) || {}
     const liked = fb.likedCats || {}
     const disliked = fb.dislikedCats || {}
-    Object.keys(liked).forEach(c => { catBoost[c] = (catBoost[c] || 0) + Math.min(liked[c], 3) })
-    Object.keys(disliked).forEach(c => { catBoost[c] = (catBoost[c] || 0) - Math.min(disliked[c], 2) })
+    Object.keys(liked).forEach(c => { catBoost[c] = (catBoost[c] || 0) + Math.min(liked[c], 5) })
+    Object.keys(disliked).forEach(c => { catBoost[c] = (catBoost[c] || 0) - Math.min(disliked[c], 4) })
   } catch (e) {}
 
   /** @param {string} [focusTag] 与档案「关心领域」id 对应时标记，供抽取阶段保证强相关条数 */
   const push = (cat, text, weight = 1, focusTag = null) => {
     const boost = catBoost[cat] || 0
-    const w = Math.max(1, weight + boost)
-    const base = focusTag ? { cat, text, focusTag } : { cat, text }
-    for (let i = 0; i < w; i++) out.push({ ...base })
+    const w = Math.max(0.2, weight + boost)
+    const base = focusTag ? { cat, text, focusTag, _w: w } : { cat, text, _w: w }
+    out.push(base)
   }
 
   /* —— 等第与建除 —— */
@@ -502,27 +502,33 @@ function normalizeAvoidTexts(avoidAdviceTexts) {
   return s
 }
 
+/** Weighted roulette-wheel pick from a pool with `_w` float weights */
+function weightedPick(pool, rnd) {
+  let total = 0
+  for (let i = 0; i < pool.length; i++) total += (pool[i]._w || 1)
+  let r = rnd() * total
+  for (let i = 0; i < pool.length; i++) {
+    r -= (pool[i]._w || 1)
+    if (r <= 0) return pool[i]
+  }
+  return pool[pool.length - 1]
+}
+
 /**
- * 贪心选取：优先不与上一条同 cat、优先避开上一轮抽签出现过的正文；
+ * 贪心选取：优先不与上一条同 cat、优先避开近几轮出现过的正文；
+ * 使用轮盘赌加权随机，权重由 catBoost 和条目本身 weight 共同决定。
  * 候选不足时逐级放宽，直到凑满 targetCount 或候选耗尽。
- * @param {{cat:string,text:string,focusTag?:string}[]} [seedRes] 已选条目（会并入结果并参与去重）
+ * @param {{cat:string,text:string,focusTag?:string,_w?:number}[]} [seedRes] 已选条目
  */
 function uniquePick(list, rnd, targetCount, avoidAdviceTexts, seedRes) {
   const avoid = normalizeAvoidTexts(avoidAdviceTexts)
   const seen = new Set()
   const res = Array.isArray(seedRes) ? seedRes.slice() : []
   res.forEach((p) => seen.add(p.text))
-  const shuffled = list.slice()
-  for (let i = shuffled.length - 1; i > 0; i--) {
-    const j = Math.floor(rnd() * (i + 1))
-    const t = shuffled[i]
-    shuffled[i] = shuffled[j]
-    shuffled[j] = t
-  }
 
   while (res.length < targetCount) {
     const lastCat = res.length ? res[res.length - 1].cat : null
-    const candidates = shuffled.filter((it) => !seen.has(it.text))
+    const candidates = list.filter((it) => !seen.has(it.text))
     if (!candidates.length) break
 
     const tierA = candidates.filter((it) => (!lastCat || it.cat !== lastCat) && !avoid.has(it.text))
@@ -536,18 +542,22 @@ function uniquePick(list, rnd, targetCount, avoidAdviceTexts, seedRes) {
         break
       }
     }
-    const pick = pool[Math.floor(rnd() * pool.length)]
+    const pick = weightedPick(pool, rnd)
     seen.add(pick.text)
     res.push(pick)
   }
   return res
 }
 
-function buildDataDrivenAdvice(ctx) {
+/**
+ * 返回数据驱动箴言数组（0-3 条）。
+ * 记录 >= 7 天时最多返回 3 条，3-6 天返回 1 条。
+ */
+function buildDataDrivenAdvices(ctx) {
   try {
     const records = wx.getStorageSync(KEYS.TRACK_RECORDS) || []
-    if (records.length < 3) return null
-    const recent = records.slice(-5)
+    if (records.length < 3) return []
+    const recent = records.slice(-7)
     const tAvg = (key) => {
       const xs = recent.map(r => Number(r[key])).filter(n => !Number.isNaN(n))
       return xs.length ? +(xs.reduce((a, b) => a + b, 0) / xs.length).toFixed(1) : null
@@ -559,49 +569,51 @@ function buildDataDrivenAdvice(ctx) {
     const avgAnger = tAvg('angerCount')
     const n = recent.length
 
+    const all = []
     if (avgSleep != null && avgSleep < 6.5) {
-      return {
-        cat: '起居', 
+      all.push({
+        cat: '起居',
         text: `你近 ${n} 天平均睡眠仅 ${avgSleep}h，今天试试提前 30 分钟放下手机。`,
         reason: `近 ${n} 天平均 ${avgSleep}h`,
         microAction: '今晚提前 30 分钟放下手机'
-      }
+      })
     }
     if (avgScreen != null && avgScreen > 6) {
-      return {
+      all.push({
         cat: '行动',
         text: `你近 ${n} 天日均屏幕 ${avgScreen}h，试试午后用 20 分钟散步替代刷手机。`,
         reason: `近 ${n} 天日均 ${avgScreen}h`,
         microAction: '午后散步 20 分钟替代刷手机'
-      }
+      })
     }
     if (avgRecovery != null && avgRecovery <= 2.5) {
-      return {
+      all.push({
         cat: '起居',
         text: `你近 ${n} 天恢复感均值仅 ${avgRecovery}，给自己 15 分钟彻底休息。`,
         reason: `恢复感均值 ${avgRecovery}/5`,
         microAction: '安排 15 分钟纯休息'
-      }
+      })
     }
     if (avgDrain != null && avgDrain >= 4) {
-      return {
+      all.push({
         cat: '行动',
         text: `你近 ${n} 天耗竭感均值 ${avgDrain}，砍掉一件不重要的事。`,
         reason: `耗竭感均值 ${avgDrain}/5`,
         microAction: '砍掉今天一件不重要的事'
-      }
+      })
     }
     if (avgAnger != null && avgAnger >= 3) {
-      return {
+      all.push({
         cat: '情绪',
         text: `你近 ${n} 天日均发火 ${avgAnger} 次，回消息前试试深呼吸 3 次。`,
         reason: `日均 ${avgAnger} 次`,
         microAction: '回消息前深呼吸 3 次'
-      }
+      })
     }
-    return null
+    const maxItems = records.length >= 7 ? 3 : 1
+    return all.slice(0, maxItems)
   } catch (e) {
-    return null
+    return []
   }
 }
 
@@ -619,6 +631,71 @@ function deriveMicroAction(cat, text, rnd) {
   }
   const options = MAP[cat] || MAP['日常']
   return options[Math.floor(rnd() * options.length)]
+}
+
+var PALACE_DOMAIN_TO_FOCUS = {
+  'finance': 'finance',
+  'work': 'work',
+  'relation': 'relation',
+  'health': 'health',
+  'rest': 'rest',
+  'family': 'family',
+  'self': null
+}
+
+var SHENGKE_CAT_BOOST = {
+  'action_positive': ['行动', '事业', '学业'],
+  'action_cautious': ['起居', '情绪', '日常', '自修']
+}
+
+/**
+ * 根据梅花体用生克、紫微今日宫位、卦气旺衰调整候选池权重。
+ */
+function applyMetaphysicsWeights(pool, meihua, guaQi, todayPalace) {
+  if (!pool || !pool.length) return
+
+  var shengkeAdj = 0
+  var shengkeTone = 'neutral'
+  if (meihua) {
+    var score = meihua.score || 0
+    if (score >= 2) { shengkeAdj = 2; shengkeTone = 'positive' }
+    else if (score === 1) { shengkeAdj = 1; shengkeTone = 'positive' }
+    else if (score <= -1) { shengkeAdj = 2; shengkeTone = 'cautious' }
+  }
+
+  var guaQiAdj = 0
+  var guaQiTone = 'neutral'
+  if (guaQi) {
+    var qs = guaQi.score || 0
+    if (qs >= 1) { guaQiAdj = 1; guaQiTone = 'positive' }
+    else if (qs <= -1) { guaQiAdj = 1; guaQiTone = 'cautious' }
+  }
+
+  var palaceFocusDomain = null
+  if (todayPalace && todayPalace.domain) {
+    palaceFocusDomain = PALACE_DOMAIN_TO_FOCUS[todayPalace.domain] || null
+  }
+
+  for (var i = 0; i < pool.length; i++) {
+    var item = pool[i]
+    var w = item._w || 1
+
+    if (shengkeAdj > 0) {
+      var cats = shengkeTone === 'positive' ? SHENGKE_CAT_BOOST.action_positive : SHENGKE_CAT_BOOST.action_cautious
+      if (cats.indexOf(item.cat) >= 0) w += shengkeAdj
+    }
+
+    if (guaQiAdj > 0) {
+      var gCats = guaQiTone === 'positive' ? SHENGKE_CAT_BOOST.action_positive : SHENGKE_CAT_BOOST.action_cautious
+      if (gCats.indexOf(item.cat) >= 0) w += guaQiAdj
+    }
+
+    if (palaceFocusDomain && item.focusTag === palaceFocusDomain) {
+      w += 2
+    }
+
+    item._w = Math.max(0.2, w)
+  }
 }
 
 /**
@@ -641,7 +718,11 @@ function computeLotteryAdvices(input) {
     rhythmType,
     focusTags,
     profile,
-    avoidAdviceTexts
+    avoidAdviceTexts,
+    meihua,
+    ziwei,
+    guaQi,
+    todayPalace
   } = input
 
   const wf = weatherFlags(weather)
@@ -685,6 +766,9 @@ function computeLotteryAdvices(input) {
     userTone
   }
   const pool = collectCandidates(ctx, rnd)
+
+  applyMetaphysicsWeights(pool, meihua, guaQi, todayPalace)
+
   const ftArr = Array.isArray(focusTags) ? focusTags.filter(Boolean) : []
   /** 5–9 条（含），稳定随机 */
   const adviceTotal = 5 + Math.floor(rnd() * 5)
@@ -728,22 +812,18 @@ function computeLotteryAdvices(input) {
     }
   }
 
-  const dataAdvice = buildDataDrivenAdvice(ctx)
-  if (dataAdvice && topPicked.length) {
-    const dup = topPicked.some((p) => p.text === dataAdvice.text)
-    if (!dup) {
-      let rep = -1
-      for (let i = topPicked.length - 1; i >= 0; i--) {
-        const p = topPicked[i]
-        if (!p.focusTag || ftArr.indexOf(p.focusTag) < 0) {
-          rep = i
-          break
-        }
-      }
-      if (rep >= 0) {
-        topPicked[rep] = dataAdvice
+  const dataAdvices = buildDataDrivenAdvices(ctx)
+  for (let di = 0; di < dataAdvices.length; di++) {
+    const da = dataAdvices[di]
+    if (topPicked.some((p) => p.text === da.text)) continue
+    let rep = -1
+    for (let i = topPicked.length - 1; i >= 0; i--) {
+      const p = topPicked[i]
+      if (!p.focusTag || ftArr.indexOf(p.focusTag) < 0) {
+        if (!dataAdvices.some((d) => d.text === p.text)) { rep = i; break }
       }
     }
+    if (rep >= 0) topPicked[rep] = da
   }
 
   if (ftArr.length && countFocusIn(topPicked) < 3) {
