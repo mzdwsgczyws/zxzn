@@ -897,4 +897,4 @@ function computeLotteryAdvices(input) {
   return result
 }
 
-module.exports = { computeLotteryAdvices, seasonBucket, ageBracket, weatherFlags, buildDataDrivenAdvice, deriveMicroAction }
+module.exports = { computeLotteryAdvices, seasonBucket, ageBracket, weatherFlags, buildDataDrivenAdvices, deriveMicroAction }

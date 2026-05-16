@@ -24,22 +24,16 @@ App({
 
   _initTheme() {
     try {
-      const info = wx.getSystemInfoSync()
+      const info = wx.getAppBaseInfo ? wx.getAppBaseInfo() : wx.getSystemInfoSync()
       this.globalData.systemTheme = info.theme || 'light'
     } catch (e) {
       this.globalData.systemTheme = 'light'
     }
   },
 
+  /** 外链字体 CDN 已失效；样式表已配置 Songti 等系统衬线回退 */
   _loadDisplayFont() {
-    wx.loadFontFace({
-      global: true,
-      family: 'DaoDisplay',
-      source: 'url("https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/fonts/LXGWWenKai-Regular.woff2")',
-      scopes: ['webview', 'native'],
-      success: () => { this.globalData.fontLoaded = true },
-      fail: () => { this.globalData.fontLoaded = false }
-    })
+    this.globalData.fontLoaded = false
   },
 
   globalData: {
