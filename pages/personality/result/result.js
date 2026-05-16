@@ -342,8 +342,21 @@ function paintResultPoster(
   ctx.fillText(APP_NAME + ' · 仅供文化参考', 56, H - 56)
 }
 
-function drawShareDualBar(ctx, x, y, barW, lv, rv, leftDom) {
+function drawShareDualBar(ctx, x, y, barW, lv, rv, leftDom, is2d) {
   const h = 9
+  if (is2d) {
+    ctx.fillStyle = '#e5dfd4'
+    ctx.fillRect(x, y, barW, h)
+    if (leftDom) {
+      ctx.fillStyle = '#3949ab'
+      ctx.fillRect(x, y, Math.max(2, (barW * lv) / 100), h)
+    } else {
+      ctx.fillStyle = '#c9a227'
+      const rw = Math.max(2, (barW * rv) / 100)
+      ctx.fillRect(x + barW - rw, y, rw, h)
+    }
+    return
+  }
   ctx.setFillStyle('#e5dfd4')
   ctx.fillRect(x, y, barW, h)
   if (leftDom) {
@@ -354,6 +367,98 @@ function drawShareDualBar(ctx, x, y, barW, lv, rv, leftDom) {
     const rw = Math.max(2, (barW * rv) / 100)
     ctx.fillRect(x + barW - rw, y, rw, h)
   }
+}
+
+/** 微信分享卡片（5:4）Canvas 2D 绘制 */
+function paintShareCard2d(ctx, result, imgPortrait, imgCode) {
+  const W = SHARE_W
+  const H = SHARE_H
+
+  ctx.fillStyle = '#17122e'
+  ctx.fillRect(0, 0, W, H)
+  ctx.fillStyle = '#1f1840'
+  ctx.fillRect(8, 8, W - 16, H - 16)
+
+  ctx.fillStyle = '#d4af37'
+  ctx.fillRect(8, 8, W - 16, 5)
+  ctx.strokeStyle = 'rgba(212, 175, 55, 0.35)'
+  ctx.lineWidth = 1
+  ctx.strokeRect(20, 20, W - 40, H - 40)
+
+  ctx.fillStyle = '#e8d4a8'
+  ctx.font = '17px sans-serif'
+  ctx.textAlign = 'left'
+  ctx.fillText(APP_NAME + ' · 道性十六型', 28, 52)
+
+  ctx.fillStyle = 'rgba(212, 175, 55, 0.55)'
+  ctx.font = '13px sans-serif'
+  ctx.fillText('当前更接近（非固定标签）', 28, 72)
+
+  const p = SHARE_PORTRAIT
+  ctx.strokeStyle = '#d4af37'
+  ctx.lineWidth = 2
+  ctx.strokeRect(p.x - 2, p.y - 2, p.w + 4, p.h + 4)
+  if (imgPortrait) {
+    ctx.drawImage(imgPortrait, p.x, p.y, p.w, p.h)
+  } else {
+    ctx.fillStyle = '#3a3550'
+    ctx.fillRect(p.x, p.y, p.w, p.h)
+    ctx.fillStyle = '#908878'
+    ctx.font = '13px sans-serif'
+    ctx.textAlign = 'center'
+    ctx.fillText('肖像', p.x + p.w / 2, p.y + p.h / 2 + 5)
+    ctx.textAlign = 'left'
+  }
+
+  const infoX = 196
+  const name = String(result.typeName || '')
+  ctx.fillStyle = '#f0e8d8'
+  ctx.font = 'bold 26px sans-serif'
+  ctx.fillText(name.length > 8 ? name.slice(0, 8) + '…' : name, infoX, 108)
+
+  ctx.fillStyle = '#c4b8a8'
+  ctx.font = '14px sans-serif'
+  const fig = '形象取意：' + (result.figure || '—')
+  ctx.fillText(fig.length > 16 ? fig.slice(0, 16) + '…' : fig, infoX, 132)
+
+  const sc = result.scores || {}
+  const SHARE_DIMS = [
+    { left: '静', right: '动', key: '动' },
+    { left: '柔', right: '刚', key: '刚' },
+    { left: '聚', right: '散', key: '散' },
+    { left: '隐', right: '显', key: '显' }
+  ]
+  const barX = 28
+  const barW = W - 56
+  let y = 248
+  SHARE_DIMS.forEach((d) => {
+    const rv = sc[d.key] || 50
+    const lv = 100 - rv
+    const leftDom = lv > rv
+    const dom = leftDom ? d.left : d.right
+    const pct = Math.max(rv, lv)
+    ctx.fillStyle = '#b8b0a4'
+    ctx.font = '13px sans-serif'
+    ctx.fillText(d.left + ' · ' + d.right, barX, y)
+    ctx.fillStyle = leftDom ? '#9eb3ff' : '#e8d4a8'
+    ctx.fillText(dom + ' ' + pct + '%', barX + barW - 58, y)
+    drawShareDualBar(ctx, barX, y + 6, barW, lv, rv, leftDom, true)
+    y += 30
+  })
+
+  const c = SHARE_CODE
+  if (imgCode) {
+    ctx.fillStyle = '#ffffff'
+    ctx.fillRect(c.x - 3, c.y - 3, c.w + 6, c.h + 6)
+    ctx.drawImage(imgCode, c.x, c.y, c.w, c.h)
+    ctx.fillStyle = '#908878'
+    ctx.font = '11px sans-serif'
+    ctx.fillText('扫码进入', c.x - 4, c.y + c.h + 16)
+  }
+
+  ctx.fillStyle = '#7a7268'
+  ctx.font = '12px sans-serif'
+  ctx.fillText(imgCode ? '仅供文化参考' : APP_NAME + ' · 仅供文化参考', 28, H - 22)
 }
 
 function getImageInfoPath(src) {
@@ -367,6 +472,7 @@ function getImageInfoPath(src) {
 }
 
 async function firstImagePathAndSrc(sources) {
+  await loadPortraitSubpackage()
   for (let i = 0; i < sources.length; i++) {
     const s = sources[i]
     const p = await getImageInfoPath(s)
@@ -603,7 +709,14 @@ Page({
             if (!this.data.hasResult || !this.data.result || resultTypeId(this.data.result) !== tid) return
             this.setData(
               { portraitImgBind: { key: String(myGen), src: plain } },
-              () => setTimeout(() => this.renderShareCard(), 200)
+              () => {
+                setTimeout(() => this.renderShareCard(), 320)
+                setTimeout(() => {
+                  if (myGen === this._portraitShowGen && this.data.hasResult) {
+                    this.renderShareCard()
+                  }
+                }, 1000)
+              }
             )
           }, delayMs)
         })
@@ -643,128 +756,80 @@ Page({
     }
   },
 
-  /** 分享用卡片：500×400（5:4），导出 2x；含肖像、类型名、四维与小程序码 */
+  _getShareCanvas2d() {
+    return new Promise((resolve, reject) => {
+      const query = wx.createSelectorQuery().in(this)
+      query
+        .select('#shareCanvas2d')
+        .fields({ node: true, size: true })
+        .exec((res) => {
+          const r = res && res[0]
+          if (!r || !r.node) {
+            reject(new Error('no share canvas'))
+            return
+          }
+          const canvas = r.node
+          const ctx = canvas.getContext('2d')
+          if (!ctx) {
+            reject(new Error('no 2d context'))
+            return
+          }
+          const win = wx.getWindowInfo ? wx.getWindowInfo() : wx.getSystemInfoSync()
+          const dpr = Math.min(win.pixelRatio || 2, 3)
+          canvas.width = Math.floor(SHARE_W * dpr)
+          canvas.height = Math.floor(SHARE_H * dpr)
+          ctx.scale(dpr, dpr)
+          ctx.textBaseline = 'alphabetic'
+          resolve({ canvas, ctx, dpr })
+        })
+    })
+  },
+
+  /** 分享用卡片：500×400（5:4），Canvas 2D + 分包图稳健加载 */
   async renderShareCard() {
     const result = this.data.result
     if (!result) return
     const tid = resultTypeId(result)
     const myGen = this._portraitShowGen
-    await loadPortraitSubpackage()
-    if (myGen !== this._portraitShowGen || !this.data.result) return
-    const [{ path: portraitPath }, { path: codePath }] = await Promise.all([
-      firstImagePathAndSrc(personalityPortraitCandidates(tid)),
-      firstImagePathAndSrc(MINI_CODE_SRCS)
-    ])
-    if (myGen !== this._portraitShowGen || !this.data.result) return
-    this._paintShareCard(result, portraitPath, codePath)
-  },
-
-  _paintShareCard(result, portraitLocalPath, codeLocalPath) {
-    const ctx = wx.createCanvasContext('shareCanvas', this)
-    const W = SHARE_W
-    const H = SHARE_H
-
-    ctx.setFillStyle('#17122e')
-    ctx.fillRect(0, 0, W, H)
-    ctx.setFillStyle('#1f1840')
-    ctx.fillRect(8, 8, W - 16, H - 16)
-
-    ctx.setFillStyle('#d4af37')
-    ctx.fillRect(8, 8, W - 16, 5)
-    ctx.setStrokeStyle('rgba(212, 175, 55, 0.35)')
-    ctx.setLineWidth(1)
-    ctx.strokeRect(20, 20, W - 40, H - 40)
-
-    ctx.setFillStyle('#e8d4a8')
-    ctx.setFontSize(17)
-    ctx.fillText(APP_NAME + ' · 道性十六型', 28, 52)
-
-    ctx.setFillStyle('rgba(212, 175, 55, 0.55)')
-    ctx.setFontSize(13)
-    ctx.fillText('当前更接近（非固定标签）', 28, 72)
-
-    const p = SHARE_PORTRAIT
-    ctx.setStrokeStyle('#d4af37')
-    ctx.setLineWidth(2)
-    ctx.strokeRect(p.x - 2, p.y - 2, p.w + 4, p.h + 4)
-    if (portraitLocalPath) {
-      ctx.drawImage(portraitLocalPath, p.x, p.y, p.w, p.h)
-    } else {
-      ctx.setFillStyle('#3a3550')
-      ctx.fillRect(p.x, p.y, p.w, p.h)
+    try {
+      await loadPortraitSubpackage()
+      if (myGen !== this._portraitShowGen || !this.data.result) return
+      const [portraitRes, codeRes] = await Promise.all([
+        firstImagePathAndSrc(personalityPortraitCandidates(tid)),
+        firstImagePathAndSrc(MINI_CODE_SRCS)
+      ])
+      if (myGen !== this._portraitShowGen || !this.data.result) return
+      const { canvas, ctx } = await this._getShareCanvas2d()
+      const [imgPortrait, imgCode] = await Promise.all([
+        loadImage2dRobust(canvas, portraitRes.path, portraitRes.packSrc),
+        loadImage2dRobust(canvas, codeRes.path, codeRes.packSrc)
+      ])
+      if (myGen !== this._portraitShowGen || !this.data.result) return
+      paintShareCard2d(ctx, result, imgPortrait, imgCode)
+      await new Promise((resolve, reject) => {
+        setTimeout(() => {
+          wx.canvasToTempFilePath(
+            {
+              type: '2d',
+              canvas,
+              fileType: 'png',
+              quality: 1,
+              success: (r) => {
+                this.setData({ shareImg: r.tempFilePath })
+                resolve()
+              },
+              fail: (e) => {
+                console.warn('share card export 2d', e)
+                reject(e)
+              }
+            },
+            this
+          )
+        }, 200)
+      })
+    } catch (e) {
+      console.warn('renderShareCard', e)
     }
-
-    const infoX = 196
-    const name = String(result.typeName || '')
-    ctx.setFillStyle('#f0e8d8')
-    ctx.setFontSize(26)
-    ctx.fillText(name.length > 8 ? name.slice(0, 8) + '…' : name, infoX, 108)
-
-    ctx.setFillStyle('#c4b8a8')
-    ctx.setFontSize(14)
-    const fig = '形象取意：' + (result.figure || '—')
-    ctx.fillText(fig.length > 16 ? fig.slice(0, 16) + '…' : fig, infoX, 132)
-
-    const sc = result.scores || {}
-    const SHARE_DIMS = [
-      { left: '静', right: '动', key: '动' },
-      { left: '柔', right: '刚', key: '刚' },
-      { left: '聚', right: '散', key: '散' },
-      { left: '隐', right: '显', key: '显' }
-    ]
-    const barX = 28
-    const barW = W - 56
-    let y = 248
-    SHARE_DIMS.forEach((d) => {
-      const rv = sc[d.key] || 50
-      const lv = 100 - rv
-      const leftDom = lv > rv
-      const dom = leftDom ? d.left : d.right
-      const pct = Math.max(rv, lv)
-      ctx.setFillStyle('#b8b0a4')
-      ctx.setFontSize(13)
-      ctx.fillText(d.left + ' · ' + d.right, barX, y)
-      ctx.setFillStyle(leftDom ? '#9eb3ff' : '#e8d4a8')
-      ctx.fillText(dom + ' ' + pct + '%', barX + barW - 58, y)
-      drawShareDualBar(ctx, barX, y + 6, barW, lv, rv, leftDom)
-      y += 30
-    })
-
-    const c = SHARE_CODE
-    if (codeLocalPath) {
-      ctx.setFillStyle('#ffffff')
-      ctx.fillRect(c.x - 3, c.y - 3, c.w + 6, c.h + 6)
-      ctx.drawImage(codeLocalPath, c.x, c.y, c.w, c.h)
-      ctx.setFillStyle('#908878')
-      ctx.setFontSize(11)
-      ctx.fillText('扫码进入', c.x - 4, c.y + c.h + 16)
-    }
-
-    ctx.setFillStyle('#7a7268')
-    ctx.setFontSize(12)
-    ctx.fillText(
-      codeLocalPath ? '仅供文化参考' : APP_NAME + ' · 仅供文化参考',
-      28,
-      H - 22
-    )
-
-    ctx.draw(false, () => {
-      setTimeout(() => {
-        wx.canvasToTempFilePath(
-          {
-            canvasId: 'shareCanvas',
-            width: W,
-            height: H,
-            destWidth: W * 2,
-            destHeight: H * 2,
-            fileType: 'png',
-            success: (res) => this.setData({ shareImg: res.tempFilePath }),
-            fail: (e) => console.warn('share card export', e)
-          },
-          this
-        )
-      }, 120)
-    })
   },
 
   savePoster() {

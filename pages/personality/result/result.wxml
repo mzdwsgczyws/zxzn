@@ -67,11 +67,10 @@
 
   <view class="canvas-offscreen">
     <canvas
-      canvas-id="shareCanvas"
+      type="2d"
+      id="shareCanvas2d"
       class="hidden-canvas"
       style="width: 500px; height: 400px;"
-      width="500"
-      height="400"
     ></canvas>
     <canvas
       type="2d"
