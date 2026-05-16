@@ -23,7 +23,7 @@ Page({
 
   onShareAppMessage() {
     return {
-      title: `我的${this.data.periodLabel}修炼报告 · 道性自察`,
+      title: `我的${this.data.periodLabel}修炼报告 · 量化自修正念`,
       path: '/pages/index/index'
     }
   },

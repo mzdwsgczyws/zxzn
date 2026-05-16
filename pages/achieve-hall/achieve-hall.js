@@ -45,7 +45,7 @@ Page({
   onShareAppMessage() {
     recordShare('/pages/achieve-hall/achieve-hall')
     return {
-      title: '我在「道性自察」解锁了 ' + this.data.unlockedCount + ' 项成就',
+      title: '我在「量化自修正念」解锁了 ' + this.data.unlockedCount + ' 项成就',
       path: '/pages/achieve-hall/achieve-hall'
     }
   },

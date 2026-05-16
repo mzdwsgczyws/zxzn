@@ -1,3 +1,6 @@
+const miniCode = require('./mini-code-image.js')
+const APP_NAME = miniCode.APP_NAME
+
 /**
  * 统一海报引擎 — 使用 Canvas 2D API 生成分享图
  * 调用方需在 wxml 中放置:
@@ -33,7 +36,39 @@ function getCanvas(pageCtx, canvasId) {
  * @param {number} h - logical height (px)
  * @returns {Promise<string>} temp file path of the generated image
  */
+async function drawMiniCodeBlock(ctx, canvas, w, h, opts) {
+  const codeSize = (opts && opts.size) || 72
+  const codeX = opts && opts.x != null ? opts.x : w / 2 - codeSize / 2
+  const codeY = opts && opts.y != null ? opts.y : h - 135
+  const labelY = codeY + codeSize + (opts && opts.labelGap != null ? opts.labelGap : 20)
+
+  const codeImg = await miniCode.loadMiniCodeForCanvas(canvas)
+  if (codeImg) {
+    ctx.save()
+    ctx.beginPath()
+    ctx.arc(codeX + codeSize / 2, codeY + codeSize / 2, codeSize / 2 + 2, 0, Math.PI * 2)
+    ctx.fillStyle = 'rgba(255,255,255,0.92)'
+    ctx.fill()
+    ctx.beginPath()
+    ctx.arc(codeX + codeSize / 2, codeY + codeSize / 2, codeSize / 2, 0, Math.PI * 2)
+    ctx.clip()
+    ctx.drawImage(codeImg, codeX, codeY, codeSize, codeSize)
+    ctx.restore()
+    ctx.font = '14px sans-serif'
+    ctx.fillStyle = '#7a6e62'
+    ctx.textAlign = 'center'
+    ctx.fillText('扫码体验「' + APP_NAME + '」', codeX + codeSize / 2, labelY)
+    return true
+  }
+  ctx.font = '16px sans-serif'
+  ctx.fillStyle = '#7a6e62'
+  ctx.textAlign = 'center'
+  ctx.fillText('来自「' + APP_NAME + '」小程序', w / 2, h - 55)
+  return false
+}
+
 async function generate(pageCtx, canvasId, templateFn, w, h) {
+  await miniCode.ensurePortraitSubpackage()
   const info = wx.getSystemInfoSync()
   const dpr = info.pixelRatio || 2
 
@@ -222,7 +257,7 @@ function tplMaxim(data) {
     ctx.font = '600 34px sans-serif'
     ctx.fillStyle = '#d4af37'
     ctx.textAlign = 'center'
-    ctx.fillText('道 性 自 察', w / 2, titleY)
+    ctx.fillText(APP_NAME, w / 2, titleY)
 
     // ── 小篆装饰符 ──
     ctx.font = '16px serif'
@@ -256,46 +291,7 @@ function tplMaxim(data) {
     ctx.lineWidth = 0.8
     ctx.beginPath(); ctx.moveTo(70, h - 145); ctx.lineTo(w - 70, h - 145); ctx.stroke()
 
-    // ── 小程序码 ──
-    var codeSize = 72
-    var codeX = w / 2 - codeSize / 2
-    var codeY = h - 135
-    try {
-      var codeSrcs = [
-        '/subpackages/portrait-assets/images/personality-portraits/index.jpg',
-        '/subpackages/portrait-assets/images/personality-portraits/index.png'
-      ]
-      var codeImg = null
-      for (var s = 0; s < codeSrcs.length; s++) {
-        try { codeImg = await loadImage(canvas, codeSrcs[s]); break } catch (e) {}
-      }
-      if (codeImg) {
-        ctx.save()
-        ctx.beginPath()
-        ctx.arc(codeX + codeSize / 2, codeY + codeSize / 2, codeSize / 2 + 2, 0, Math.PI * 2)
-        ctx.fillStyle = 'rgba(255,255,255,0.9)'
-        ctx.fill()
-        ctx.beginPath()
-        ctx.arc(codeX + codeSize / 2, codeY + codeSize / 2, codeSize / 2, 0, Math.PI * 2)
-        ctx.clip()
-        ctx.drawImage(codeImg, codeX, codeY, codeSize, codeSize)
-        ctx.restore()
-        ctx.font = '14px sans-serif'
-        ctx.fillStyle = '#7a6e62'
-        ctx.textAlign = 'center'
-        ctx.fillText('扫码体验「道性自察」', w / 2, codeY + codeSize + 20)
-      } else {
-        ctx.font = '16px sans-serif'
-        ctx.fillStyle = '#7a6e62'
-        ctx.textAlign = 'center'
-        ctx.fillText('来自「道性自察」小程序', w / 2, h - 55)
-      }
-    } catch (e) {
-      ctx.font = '16px sans-serif'
-      ctx.fillStyle = '#7a6e62'
-      ctx.textAlign = 'center'
-      ctx.fillText('来自「道性自察」小程序', w / 2, h - 55)
-    }
+    await drawMiniCodeBlock(ctx, canvas, w, h, { size: 72, y: h - 135, labelGap: 20 })
   }
 }
 
@@ -350,45 +346,7 @@ function tplPersonality(data) {
     ctx.strokeStyle = 'rgba(212, 175, 55, 0.15)'
     ctx.beginPath(); ctx.moveTo(70, h - 145); ctx.lineTo(w - 70, h - 145); ctx.stroke()
 
-    var codeSize = 68
-    var codeX = w / 2 - codeSize / 2
-    var codeY = h - 130
-    try {
-      var codeImg = null
-      var srcs = [
-        '/subpackages/portrait-assets/images/personality-portraits/index.jpg',
-        '/subpackages/portrait-assets/images/personality-portraits/index.png'
-      ]
-      for (var s = 0; s < srcs.length; s++) {
-        try { codeImg = await loadImage(canvas, srcs[s]); break } catch (e) {}
-      }
-      if (codeImg) {
-        ctx.save()
-        ctx.beginPath()
-        ctx.arc(codeX + codeSize / 2, codeY + codeSize / 2, codeSize / 2 + 2, 0, Math.PI * 2)
-        ctx.fillStyle = 'rgba(255,255,255,0.9)'
-        ctx.fill()
-        ctx.beginPath()
-        ctx.arc(codeX + codeSize / 2, codeY + codeSize / 2, codeSize / 2, 0, Math.PI * 2)
-        ctx.clip()
-        ctx.drawImage(codeImg, codeX, codeY, codeSize, codeSize)
-        ctx.restore()
-        ctx.font = '14px sans-serif'
-        ctx.fillStyle = '#7a6e62'
-        ctx.textAlign = 'center'
-        ctx.fillText('扫码体验「道性自察」', w / 2, codeY + codeSize + 18)
-      } else {
-        ctx.font = '16px sans-serif'
-        ctx.fillStyle = '#7a6e62'
-        ctx.textAlign = 'center'
-        ctx.fillText('来自「道性自察」小程序', w / 2, h - 55)
-      }
-    } catch (e) {
-      ctx.font = '16px sans-serif'
-      ctx.fillStyle = '#7a6e62'
-      ctx.textAlign = 'center'
-      ctx.fillText('来自「道性自察」小程序', w / 2, h - 55)
-    }
+    await drawMiniCodeBlock(ctx, canvas, w, h, { size: 68, y: h - 130, labelGap: 18 })
   }
 }
 
@@ -465,46 +423,7 @@ function tplAchieve(data) {
     ctx.strokeStyle = 'rgba(212, 175, 55, 0.15)'
     ctx.beginPath(); ctx.moveTo(70, h - 145); ctx.lineTo(w - 70, h - 145); ctx.stroke()
 
-    // ── 小程序码 ──
-    var codeSize = 68
-    var codeX = w / 2 - codeSize / 2
-    var codeY = h - 130
-    try {
-      var codeImg = null
-      var srcs = [
-        '/subpackages/portrait-assets/images/personality-portraits/index.jpg',
-        '/subpackages/portrait-assets/images/personality-portraits/index.png'
-      ]
-      for (var s = 0; s < srcs.length; s++) {
-        try { codeImg = await loadImage(canvas, srcs[s]); break } catch (e) {}
-      }
-      if (codeImg) {
-        ctx.save()
-        ctx.beginPath()
-        ctx.arc(codeX + codeSize / 2, codeY + codeSize / 2, codeSize / 2 + 2, 0, Math.PI * 2)
-        ctx.fillStyle = 'rgba(255,255,255,0.9)'
-        ctx.fill()
-        ctx.beginPath()
-        ctx.arc(codeX + codeSize / 2, codeY + codeSize / 2, codeSize / 2, 0, Math.PI * 2)
-        ctx.clip()
-        ctx.drawImage(codeImg, codeX, codeY, codeSize, codeSize)
-        ctx.restore()
-        ctx.font = '14px sans-serif'
-        ctx.fillStyle = '#7a6e62'
-        ctx.textAlign = 'center'
-        ctx.fillText('扫码体验「道性自察」', w / 2, codeY + codeSize + 18)
-      } else {
-        ctx.font = '16px sans-serif'
-        ctx.fillStyle = '#7a6e62'
-        ctx.textAlign = 'center'
-        ctx.fillText('来自「道性自察」小程序', w / 2, h - 55)
-      }
-    } catch (e) {
-      ctx.font = '16px sans-serif'
-      ctx.fillStyle = '#7a6e62'
-      ctx.textAlign = 'center'
-      ctx.fillText('来自「道性自察」小程序', w / 2, h - 55)
-    }
+    await drawMiniCodeBlock(ctx, canvas, w, h, { size: 68, y: h - 130, labelGap: 18 })
   }
 }
 

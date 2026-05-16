@@ -17,7 +17,7 @@
     "pages/annual-report/annual-report"
   ],
   "window": {
-    "navigationBarTitleText": "道性自察",
+    "navigationBarTitleText": "量化自修正念",
     "navigationBarBackgroundColor": "@navBgColor",
     "navigationBarTextStyle": "@navTextStyle",
     "backgroundColor": "@bgColor",
@@ -41,6 +41,18 @@
     }
   ],
   "preloadRule": {
+    "pages/index/index": {
+      "network": "all",
+      "packages": ["portrait-assets"]
+    },
+    "pages/lottery/lottery": {
+      "network": "all",
+      "packages": ["portrait-assets"]
+    },
+    "pages/achieve-hall/achieve-hall": {
+      "network": "all",
+      "packages": ["portrait-assets"]
+    },
     "pages/personality/quiz/quiz": {
       "network": "all",
       "packages": ["portrait-assets"]

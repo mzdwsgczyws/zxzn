@@ -293,7 +293,7 @@ Page({
     recordShare('/pages/index/index')
     const { lot } = this.data
     return {
-      title: lot ? `今日心象箴言：${lot.tierLabel} · ${lot.title}` : '道性自察 · 每日箴言',
+      title: lot ? `今日心象箴言：${lot.tierLabel} · ${lot.title}` : '量化自修正念 · 每日箴言',
       path: '/pages/index/index'
     }
   },

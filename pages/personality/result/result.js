@@ -1,19 +1,20 @@
 const KEYS = require('../../../utils/storage-keys.js')
 const pageAnalytics = require('../../../behaviors/page-analytics.js')
 const { recordShare } = require('../../../utils/usage-analytics.js')
+const miniCode = require('../../../utils/mini-code-image.js')
+const APP_NAME = miniCode.APP_NAME
 
-const SHARE_PORTRAIT = { x: 302, y: 22, w: 184, h: 184 }
+const SHARE_W = 500
+const SHARE_H = 400
+const SHARE_PORTRAIT = { x: 28, y: 78, w: 150, h: 150 }
+const SHARE_CODE = { x: 412, y: 310, w: 58, h: 58 }
 /** 与 result.wxml 中 banner.tip 一致 */
 const BANNER_TIP =
   '你当前更接近以下状态（非固定标签，可随自修与境遇变化）'
 const PORTRAIT_W = 280
 const PORTRAIT_H = 280
 const PORTRAIT_X = (750 - PORTRAIT_W) / 2
-/** 海报用小程序码图（与十六型图同目录，便于分包预载） */
-const MINI_CODE_SRCS = [
-  '/subpackages/portrait-assets/images/personality-portraits/index.jpg',
-  '/subpackages/portrait-assets/images/personality-portraits/index.png'
-]
+const MINI_CODE_SRCS = miniCode.MINI_CODE_SRCS
 const POSTER_W = 750
 /** 二维码：右上方，下方两行说明避免裁切 */
 const MINI_CODE_BOX = { x: 538, y: 40, w: 172, h: 172 }
@@ -338,7 +339,21 @@ function paintResultPoster(
   )
   y += 32
   applyTextStyle(ctx, is2d, '#a0907c', 20)
-  ctx.fillText('道性自察 · 仅供文化参考', 56, H - 56)
+  ctx.fillText(APP_NAME + ' · 仅供文化参考', 56, H - 56)
+}
+
+function drawShareDualBar(ctx, x, y, barW, lv, rv, leftDom) {
+  const h = 9
+  ctx.setFillStyle('#e5dfd4')
+  ctx.fillRect(x, y, barW, h)
+  if (leftDom) {
+    ctx.setFillStyle('#3949ab')
+    ctx.fillRect(x, y, Math.max(2, (barW * lv) / 100), h)
+  } else {
+    ctx.setFillStyle('#c9a227')
+    const rw = Math.max(2, (barW * rv) / 100)
+    ctx.fillRect(x + barW - rw, y, rw, h)
+  }
 }
 
 function getImageInfoPath(src) {
@@ -511,7 +526,9 @@ Page({
     recordShare('/pages/personality/result/result')
     const r = this.data.result
     return {
-      title: r ? `我的道性状态更接近：${r.typeName}` : '道性十六型测验',
+      title: r
+        ? `【${r.typeName}】我的道性十六型 · ${APP_NAME}`
+        : `道性十六型测验 · ${APP_NAME}`,
       path: '/pages/personality/result/result',
       imageUrl: this.data.shareImg || ''
     }
@@ -521,7 +538,7 @@ Page({
     recordShare('timeline:personality_result')
     const r = this.data.result
     return {
-      title: r ? `道性十六型 · ${r.typeName}` : '道性十六型 · 自我觉察',
+      title: r ? `道性十六型 · ${r.typeName} · ${APP_NAME}` : `道性十六型 · ${APP_NAME}`,
       imageUrl: this.data.shareImg || ''
     }
   },
@@ -626,72 +643,68 @@ Page({
     }
   },
 
-  /** 分享用卡片：500×400 CSS 像素，导出 2x 更清晰 */
-  renderShareCard() {
+  /** 分享用卡片：500×400（5:4），导出 2x；含肖像、类型名、四维与小程序码 */
+  async renderShareCard() {
     const result = this.data.result
     if (!result) return
-    const src = personalityPortraitSrc(resultTypeId(result))
-    wx.getImageInfo({
-      src,
-      success: (info) => this._paintShareCard(result, info.path),
-      fail: () => this._paintShareCard(result, '')
-    })
+    const tid = resultTypeId(result)
+    const myGen = this._portraitShowGen
+    await loadPortraitSubpackage()
+    if (myGen !== this._portraitShowGen || !this.data.result) return
+    const [{ path: portraitPath }, { path: codePath }] = await Promise.all([
+      firstImagePathAndSrc(personalityPortraitCandidates(tid)),
+      firstImagePathAndSrc(MINI_CODE_SRCS)
+    ])
+    if (myGen !== this._portraitShowGen || !this.data.result) return
+    this._paintShareCard(result, portraitPath, codePath)
   },
 
-  _paintShareCard(result, portraitLocalPath) {
+  _paintShareCard(result, portraitLocalPath, codeLocalPath) {
     const ctx = wx.createCanvasContext('shareCanvas', this)
-    const W = 500
-    const H = 400
+    const W = SHARE_W
+    const H = SHARE_H
 
-    ctx.setFillStyle('#f5f0e8')
+    ctx.setFillStyle('#17122e')
     ctx.fillRect(0, 0, W, H)
-
-    ctx.setFillStyle('#1a237e')
-    ctx.fillRect(0, 0, W, 14)
-    ctx.fillRect(0, H - 14, W, 14)
+    ctx.setFillStyle('#1f1840')
+    ctx.fillRect(8, 8, W - 16, H - 16)
 
     ctx.setFillStyle('#d4af37')
-    ctx.fillRect(12, 24, W - 24, 3)
-    ctx.fillRect(12, H - 36, W - 24, 3)
+    ctx.fillRect(8, 8, W - 16, 5)
+    ctx.setStrokeStyle('rgba(212, 175, 55, 0.35)')
+    ctx.setLineWidth(1)
+    ctx.strokeRect(20, 20, W - 40, H - 40)
 
+    ctx.setFillStyle('#e8d4a8')
+    ctx.setFontSize(17)
+    ctx.fillText(APP_NAME + ' · 道性十六型', 28, 52)
+
+    ctx.setFillStyle('rgba(212, 175, 55, 0.55)')
+    ctx.setFontSize(13)
+    ctx.fillText('当前更接近（非固定标签）', 28, 72)
+
+    const p = SHARE_PORTRAIT
+    ctx.setStrokeStyle('#d4af37')
+    ctx.setLineWidth(2)
+    ctx.strokeRect(p.x - 2, p.y - 2, p.w + 4, p.h + 4)
     if (portraitLocalPath) {
-      ctx.drawImage(
-        portraitLocalPath,
-        SHARE_PORTRAIT.x,
-        SHARE_PORTRAIT.y,
-        SHARE_PORTRAIT.w,
-        SHARE_PORTRAIT.h
-      )
+      ctx.drawImage(portraitLocalPath, p.x, p.y, p.w, p.h)
     } else {
-      ctx.setFillStyle('#d7cfc4')
-      ctx.fillRect(SHARE_PORTRAIT.x, SHARE_PORTRAIT.y, SHARE_PORTRAIT.w, SHARE_PORTRAIT.h)
+      ctx.setFillStyle('#3a3550')
+      ctx.fillRect(p.x, p.y, p.w, p.h)
     }
 
-    const leftX = 24
-    ctx.setFillStyle('#1a237e')
-    ctx.setFontSize(18)
-    ctx.fillText('道性十六型 · 自我觉察卡片', leftX, 48)
+    const infoX = 196
+    const name = String(result.typeName || '')
+    ctx.setFillStyle('#f0e8d8')
+    ctx.setFontSize(26)
+    ctx.fillText(name.length > 8 ? name.slice(0, 8) + '…' : name, infoX, 108)
 
-    ctx.setFontSize(22)
-    ctx.fillText('当前更接近（非固定标签）', leftX, 78)
+    ctx.setFillStyle('#c4b8a8')
+    ctx.setFontSize(14)
+    const fig = '形象取意：' + (result.figure || '—')
+    ctx.fillText(fig.length > 16 ? fig.slice(0, 16) + '…' : fig, infoX, 132)
 
-    ctx.setFontSize(28)
-    const name = result.typeName || ''
-    ctx.fillText(name.length > 11 ? name.slice(0, 11) + '…' : name, leftX, 118)
-
-    ctx.setFillStyle('#6d4c41')
-    ctx.setFontSize(16)
-    ctx.fillText('形象取意：' + (result.figure || '—'), leftX, 148)
-
-    ctx.setFillStyle('#3e3428')
-    ctx.setFontSize(15)
-    let y = this.drawLines(ctx, result.summary || '', leftX, 172, 17, 21)
-
-    y += 12
-    ctx.setFillStyle('#3949ab')
-    ctx.setFontSize(15)
-    ctx.fillText('四维 · 静动 / 柔刚 / 聚散 / 隐显', leftX, y)
-    y += 22
     const sc = result.scores || {}
     const SHARE_DIMS = [
       { left: '静', right: '动', key: '动' },
@@ -699,19 +712,41 @@ Page({
       { left: '聚', right: '散', key: '散' },
       { left: '隐', right: '显', key: '显' }
     ]
-    ctx.setFillStyle('#4a4034')
-    ctx.setFontSize(14)
+    const barX = 28
+    const barW = W - 56
+    let y = 248
     SHARE_DIMS.forEach((d) => {
       const rv = sc[d.key] || 50
       const lv = 100 - rv
-      const dom = rv >= lv ? d.right : d.left
-      ctx.fillText(`${d.left}/${d.right}  ${dom} ${Math.max(rv, lv)}%`, leftX, y)
-      y += 19
+      const leftDom = lv > rv
+      const dom = leftDom ? d.left : d.right
+      const pct = Math.max(rv, lv)
+      ctx.setFillStyle('#b8b0a4')
+      ctx.setFontSize(13)
+      ctx.fillText(d.left + ' · ' + d.right, barX, y)
+      ctx.setFillStyle(leftDom ? '#9eb3ff' : '#e8d4a8')
+      ctx.fillText(dom + ' ' + pct + '%', barX + barW - 58, y)
+      drawShareDualBar(ctx, barX, y + 6, barW, lv, rv, leftDom)
+      y += 30
     })
 
-    ctx.setFillStyle('#a0907c')
-    ctx.setFontSize(13)
-    ctx.fillText('道性自修 · 仅供文化参考', leftX, H - 26)
+    const c = SHARE_CODE
+    if (codeLocalPath) {
+      ctx.setFillStyle('#ffffff')
+      ctx.fillRect(c.x - 3, c.y - 3, c.w + 6, c.h + 6)
+      ctx.drawImage(codeLocalPath, c.x, c.y, c.w, c.h)
+      ctx.setFillStyle('#908878')
+      ctx.setFontSize(11)
+      ctx.fillText('扫码进入', c.x - 4, c.y + c.h + 16)
+    }
+
+    ctx.setFillStyle('#7a7268')
+    ctx.setFontSize(12)
+    ctx.fillText(
+      codeLocalPath ? '仅供文化参考' : APP_NAME + ' · 仅供文化参考',
+      28,
+      H - 22
+    )
 
     ctx.draw(false, () => {
       setTimeout(() => {
@@ -722,12 +757,13 @@ Page({
             height: H,
             destWidth: W * 2,
             destHeight: H * 2,
+            fileType: 'png',
             success: (res) => this.setData({ shareImg: res.tempFilePath }),
-            fail: () => {}
+            fail: (e) => console.warn('share card export', e)
           },
           this
         )
-      }, 80)
+      }, 120)
     })
   },
 

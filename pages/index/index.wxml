@@ -8,7 +8,7 @@
   />
   <view class="custom-nav" style="padding-top: {{statusBarH}}px;">
     <view class="nav-inner">
-      <text class="nav-title">道性自察</text>
+      <text class="nav-title">量化自修正念</text>
     </view>
   </view>
 
